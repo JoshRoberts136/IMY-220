@@ -1,0 +1,24 @@
+# Node.js
+node_modules/
+npm-debug.log*
+
+# Build output
+dist/
+frontend/public/bundle.js
+frontend/public/*.map
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# OS generated files
+.DS_Store
+Thumbs.db
