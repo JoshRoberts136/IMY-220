@@ -4,8 +4,8 @@ npm-debug.log*
 
 # Build output
 dist/
-frontend/public/bundle.js
-frontend/public/*.map
+frontend/bundle.js
+frontend/*.map
 
 # Environment variables
 .env
