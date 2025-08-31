@@ -1,14 +1,14 @@
 import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../components/AuthContext'; // Create this context file
+import { AuthContext } from '../components/AuthContext';
 
 function Header() {
   const navigate = useNavigate();
-  const { setIsAuthenticated } = useContext(AuthContext); // Access auth state
+  const { setIsAuthenticated } = useContext(AuthContext);
 
   const handleSignOut = () => {
-    setIsAuthenticated(false); // Reset authentication state
-    navigate('/'); // Redirect to splash page
+    setIsAuthenticated(false);
+    navigate('/');
   };
 
   return (
@@ -23,4 +23,4 @@ function Header() {
   );
 }
 
-export { Header };
+export default Header; 
