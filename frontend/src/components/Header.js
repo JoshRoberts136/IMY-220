@@ -1,10 +1,12 @@
 import React, { useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../components/AuthContext';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { AuthContext } from './AuthContext';
+import '../styles.css';
 
 function Header() {
   const navigate = useNavigate();
   const { setIsAuthenticated } = useContext(AuthContext);
+  const location = useLocation();
 
   const handleSignOut = () => {
     setIsAuthenticated(false);
@@ -12,15 +14,19 @@ function Header() {
   };
 
   return (
-    <header>
-      <ul>
-        <li><Link to="/home">Home</Link></li>
-        <li><Link to="/profile">Profile</Link></li>
-        <li><Link to="/projects">Projects</Link></li>
-        <li><a href="#" onClick={handleSignOut}>Sign out</a></li>
-      </ul>
+    <header className="header">
+      <div className="logo">
+        <div className="logo-icon"></div>
+        <div className="logo-text">ApexCoding</div>
+      </div>
+      <div className="nav-buttons">
+        <Link to="/home" className={`btn ${location.pathname === '/home' ? 'btn-primary' : ''}`}>Feed</Link>
+        <Link to="/profile" className={`btn ${location.pathname === '/profile' ? 'btn-primary' : ''}`}>Profile</Link>
+        <Link to="/projects" className={`btn ${location.pathname === '/projects' ? 'btn-primary' : ''}`}>Projects</Link>
+        <button onClick={handleSignOut} className="btn">Sign out</button>
+      </div>
     </header>
   );
 }
 
-export default Header; 
+export default Header;

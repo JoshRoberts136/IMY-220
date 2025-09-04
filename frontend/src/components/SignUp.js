@@ -1,19 +1,25 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
-import { AuthContext } from '../components/AuthContext';
+import { AuthContext } from './AuthContext';
+import '../styles.css';
 
 function Signup() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
+  const [legendName, setLegendName] = useState('');
+  const [legendId, setLegendId] = useState('');
+  const [passcode, setPasscode] = useState('');
+  const [confirmPasscode, setConfirmPasscode] = useState('');
   const navigate = useNavigate();
   const { setIsAuthenticated } = useContext(AuthContext);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (email && password && name) {
-      console.log('Signup successful with:', { name, email, password });
+    if (passcode !== confirmPasscode) {
+      console.log('Passcodes do not match');
+      return;
+    }
+    if (legendId && passcode && legendName) {
+      console.log('Signup successful with:', { legendName, legendId, passcode });
       setIsAuthenticated(true);
       navigate('/home');
     } else {
@@ -22,24 +28,57 @@ function Signup() {
   };
 
   return (
-    <div>
-      <h3>Sign Up</h3>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Name:</label>
-          <input type="text" value={name} onChange={(e) => setName(e.target.value)} required />
-        </div>
-        <div>
-          <label>Email:</label>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        </div>
-        <div>
-          <label>Password:</label>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        </div>
-        <button type="submit">Sign Up</button>
-      </form>
-    </div>
+    <form className="auth-form active" onSubmit={handleSubmit}>
+      <div className="form-group">
+        <label className="form-label" htmlFor="regUsername">Legend Name</label>
+        <input 
+          type="text" 
+          className="form-input" 
+          id="regUsername" 
+          placeholder="Choose your legend name" 
+          value={legendName} 
+          onChange={(e) => setLegendName(e.target.value)} 
+          required 
+        />
+      </div>
+      <div className="form-group">
+        <label className="form-label" htmlFor="regEmail">Legend ID</label>
+        <input 
+          type="email" 
+          className="form-input" 
+          id="regEmail" 
+          placeholder="your@email.com" 
+          value={legendId} 
+          onChange={(e) => setLegendId(e.target.value)} 
+          required 
+        />
+      </div>
+      <div className="form-group">
+        <label className="form-label" htmlFor="regPassword">Passcode</label>
+        <input 
+          type="password" 
+          className="form-input" 
+          id="regPassword" 
+          placeholder="Create secure passcode" 
+          value={passcode} 
+          onChange={(e) => setPasscode(e.target.value)} 
+          required 
+        />
+      </div>
+      <div className="form-group">
+        <label className="form-label" htmlFor="regConfirmPassword">Confirm Passcode</label>
+        <input 
+          type="password" 
+          className="form-input" 
+          id="regConfirmPassword" 
+          placeholder="Confirm your passcode" 
+          value={confirmPasscode} 
+          onChange={(e) => setConfirmPasscode(e.target.value)} 
+          required 
+        />
+      </div>
+      <button type="submit" className="form-submit">Become Champion</button>
+    </form>
   );
 }
 
