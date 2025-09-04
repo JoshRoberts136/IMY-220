@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack --mode development",
-    "watch": "webpack --watch --mode development",
+    "watch": "webpack --mode development",
     "start": "node backend/server.js",
     "serve": "webpack serve --open --mode development"
   },
