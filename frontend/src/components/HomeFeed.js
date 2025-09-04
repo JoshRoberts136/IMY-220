@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Search from '../components/Search';
-import ProjectPreview from './ProjectPreview';
+import ProjectPreview, {defaultActivities} from './ProjectPreview';
 import '../styles.css';
 
 const HomeFeed = () => {
