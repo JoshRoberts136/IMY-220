@@ -63,8 +63,8 @@ const ProjectsSection = () => {
   }));
 
   return (
-    <div>
-    <div className="section-title">Legend's Projects</div>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div className="section-title">Legend's Projects</div>
       <div className="tabs-placeholder">
         <div
           className={`tab-placeholder ${activeTab === 'owned' ? 'active' : ''}`}
@@ -81,14 +81,13 @@ const ProjectsSection = () => {
           Member
         </div>
       </div>
-    <div className="scrollable-section">
-      
-      <div className="scrollable-content">
-        {projectActivities.slice(0, 2).map((activity) => (
-          <ProjectPreview key={activity.id} activity={activity} />
-        ))}
+      <div className="scrollable-section">
+        <div className="scrollable-content">
+          {projectActivities.map((activity) => (
+            <ProjectPreview key={activity.id} activity={activity} />
+          ))}
+        </div>
       </div>
-    </div>
     </div>
   );
 };

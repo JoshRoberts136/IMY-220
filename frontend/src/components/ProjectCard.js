@@ -5,9 +5,12 @@ import EditProject from './EditProject';
 import LanguageTags from './LanguageTags';
 import ActivityFeed from './ActivityFeed';
 import '../styles.css';
+import { User, Trophy, Edit3, Plus } from 'lucide-react';
 
 const ProjectCard = () => {
-  const [project] = useState({
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [project, setProject] = useState({
     id: '1',
     name: 'Battle Royale Engine',
     description: 'A high-performance battle royale game engine with advanced hitbox detection, real-time physics, and optimized networking for 100+ players.',
@@ -20,9 +23,35 @@ const ProjectCard = () => {
     ],
     stats: { stars: 15, forks: 5, commits: 150, issues: 3 },
     tags: ['Game Engine', 'Real-time', 'Multiplayer'],
+    languages: ['JavaScript', 'Python', 'C++'],
+    visibility: 'public',
+    repository: 'https://github.com/wraith/battle-royale-engine',
     created: '3 months ago',
     lastUpdated: '2 hours ago',
   });
+
+  const handleEditProject = () => {
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseEdit = () => {
+    setIsEditModalOpen(false);
+  };
+
+  const handleSaveProject = (updatedProject) => {
+    setProject(prevProject => ({
+      ...prevProject,
+      ...updatedProject,
+      lastUpdated: 'just now'
+    }));
+    console.log('Project updated:', updatedProject);
+    
+    // Show success message
+    setShowSuccessMessage(true);
+    setTimeout(() => {
+      setShowSuccessMessage(false);
+    }, 3000);
+  };
 
   return (
     <div>
@@ -46,7 +75,37 @@ const ProjectCard = () => {
               ))}
             </div>
             
-            <EditProject />
+            <button 
+              className="button-placeholder"
+              onClick={handleEditProject}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                background: 'var(--apex-orange)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                padding: '10px 20px',
+                cursor: 'pointer',
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = 'var(--apex-orange)';
+                e.target.style.color = 'white';
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = '0 8px 25px rgba(139, 0, 0, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = 'transparent';
+                e.target.style.color = 'var(--apex-orange)';
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = 'none';
+              }}
+            >
+                <Edit3 className="w-4 h-4" />
+              Edit Project
+              
+            </button>
                 </div>
                 <LanguageTags />
             </div>
@@ -114,6 +173,38 @@ const ProjectCard = () => {
                 </div>
         </div>
       </div>
+
+      {/* Success Message */}
+      {showSuccessMessage && (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          background: 'linear-gradient(45deg, #00ff88, #00cc6a)',
+          color: 'white',
+          padding: '15px 25px',
+          borderRadius: '8px',
+          zIndex: 2000,
+          boxShadow: '0 8px 25px rgba(0, 255, 136, 0.3)',
+          fontFamily: 'Rajdhani, sans-serif',
+          fontWeight: '700',
+          fontSize: '16px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          animation: 'slideInRight 0.3s ease-out'
+        }}>
+          ✅ Project updated successfully!
+        </div>
+      )}
+
+      {/* Edit Project Modal */}
+      <EditProject 
+        isOpen={isEditModalOpen}
+        onClose={handleCloseEdit}
+        project={project}
+        onSave={handleSaveProject}
+      />
     </div>
   );
 };

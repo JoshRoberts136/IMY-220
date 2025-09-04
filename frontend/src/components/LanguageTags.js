@@ -31,8 +31,8 @@ const LanguageTags = () => {
 
   return (
     <div>
-      <div className="section-title">Favorite Languages</div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+      <div className="section-title"></div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', paddingBottom: "10px" }}>
         {languages.map((lang, index) => (
           <div
             key={index}

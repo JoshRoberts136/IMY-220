@@ -1,6 +1,7 @@
 import React from 'react';
 import ProfileInfo from './ProfileInfo';
 import ProfileDetails from './ProfileDetails';
+import ViewFriend from './ViewFriend';
 import LanguageTags from './LanguageTags';
 import ProjectsSection from './ProjectsSection';
 import ActivityFeed from './ActivityFeed';
@@ -15,14 +16,19 @@ const Profile = () => {
       <div className="grid-2">
         <div className="column-left">
           <ProfileInfo />
-          <ProjectsSection />
+          <ProfileDetails />
+          <div className="projects-section">
+            <ProjectsSection />
+          </div>
         </div>
         <div className="column-right">
           <div className="details-languages">
-            <ProfileDetails />
+            <ViewFriend />
             <LanguageTags />
           </div>
-          <ActivityFeed />
+          <div className="activity-feed">
+            <ActivityFeed />
+          </div>
         </div>
       </div>
     </div>

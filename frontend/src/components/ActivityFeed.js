@@ -79,17 +79,17 @@ const ActivityFeed = () => {
   ]);
 
   return (
-    <div className="section-title">
-      Recent Legend Activity
-    <div className="scrollable-section">
-      <div className="scrollable-content">
-        <div className="activity-feed">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div className="section-title">
+        Recent Legend Activity
+      </div>
+      <div className="scrollable-section">
+        <div className="scrollable-content">
           {activities.map((activity) => (
             <ProjectPreview key={activity.id} activity={activity} />
           ))}
         </div>
       </div>
-    </div>
     </div>
   );
 };
