@@ -174,7 +174,7 @@ const ProjectCard = () => {
         </div>
       </div>
 
-      {/* Success Message */}
+      {}
       {showSuccessMessage && (
         <div style={{
           position: 'fixed',
@@ -198,7 +198,7 @@ const ProjectCard = () => {
         </div>
       )}
 
-      {/* Edit Project Modal */}
+      {}
       <EditProject 
         isOpen={isEditModalOpen}
         onClose={handleCloseEdit}

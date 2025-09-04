@@ -20,7 +20,6 @@ const ProfileInfo = () => {
 
   const handleCreateProject = (projectData) => {
     console.log('New project created:', projectData);
-    // Here you would typically send this to your backend
   };
 
   return (

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Search from '../components/Search';
-import ProjectPreview, { defaultActivities } from './ProjectPreview';
+import ProjectPreview from './ProjectPreview';
 import '../styles.css';
 
 const HomeFeed = () => {
@@ -9,7 +9,6 @@ const HomeFeed = () => {
   const [activities, setActivities] = useState([]);
 
   useEffect(() => {
-    // Use defaultActivities from ProjectPreview
     setActivities(defaultActivities);
   }, []);
 
