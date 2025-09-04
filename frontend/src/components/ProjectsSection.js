@@ -1,44 +1,94 @@
 import React, { useState } from 'react';
-import ProjectCard from './ProjectCard';
+import ProjectPreview from './ProjectPreview';
 import '../styles.css';
 
-const ProjectsSection = ({ projects }) => {
+const ProjectsSection = () => {
   const [activeTab, setActiveTab] = useState('owned');
+  const [projects] = useState([
+    {
+      name: 'E-Commerce Beast',
+      description: 'Full-stack e-commerce platform with real-time inventory',
+      stars: 42,
+      forks: 18,
+      lastUpdated: '2 hours ago',
+      role: 'owner',
+    },
+    {
+      name: 'AI Chat Companion',
+      description: 'React-based chat interface with AI integration',
+      stars: 28,
+      forks: 12,
+      lastUpdated: '1 day ago',
+      role: 'owner',
+    },
+    {
+      name: 'Code Arena Platform',
+      description: 'Collaborative coding platform for teams',
+      stars: 156,
+      forks: 67,
+      lastUpdated: '3 days ago',
+      role: 'member',
+    },
+    {
+      name: 'Data Visualization Suite',
+      description: 'Interactive charts and graphs library',
+      stars: 89,
+      forks: 34,
+      lastUpdated: '1 week ago',
+      role: 'member',
+    },
+  ]);
 
   const filteredProjects = projects.filter(p =>
     activeTab === 'owned' ? p.role === 'owner' : p.role === 'member'
   );
 
+  const projectActivities = filteredProjects.map(project => ({
+    id: project.name.toLowerCase().replace(/\s/g, '-'),
+    user: { name: 'CodeLegend42', avatar: '👤', isOnline: true },
+    action: project.role === 'owner' ? 'created' : 'contributed to',
+    project: {
+      id: project.name.toLowerCase().replace(/\s/g, '-'),
+      name: project.name,
+      description: project.description,
+      stars: project.stars,
+      forks: project.forks,
+      lastUpdated: project.lastUpdated,
+    },
+    message: project.description,
+    timestamp: project.lastUpdated,
+    projectImage: '📂',
+    likes: project.stars,
+    type: project.role === 'owner' ? 'create' : 'update',
+  }));
+
   return (
-    <div className="bg-gray-800 p-6 rounded-lg border border-red-900">
-      <h3 className="text-xl font-semibold text-red-500 mb-4">Legend's Projects</h3>
-      <div className="flex gap-2 mb-6">
-        <button
+    <div>
+    <div className="section-title">Legend's Projects</div>
+      <div className="tabs-placeholder">
+        <div
+          className={`tab-placeholder ${activeTab === 'owned' ? 'active' : ''}`}
           onClick={() => setActiveTab('owned')}
-          className={`px-4 py-2 rounded-t transition-colors ${
-            activeTab === 'owned'
-              ? 'bg-red-600 text-white'
-              : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
-          }`}
+          style={{ cursor: 'pointer' }}
         >
-          Owned ({projects.filter(p => p.role === 'owner').length})
-        </button>
-        <button
+          Owned
+        </div>
+        <div
+          className={`tab-placeholder ${activeTab === 'member' ? 'active' : ''}`}
           onClick={() => setActiveTab('member')}
-          className={`px-4 py-2 rounded-t transition-colors ${
-            activeTab === 'member'
-              ? 'bg-red-600 text-white'
-              : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
-          }`}
+          style={{ cursor: 'pointer' }}
         >
-          Member ({projects.filter(p => p.role === 'member').length})
-        </button>
+          Member
+        </div>
       </div>
-      <div className="space-y-4">
-        {filteredProjects.map((project, index) => (
-          <ProjectCard key={index} project={project} />
+    <div className="scrollable-section">
+      
+      <div className="scrollable-content">
+        {projectActivities.slice(0, 2).map((activity) => (
+          <ProjectPreview key={activity.id} activity={activity} />
         ))}
       </div>
+    </div>
     </div>
   );
 };

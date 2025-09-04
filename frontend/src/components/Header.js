@@ -22,7 +22,6 @@ function Header() {
       <div className="nav-buttons">
         <Link to="/home" className={`btn ${location.pathname === '/home' ? 'btn-primary' : ''}`}>Feed</Link>
         <Link to="/profile" className={`btn ${location.pathname === '/profile' ? 'btn-primary' : ''}`}>Profile</Link>
-        <Link to="/projects" className={`btn ${location.pathname === '/projects' ? 'btn-primary' : ''}`}>Projects</Link>
         <button onClick={handleSignOut} className="btn">Sign out</button>
       </div>
     </header>

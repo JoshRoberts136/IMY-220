@@ -1,24 +1,55 @@
-import React from 'react';
-import '../styles.css';
+import React, { useState } from 'react';
 
-const LanguageTags = ({ languages }) => (
-  <div className="bg-gray-800 p-6 rounded-lg border border-red-900">
-    <h3 className="text-xl font-semibold text-red-500 mb-4">Favorite Languages</h3>
-    <div className="flex flex-wrap gap-2">
-      {languages.map((lang, index) => (
-        <span
-          key={index}
-          className={`px-3 py-1 rounded-full text-sm font-medium ${
-            lang.level === 'expert' ? 'bg-red-600 text-white text-base px-4 py-2' :
-            lang.level === 'advanced' ? 'bg-orange-600 text-white' :
-            'bg-gray-600 text-gray-200'
-          }`}
-        >
-          #{lang.name}
-        </span>
-      ))}
+const LanguageTags = () => {
+  const [languages] = useState([
+    { name: 'Java', level: 'expert' },
+    { name: 'C++', level: 'expert' },
+    { name: 'Python', level: 'advanced' },
+    { name: 'JavaScript', level: 'advanced' },
+    { name: 'Rust', level: 'intermediate' },
+    { name: 'Go', level: 'intermediate' },
+    { name: 'TypeScript', level: 'advanced' },
+  ]);
+
+  const getLevelColor = (level) => {
+    switch (level) {
+      case 'expert': return 'var(--apex-red)';
+      case 'advanced': return 'var(--apex-orange)';
+      case 'intermediate': return '#4a5568';
+      default: return '#666';
+    }
+  };
+
+  const getLevelSize = (level) => {
+    switch (level) {
+      case 'expert': return { padding: '10px 14px', fontSize: '16px' };
+      case 'advanced': return { padding: '8px 12px', fontSize: '14px' };
+      case 'intermediate': return { padding: '6px 10px', fontSize: '12px' };
+      default: return { padding: '4px 8px', fontSize: '11px' };
+    }
+  };
+
+  return (
+    <div>
+      <div className="section-title">Favorite Languages</div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+        {languages.map((lang, index) => (
+          <div
+            key={index}
+            style={{
+              background: getLevelColor(lang.level),
+              borderRadius: '20px',
+              color: 'white',
+              fontWeight: '600',
+              ...getLevelSize(lang.level),
+            }}
+          >
+            #{lang.name}
+          </div>
+        ))}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default LanguageTags;

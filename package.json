@@ -4,8 +4,9 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack --mode development",
+    "watch": "webpack --watch --mode development",
     "start": "node backend/server.js",
-    "serve": "npx http-server frontend/public -p 8080"
+    "serve": "webpack serve --open --mode development"
   },
   "keywords": [],
   "author": "",
@@ -22,7 +23,8 @@
     "http-server": "^14.1.1",
     "style-loader": "^4.0.0",
     "webpack": "^5.101.3",
-    "webpack-cli": "^6.0.1"
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.2"
   },
   "dependencies": {
     "@babel/runtime": "^7.28.3",
