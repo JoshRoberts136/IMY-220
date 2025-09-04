@@ -3,7 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import Splash from './pages/Splash';
 import Home from './pages/Home';
 import ProfilePage from './pages/ProfilePage';
-import Projects from './pages/Projects';
+import ProjectsPage from './pages/ProjectsPage';
 
 function App() {
   return (
@@ -11,7 +11,7 @@ function App() {
       <Route path="/" element={<Splash />} />
       <Route path="/home" element={<Home />} />
       <Route path="/profile" element={<ProfilePage />} />
-      <Route path="/projects/:projectId" element={<Projects />} />
+      <Route path="/projects/:projectId" element={<ProjectsPage />} />
     </Routes>
   );
 }

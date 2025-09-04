@@ -1,16 +1,17 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import ProjectCard from '../components/ProjectCard';
 import '../styles.css';
 
-function Projects() {
+function ProjectsPage() {
   return (
     <div className="wireframe-container">
       <Header />
+      <div className="projects-page-container">
       <ProjectCard />
+      </div>  
     </div>
   );
 }
 
-export default Projects;
+export default ProjectsPage;
