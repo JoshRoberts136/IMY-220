@@ -33,5 +33,5 @@ module.exports = {
       directory: path.join(__dirname, 'public'),
     },
   },
-  watch: true,
+  watch: false ,
 };

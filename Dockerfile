@@ -4,7 +4,7 @@ FROM node:18
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json (if present) to leverage Docker cache
+# Copy package.json and package-lock.json
 COPY package*.json ./
 
 # Install dependencies
@@ -13,11 +13,8 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
-# Build the React app
-RUN npm run build
+# Expose ports for frontend (3000) and backend 
+EXPOSE 3000 3000
 
-# Expose port 3000 
-EXPOSE 3000
-
-# Command to run the application
-CMD ["npm", "start"]
+# Run the development script
+CMD ["npm", "run", "dev"]
