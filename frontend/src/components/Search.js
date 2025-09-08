@@ -106,7 +106,7 @@ const Search = ({ onSearchResults }) => {
               className="search-suggestion"
               onClick={() => handleSuggestionClick(suggestion)}
             >
-              <div className="suggestion-icon" style={{ color: getTypeColor(suggestion.type) }}>
+              <div className="suggestion-icon suggestion-icon-dynamic" style={{ color: getTypeColor(suggestion.type) }}>
                 {getTypeIcon(suggestion.type)}
               </div>
               <div className="suggestion-content">

@@ -27,56 +27,13 @@ const CreateProject = ({ isOpen, onClose, onSave }) => {
   if (!isOpen) return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(0, 0, 0, 0.8)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000,
-      backdropFilter: 'blur(5px)'
-    }}>
-      <div style={{
-        background: 'rgba(10, 10, 10, 0.95)',
-        border: '2px solid var(--apex-orange)',
-        borderRadius: '12px',
-        padding: '30px',
-        width: '90%',
-        maxWidth: '500px',
-        maxHeight: '80vh',
-        overflowY: 'auto',
-        boxShadow: '0 0 50px rgba(139, 0, 0, 0.3)'
-      }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '25px'
-        }}>
-          <h2 style={{
-            fontFamily: 'Orbitron, monospace',
-            fontSize: '24px',
-            fontWeight: '700',
-            color: 'var(--apex-orange)',
-            margin: 0
-          }}>Create New Project</h2>
+    <div className="modal-overlay">
+      <div className="modal-content">
+        <div className="modal-header">
+          <h2 className="modal-title">Create New Project</h2>
           <button
             onClick={onClose}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: '#888',
-              cursor: 'pointer',
-              padding: '5px',
-              borderRadius: '4px',
-              transition: 'color 0.3s ease'
-            }}
-            onMouseEnter={(e) => e.target.style.color = 'var(--apex-orange)'}
-            onMouseLeave={(e) => e.target.style.color = '#888'}
+            className="close-button"
           >
             <X size={24} />
           </button>
@@ -85,7 +42,7 @@ const CreateProject = ({ isOpen, onClose, onSave }) => {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label">
-              <FileText size={16} style={{ marginRight: '8px' }} />
+              <FileText size={16} className="icon-margin-right" />
               Project Name
             </label>
             <input
@@ -107,17 +64,16 @@ const CreateProject = ({ isOpen, onClose, onSave }) => {
               name="description"
               value={formData.description}
               onChange={handleChange}
-              className="form-input"
+              className="form-input textarea-resize"
               rows="3"
               placeholder="Describe your project"
-              style={{ resize: 'vertical', minHeight: '80px' }}
               required
             />
           </div>
 
           <div className="form-group">
             <label className="form-label">
-              <Tag size={16} style={{ marginRight: '8px' }} />
+              <Tag size={16} className="icon-margin-right" />
               Tags
             </label>
             <input
@@ -132,7 +88,7 @@ const CreateProject = ({ isOpen, onClose, onSave }) => {
 
           <div className="form-group">
             <label className="form-label">
-              <Code size={16} style={{ marginRight: '8px' }} />
+              <Code size={16} className="icon-margin-right" />
               Languages
             </label>
             <input
@@ -147,7 +103,7 @@ const CreateProject = ({ isOpen, onClose, onSave }) => {
 
           <div className="form-group">
             <label className="form-label">
-              <Users size={16} style={{ marginRight: '8px' }} />
+              <Users size={16} className="icon-margin-right" />
               Visibility
             </label>
             <select
@@ -176,47 +132,17 @@ const CreateProject = ({ isOpen, onClose, onSave }) => {
             />
           </div>
 
-          <div style={{
-            display: 'flex',
-            gap: '15px',
-            marginTop: '30px'
-          }}>
+          <div className="buttons-container">
             <button
               type="submit"
-              className="form-submit"
-              style={{
-                flex: 1,
-                background: 'linear-gradient(45deg, var(--apex-orange), var(--apex-red))'
-              }}
+              className="form-submit submit-button-inline"
             >
               Create Project
             </button>
             <button
               type="button"
               onClick={onClose}
-              style={{
-                flex: 1,
-                padding: '18px',
-                background: 'transparent',
-                border: '2px solid #4a5568',
-                borderRadius: '6px',
-                color: '#888',
-                fontFamily: 'Rajdhani, sans-serif',
-                fontWeight: '700',
-                fontSize: '18px',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                textTransform: 'uppercase',
-                letterSpacing: '1px'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.borderColor = 'var(--apex-orange)';
-                e.target.style.color = 'var(--apex-orange)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.borderColor = '#4a5568';
-                e.target.style.color = '#888';
-              }}
+              className="cancel-button-inline"
             >
               Cancel
             </button>

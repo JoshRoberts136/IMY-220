@@ -79,90 +79,28 @@ const ViewFriend = () => {
   return (
     <div>
       <div className="section-title">Friends ({friends.length})</div>
-      <div style={{
-        maxHeight: '240px',
-        overflowY: 'auto',
-        paddingRight: '8px',
-        marginBottom: '20px'
-      }}>
+      <div className="friends-container">
         {friends.map((friend) => (
           <div
             key={friend.id}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              padding: '12px',
-              background: 'rgba(45, 55, 72, 0.3)',
-              borderRadius: '8px',
-              marginBottom: '8px',
-              border: '1px solid rgba(139, 0, 0, 0.2)',
-              transition: 'all 0.3s ease',
-              cursor: 'pointer'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.background = 'rgba(45, 55, 72, 0.5)';
-              e.target.style.borderColor = 'var(--apex-orange)';
-              e.target.style.transform = 'translateX(4px)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.background = 'rgba(45, 55, 72, 0.3)';
-              e.target.style.borderColor = 'rgba(139, 0, 0, 0.2)';
-              e.target.style.transform = 'translateX(0px)';
-            }}
+            className="friend-item"
           >
-            <div style={{
-              position: 'relative',
-              width: '40px',
-              height: '40px',
-              background: 'rgba(139, 0, 0, 0.2)',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: '2px solid var(--apex-orange)',
-              fontSize: '18px',
-              flexShrink: 0
-            }}>
+            <div className="friend-avatar">
               {friend.avatar}
-              <div style={{
-                position: 'absolute',
-                bottom: '0px',
-                right: '0px',
-                width: '12px',
-                height: '12px',
+              <div className="friend-status-indicator" style={{
                 background: getStatusColor(friend.status),
-                borderRadius: '50%',
-                border: '2px solid #1a1a1a',
                 boxShadow: friend.status === 'online' ? '0 0 8px #00ff88' : 'none'
               }}></div>
             </div>
             
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{
-                color: 'white',
-                fontWeight: '700',
-                fontSize: '14px',
-                marginBottom: '2px',
-                textOverflow: 'ellipsis',
-                overflow: 'hidden',
-                whiteSpace: 'nowrap'
-              }}>
+            <div className="friend-info">
+              <div className="friend-username">
                 {friend.username}
               </div>
-              <div style={{
-                color: '#888',
-                fontSize: '12px',
-                marginBottom: '1px'
-              }}>
+              <div className="friend-title">
                 {friend.title}
               </div>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                fontSize: '11px'
-              }}>
+              <div className="friend-status-projects">
                 <span style={{ color: getStatusColor(friend.status) }}>
                   {getStatusText(friend.status)}
                 </span>
@@ -173,36 +111,9 @@ const ViewFriend = () => {
               </div>
             </div>
 
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '4px',
-              alignItems: 'flex-end'
-            }}>
+            <div className="friend-actions">
               <button
-                style={{
-                  background: 'rgba(139, 0, 0, 0.1)',
-                  border: '1px solid var(--apex-orange)',
-                  color: 'var(--apex-orange)',
-                  padding: '4px 8px',
-                  borderRadius: '12px',
-                  fontSize: '10px',
-                  cursor: 'pointer',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                  fontWeight: '600',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.background = 'var(--apex-orange)';
-                  e.target.style.color = 'white';
-                  e.target.style.transform = 'translateY(-1px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.background = 'rgba(139, 0, 0, 0.1)';
-                  e.target.style.color = 'var(--apex-orange)';
-                  e.target.style.transform = 'translateY(0px)';
-                }}
+                className="message-button"
                 onClick={(e) => {
                   e.stopPropagation();
                   // Handle message action

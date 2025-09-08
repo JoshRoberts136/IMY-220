@@ -25,11 +25,11 @@ const ProfileInfo = () => {
   return (
     <div>
       <div className="section-title">Legend Profile</div>
-      <div style={{ display: 'flex', gap: '20px', alignItems: 'center', marginBottom: '20px' }}>
+      <div className="profile-container">
         <div className="placeholder-image profile">
           <User className="w-16 h-16 text-gray-400" />
         </div>
-        <div style={{ flex: 1 }}>
+        <div className="profile-info">
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-3xl font-bold text-white">{user.username}</h1>
             <div className="flex items-center gap-1 bg-red-600 px-2 py-1 rounded-full">
@@ -39,48 +39,17 @@ const ProfileInfo = () => {
           </div>
           <p className="text-gray-300 mb-2">{user.title}</p>
           <p className="text-gray-400 text-sm mb-4">{user.bio}</p>
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div className="buttons-container-profile">
             <button
               onClick={() => setIsEditingProfile(true)}
-              className="button-placeholder"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                background: 'var(--apex-orange)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                padding: '10px 20px',
-                cursor: 'pointer',
-              }}
+              className="edit-profile-button"
             >
               <Edit3 className="w-4 h-4" />
               Edit Profile
             </button>
             <button
               onClick={() => setIsCreatingProject(true)}
-              className="button-placeholder"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                background: 'transparent',
-                color: 'var(--apex-orange)',
-                border: '2px solid var(--apex-orange)',
-                borderRadius: '4px',
-                padding: '10px 20px',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.background = 'var(--apex-orange)';
-                e.target.style.color = 'white';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.background = 'transparent';
-                e.target.style.color = 'var(--apex-orange)';
-              }}
+              className="create-project-button"
             >
               <Plus className="w-4 h-4" />
               Create Project

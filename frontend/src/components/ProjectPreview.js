@@ -47,7 +47,7 @@ const ProjectPreview = ({ activity }) => {
   };
 
   return (
-    <div className="activity-item" onClick={handleProjectClick} style={{ cursor: 'pointer' }}>
+    <div className="activity-item activity-item-cursor" onClick={handleProjectClick}>
       {/* Activity Header */}
       <div className="activity-header">
         <div className="user-info" onClick={handleUserClick}>
@@ -60,8 +60,8 @@ const ProjectPreview = ({ activity }) => {
             <div className="activity-time">{formatTimeAgo(currentActivity.timestamp)}</div>
           </div>
         </div>
-        <div 
-          className="action-badge" 
+        <div
+          className="action-badge action-badge-dynamic"
           style={{ backgroundColor: getActionColor(currentActivity.type) }}
         >
           {getActionIcon(currentActivity.type)} {currentActivity.action}

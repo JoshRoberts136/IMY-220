@@ -1,44 +1,36 @@
 const express = require('express');
+const jwt = require('jsonwebtoken');
+const { User } = require('../models');
+const { authenticateToken } = require('../middleware/auth');
+
 const router = express.Router();
 
-const mockUsers = [
-  {
-    id: 1,
-    legendName: 'Test Champion',
-    legendId: 'test@example.com',
-    passcode: 'password123',
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 2,
-    legendName: 'Demo Legend',
-    legendId: 'demo@example.com',
-    passcode: 'demo123',
-    createdAt: new Date().toISOString()
-  }
-];
-
-const generateMockToken = (user) => {
-  return `mock-jwt-token-${user.id}-${Date.now()}`;
+// Generate JWT token
+const generateToken = (userId) => {
+  return jwt.sign(
+    { userId },
+    process.env.JWT_SECRET,
+    { expiresIn: '7d' } // Token expires in 7 days
+  );
 };
 
-const findUserByLegendId = (legendId) => {
-  return mockUsers.find(user => user.legendId === legendId);
-};
-
-router.post('/signup', (req, res) => {
+// Register new user
+router.post('/signup', async (req, res) => {
   try {
-    const { legendName, legendId, passcode } = req.body;
+    const { legendName, legendId, passcode, profile } = req.body;
 
+    // Validate required fields
     if (!legendName || !legendId || !passcode) {
       return res.status(400).json({
         success: false,
-        error: 'All fields are required',
-        message: 'Please provide legendName, legendId, and passcode'
+        error: 'Missing required fields',
+        message: 'Please provide legendName, legendId (email), and passcode'
       });
     }
 
-    if (findUserByLegendId(legendId)) {
+    // Check if user already exists
+    const existingUser = await User.findByEmailOrUsername(legendId);
+    if (existingUser) {
       return res.status(409).json({
         success: false,
         error: 'User already exists',
@@ -46,33 +38,49 @@ router.post('/signup', (req, res) => {
       });
     }
 
-    const newUser = {
-      id: mockUsers.length + 1,
-      legendName,
-      legendId,
-      passcode,
-      createdAt: new Date().toISOString()
-    };
+    // Create new user
+    const newUser = new User({
+      username: legendName,
+      email: legendId,
+      password: passcode,
+      profile: profile || {
+        firstName: '',
+        lastName: '',
+        bio: 'A new champion has joined the realm!'
+      },
+      lastLogin: new Date()
+    });
 
-    mockUsers.push(newUser);
+    await newUser.save();
 
-    const token = generateMockToken(newUser);
+    // Generate token
+    const token = generateToken(newUser._id);
 
-    const userResponse = {
-      id: newUser.id,
-      legendName: newUser.legendName,
-      legendId: newUser.legendId,
-      createdAt: newUser.createdAt
-    };
-
+    // Return user data (password excluded by schema transform)
     res.status(201).json({
       success: true,
       message: 'Champion registration successful!',
-      user: userResponse,
+      user: {
+        id: newUser._id,
+        legendName: newUser.username,
+        legendId: newUser.email,
+        profile: newUser.profile,
+        createdAt: newUser.createdAt
+      },
       token: token
     });
 
   } catch (error) {
+    console.error('Signup error:', error);
+    
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        success: false,
+        error: 'Validation error',
+        message: error.message
+      });
+    }
+
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -81,10 +89,12 @@ router.post('/signup', (req, res) => {
   }
 });
 
-router.post('/login', (req, res) => {
+// Login user
+router.post('/login', async (req, res) => {
   try {
     const { legendId, passcode } = req.body;
 
+    // Validate required fields
     if (!legendId || !passcode) {
       return res.status(400).json({
         success: false,
@@ -93,7 +103,8 @@ router.post('/login', (req, res) => {
       });
     }
 
-    const user = findUserByLegendId(legendId);
+    // Find user by email or username
+    const user = await User.findByEmailOrUsername(legendId);
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -102,7 +113,18 @@ router.post('/login', (req, res) => {
       });
     }
 
-    if (user.passcode !== passcode) {
+    // Check if user is active
+    if (!user.isActive) {
+      return res.status(401).json({
+        success: false,
+        error: 'Account inactive',
+        message: 'Your account has been deactivated'
+      });
+    }
+
+    // Verify password
+    const isPasswordValid = await user.comparePassword(passcode);
+    if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
         error: 'Invalid credentials',
@@ -110,23 +132,29 @@ router.post('/login', (req, res) => {
       });
     }
 
-    const token = generateMockToken(user);
+    // Update last login
+    user.lastLogin = new Date();
+    await user.save();
 
-    const userResponse = {
-      id: user.id,
-      legendName: user.legendName,
-      legendId: user.legendId,
-      createdAt: user.createdAt
-    };
+    // Generate token
+    const token = generateToken(user._id);
 
     res.status(200).json({
       success: true,
       message: 'Welcome back, Champion!',
-      user: userResponse,
+      user: {
+        id: user._id,
+        legendName: user.username,
+        legendId: user.email,
+        profile: user.profile,
+        lastLogin: user.lastLogin,
+        createdAt: user.createdAt
+      },
       token: token
     });
 
   } catch (error) {
+    console.error('Login error:', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -135,13 +163,18 @@ router.post('/login', (req, res) => {
   }
 });
 
-router.post('/logout', (req, res) => {
+// Logout (client-side token removal)
+router.post('/logout', authenticateToken, async (req, res) => {
   try {
+    // In a more advanced setup, you might want to blacklist the token
+    // For now, logout is handled client-side by removing the token
+    
     res.status(200).json({
       success: true,
-      message: 'Logout successful'
+      message: 'Logout successful. May the odds be ever in your favor!'
     });
   } catch (error) {
+    console.error('Logout error:', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -150,66 +183,98 @@ router.post('/logout', (req, res) => {
   }
 });
 
-router.get('/verify', (req, res) => {
+// Verify token and get current user
+router.get('/verify', authenticateToken, async (req, res) => {
   try {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader) {
-      return res.status(401).json({
-        success: false,
-        error: 'No token provided',
-        message: 'Authorization header is missing'
-      });
-    }
-
-    const token = authHeader.split(' ')[1];
-
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        error: 'Invalid token format',
-        message: 'Token should be in format: Bearer <token>'
-      });
-    }
-
-    if (!token.startsWith('mock-jwt-token-')) {
-      return res.status(401).json({
-        success: false,
-        error: 'Invalid token',
-        message: 'Token verification failed'
-      });
-    }
-
-    const parts = token.split('-');
-    const userId = parseInt(parts[3]);
-    const user = mockUsers.find(u => u.id === userId);
-
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        error: 'User not found',
-        message: 'Token is valid but user does not exist'
-      });
-    }
-
-    const userResponse = {
-      id: user.id,
-      legendName: user.legendName,
-      legendId: user.legendId,
-      createdAt: user.createdAt
-    };
-
+    // req.user is set by the authenticateToken middleware
     res.status(200).json({
       success: true,
       message: 'Token verified',
-      user: userResponse
+      user: {
+        id: req.user._id,
+        legendName: req.user.username,
+        legendId: req.user.email,
+        profile: req.user.profile,
+        lastLogin: req.user.lastLogin,
+        createdAt: req.user.createdAt
+      }
     });
-
   } catch (error) {
+    console.error('Verify token error:', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
       message: 'Failed to verify token'
+    });
+  }
+});
+
+// Get current user profile
+router.get('/profile', authenticateToken, async (req, res) => {
+  try {
+    res.status(200).json({
+      success: true,
+      data: {
+        id: req.user._id,
+        legendName: req.user.username,
+        legendId: req.user.email,
+        profile: req.user.profile,
+        lastLogin: req.user.lastLogin,
+        createdAt: req.user.createdAt,
+        updatedAt: req.user.updatedAt
+      }
+    });
+  } catch (error) {
+    console.error('Get profile error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      message: 'Failed to get profile'
+    });
+  }
+});
+
+// Update user profile
+router.put('/profile', authenticateToken, async (req, res) => {
+  try {
+    const { profile } = req.body;
+    
+    // Update profile fields
+    if (profile) {
+      req.user.profile = {
+        ...req.user.profile,
+        ...profile
+      };
+    }
+    
+    await req.user.save();
+    
+    res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully',
+      data: {
+        id: req.user._id,
+        legendName: req.user.username,
+        legendId: req.user.email,
+        profile: req.user.profile,
+        updatedAt: req.user.updatedAt
+      }
+    });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        success: false,
+        error: 'Validation error',
+        message: error.message
+      });
+    }
+    
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      message: 'Failed to update profile'
     });
   }
 });

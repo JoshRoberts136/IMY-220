@@ -1,6 +1,13 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
+require('dotenv').config();
+
+// Import database connection
+const connectDB = require('./config/database');
+
+// Connect to MongoDB
+connectDB();
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -15,9 +22,11 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 // Import routes
 const authRoutes = require('./routes/auth');
+const apiRoutes = require('./routes/api');
 
 // Use routes
 app.use('/api/auth', authRoutes);
+app.use('/api', apiRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

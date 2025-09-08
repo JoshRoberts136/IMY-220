@@ -75,32 +75,9 @@ const ProjectCard = () => {
               ))}
             </div>
             
-            <button 
-              className="button-placeholder"
+            <button
+              className="edit-project-button"
               onClick={handleEditProject}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                background: 'var(--apex-orange)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                padding: '10px 20px',
-                cursor: 'pointer',
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.background = 'var(--apex-orange)';
-                e.target.style.color = 'white';
-                e.target.style.transform = 'translateY(-2px)';
-                e.target.style.boxShadow = '0 8px 25px rgba(139, 0, 0, 0.4)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.background = 'transparent';
-                e.target.style.color = 'var(--apex-orange)';
-                e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = 'none';
-              }}
             >
                 <Edit3 className="w-4 h-4" />
               Edit Project
@@ -115,17 +92,16 @@ const ProjectCard = () => {
             {project.members.map((member, index) => (
                 <div
                 key={index}
-                className="member-card"
+                className="member-card member-card-cursor"
                 onClick={() => {
                     // Placeholder for routing to /profile/{member.name} (e.g., using react-router-dom: history.push(`/profile/${member.name}`))
                     console.log(`Navigate to profile of ${member.name}`);
                 }}
-                style={{ cursor: 'pointer' }}
                 >
                 <div className="member-avatar">
                     <span className="avatar-emoji">{member.avatar}</span>
                     {member.isOnline && <div className="online-indicator"></div>}
-                    {member.name === project.owner.name && <span style={{ marginLeft: '5px' }}>👑</span>}
+                    {member.name === project.owner.name && <span className="crown-indicator">👑</span>}
                 </div>
                 <div className="member-info">
                     <div className="member-name">{member.name}</div>
@@ -176,24 +152,7 @@ const ProjectCard = () => {
 
       {}
       {showSuccessMessage && (
-        <div style={{
-          position: 'fixed',
-          top: '20px',
-          right: '20px',
-          background: 'linear-gradient(45deg, #00ff88, #00cc6a)',
-          color: 'white',
-          padding: '15px 25px',
-          borderRadius: '8px',
-          zIndex: 2000,
-          boxShadow: '0 8px 25px rgba(0, 255, 136, 0.3)',
-          fontFamily: 'Rajdhani, sans-serif',
-          fontWeight: '700',
-          fontSize: '16px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          animation: 'slideInRight 0.3s ease-out'
-        }}>
+        <div className="success-message">
           ✅ Project updated successfully!
         </div>
       )}

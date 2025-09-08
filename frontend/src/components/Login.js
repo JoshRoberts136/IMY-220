@@ -41,14 +41,7 @@ function Login() {
   return (
     <form className="auth-form active" onSubmit={handleSubmit}>
       {error && (
-        <div className="error-message" style={{ 
-          color: '#ff6b6b', 
-          background: '#ffe0e0', 
-          padding: '10px', 
-          borderRadius: '4px', 
-          marginBottom: '15px',
-          fontSize: '14px'
-        }}>
+        <div className="error-message error-message-inline">
           {error}
         </div>
       )}
@@ -83,17 +76,13 @@ function Login() {
       
       <button 
         type="submit" 
-        className="form-submit" 
+        className={`form-submit ${isLoading ? 'submit-button-loading' : 'submit-button-normal'}`}
         disabled={isLoading}
-        style={{
-          opacity: isLoading ? 0.7 : 1,
-          cursor: isLoading ? 'not-allowed' : 'pointer'
-        }}
       >
         {isLoading ? 'Entering Arena...' : 'Drop Into Arena'}
       </button>
       
-      <div style={{ marginTop: '15px', fontSize: '12px', color: '#666' }}>
+      <div className="demo-credentials">
         <strong>Demo Credentials:</strong><br />
         Email: test@example.com<br />
         Password: password123

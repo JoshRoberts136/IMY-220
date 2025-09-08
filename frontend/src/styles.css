@@ -2135,3 +2135,411 @@ div[style*="background: #4a5568"]:hover {
   background: var(--apex-orange);
   color: white;
 }
+/* Inline style replacements */
+
+/* CreateProject.js modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  background: rgba(10, 10, 10, 0.95);
+  border: 2px solid var(--apex-orange);
+  border-radius: 12px;
+  padding: 30px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 0 50px rgba(139, 0, 0, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.modal-title {
+  font-family: 'Orbitron, monospace';
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--apex-orange);
+  margin: 0;
+}
+
+.close-button {
+  background: transparent;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+  transition: color 0.3s ease;
+}
+
+.close-button:hover {
+  color: var(--apex-orange);
+}
+
+.icon-margin-right {
+  margin-right: 8px;
+}
+
+.textarea-resize {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.buttons-container {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.submit-button-inline {
+  flex: 1;
+  background: linear-gradient(45deg, var(--apex-orange), var(--apex-red));
+}
+
+.cancel-button-inline {
+  flex: 1;
+  padding: 18px;
+  background: transparent;
+  border: 2px solid #4a5568;
+  border-radius: 6px;
+  color: #888;
+  font-family: 'Rajdhani, sans-serif';
+  font-weight: 700;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.cancel-button-inline:hover {
+  border-color: var(--apex-orange);
+  color: var(--apex-orange);
+}
+
+/* ActivityFeed.js styles */
+.activity-feed-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Files.js styles */
+.file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  background: #2a2a2a;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+/* Header.js styles */
+.user-greeting-inline {
+  margin-right: 10px;
+  color: #666;
+}
+
+/* LanguageTags.js styles */
+.language-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 10px;
+}
+
+.language-tag {
+  border-radius: 20px;
+  color: white;
+  font-weight: 600;
+}
+
+.language-tag-expert {
+  background: var(--apex-red);
+  padding: 10px 14px;
+  font-size: 16px;
+}
+
+.language-tag-advanced {
+  background: var(--apex-orange);
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+.language-tag-intermediate {
+  background: #4a5568;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+/* Second batch inline styles */
+
+/* Login.js styles */
+.error-message-inline {
+  color: #ff6b6b;
+  background: #ffe0e0;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.submit-button-loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.submit-button-normal {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.demo-credentials {
+  margin-top: 15px;
+  font-size: 12px;
+  color: #666;
+}
+
+/* Messages.js styles */
+.message-item {
+  margin-bottom: 10px;
+  background: #2a2a2a;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+/* ProfileInfo.js styles */
+.profile-container {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.buttons-container-profile {
+  display: flex;
+  gap: 10px;
+}
+
+.edit-profile-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--apex-orange);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.create-project-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--apex-orange);
+  border: 2px solid var(--apex-orange);
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.create-project-button:hover {
+  background: var(--apex-orange);
+  color: white;
+}
+
+/* ProjectCard.js styles */
+.edit-project-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--apex-orange);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.member-card-cursor {
+  cursor: pointer;
+}
+
+.crown-indicator {
+  margin-left: 5px;
+}
+
+.success-message {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(45deg, #00ff88, #00cc6a);
+  color: white;
+  padding: 15px 25px;
+  border-radius: 8px;
+  z-index: 2000;
+  box-shadow: 0 8px 25px rgba(0, 255, 136, 0.3);
+  font-family: 'Rajdhani, sans-serif';
+  font-weight: 700;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: slideInRight 0.3s ease-out;
+}
+
+/* ProjectPreview.js styles */
+.activity-item-cursor {
+  cursor: pointer;
+}
+
+.action-badge-dynamic {
+  /* background-color will be set dynamically */
+}
+/* Third batch inline styles */
+
+/* ProjectsSection.js styles */
+.projects-section-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.tab-cursor {
+  cursor: pointer;
+}
+
+/* Search.js styles */
+.suggestion-icon-dynamic {
+  /* color will be set dynamically */
+}
+
+/* ViewFriend.js styles */
+.friends-container {
+  max-height: 240px;
+  overflow-y: auto;
+  padding-right: 8px;
+  margin-bottom: 20px;
+}
+
+.friend-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(45, 55, 72, 0.3);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(139, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.friend-item:hover {
+  background: rgba(45, 55, 72, 0.5);
+  border-color: var(--apex-orange);
+  transform: translateX(4px);
+}
+
+.friend-avatar {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  background: rgba(139, 0, 0, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--apex-orange);
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.friend-status-indicator {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #1a1a1a;
+}
+
+.friend-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.friend-username {
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 2px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.friend-title {
+  color: #888;
+  font-size: 12px;
+  margin-bottom: 1px;
+}
+
+.friend-status-projects {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.friend-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+}
+
+.message-button {
+  background: rgba(139, 0, 0, 0.1);
+  border: 1px solid var(--apex-orange);
+  color: var(--apex-orange);
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.message-button:hover {
+  background: var(--apex-orange);
+  color: white;
+  transform: translateY(-1px);
+}

@@ -29,7 +29,7 @@ function Header() {
         <Link to="/home" className={`btn ${location.pathname === '/home' ? 'btn-primary' : ''}`}>Feed</Link>
         <Link to="/profile" className={`btn ${location.pathname === '/profile' ? 'btn-primary' : ''}`}>Profile</Link>
         {currentUser && (
-          <span className="user-greeting" style={{ marginRight: '10px', color: '#666' }}>
+          <span className="user-greeting user-greeting-inline">
             Welcome, {currentUser.legendName}!
           </span>
         )}

@@ -79,7 +79,7 @@ const ActivityFeed = () => {
   ]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <div className="activity-feed-container">
       <div className="section-title">
         Recent Legend Activity
       </div>

@@ -63,20 +63,18 @@ const ProjectsSection = () => {
   }));
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <div className="projects-section-container">
       <div className="section-title">Legend's Projects</div>
       <div className="tabs-placeholder">
         <div
-          className={`tab-placeholder ${activeTab === 'owned' ? 'active' : ''}`}
+          className={`tab-placeholder ${activeTab === 'owned' ? 'active' : ''} tab-cursor`}
           onClick={() => setActiveTab('owned')}
-          style={{ cursor: 'pointer' }}
         >
           Owned
         </div>
         <div
-          className={`tab-placeholder ${activeTab === 'member' ? 'active' : ''}`}
+          className={`tab-placeholder ${activeTab === 'member' ? 'active' : ''} tab-cursor`}
           onClick={() => setActiveTab('member')}
-          style={{ cursor: 'pointer' }}
         >
           Member
         </div>

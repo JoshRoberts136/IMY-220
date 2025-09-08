@@ -16,7 +16,7 @@ function Files() {
         <div className="tab-placeholder">Commits</div>
       </div>
       {files.map((file, index) => (
-        <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', background: '#2a2a2a', padding: '15px', borderRadius: '8px' }}>
+        <div key={index} className="file-item">
           <span>{file.name}</span>
           <span>{file.status}</span>
         </div>

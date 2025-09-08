@@ -32,17 +32,11 @@ const LanguageTags = () => {
   return (
     <div>
       <div className="section-title"></div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', paddingBottom: "10px" }}>
+      <div className="language-tags-container">
         {languages.map((lang, index) => (
           <div
             key={index}
-            style={{
-              background: getLevelColor(lang.level),
-              borderRadius: '20px',
-              color: 'white',
-              fontWeight: '600',
-              ...getLevelSize(lang.level),
-            }}
+            className={`language-tag language-tag-${lang.level}`}
           >
             #{lang.name}
           </div>

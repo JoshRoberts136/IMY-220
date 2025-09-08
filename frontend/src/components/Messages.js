@@ -11,7 +11,7 @@ function Messages() {
     <div className="content-section">
       <h3 className="section-title">Team Comms</h3>
       {messages.map((msg, index) => (
-        <div key={index} style={{ marginBottom: '10px', background: '#2a2a2a', padding: '15px', borderRadius: '8px' }}>
+        <div key={index} className="message-item">
           <span>{msg.user}: {msg.message}</span>
           <span>{msg.timestamp}</span>
         </div>
