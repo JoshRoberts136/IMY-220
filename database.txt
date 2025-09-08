@@ -1,0 +1,198 @@
+# Database Sample Data
+# This file contains sample data that was previously hardcoded in components
+
+## MESSAGES DATA
+messages:
+  - id: 1
+    user: "WraithRunner"
+    message: "Fixed hitbox detection bugs"
+    timestamp: "2 hours ago"
+    userId: "user_001"
+    createdAt: "2024-01-15T10:00:00Z"
+  
+  - id: 2
+    user: "PathfinderBot"
+    message: "Working on trajectory calculations"
+    timestamp: "6 hours ago"
+    userId: "user_002"
+    createdAt: "2024-01-15T06:00:00Z"
+
+  - id: 3
+    user: "CodeLegend42"
+    message: "Optimized rendering pipeline"
+    timestamp: "1 day ago"
+    userId: "user_003"
+    createdAt: "2024-01-14T12:00:00Z"
+
+## FILES DATA
+files:
+  - id: 1
+    name: "engine/core.cpp"
+    status: "checked-in"
+    lastModified: "2 hours ago"
+    size: "45.2 KB"
+    author: "WraithRunner"
+    projectId: "project_001"
+    
+  - id: 2
+    name: "hitbox/detection.js"
+    status: "checked-out"
+    lastModified: "4 hours ago"
+    size: "12.8 KB"
+    author: "PathfinderBot"
+    projectId: "project_001"
+    
+  - id: 3
+    name: "networking/server.py"
+    status: "available"
+    lastModified: "1 day ago"
+    size: "28.5 KB"
+    author: "CodeLegend42"
+    projectId: "project_002"
+
+  - id: 4
+    name: "ui/components.tsx"
+    status: "checked-in"
+    lastModified: "3 hours ago"
+    size: "18.9 KB"
+    author: "ReactMaster"
+    projectId: "project_003"
+
+## LANGUAGE SKILLS DATA
+languages:
+  - id: 1
+    name: "Java"
+    level: "expert"
+    yearsExperience: 5
+    projectsCount: 25
+    
+  - id: 2
+    name: "C++"
+    level: "expert"
+    yearsExperience: 4
+    projectsCount: 18
+    
+  - id: 3
+    name: "Python"
+    level: "advanced"
+    yearsExperience: 3
+    projectsCount: 22
+    
+  - id: 4
+    name: "JavaScript"
+    level: "advanced"
+    yearsExperience: 4
+    projectsCount: 30
+    
+  - id: 5
+    name: "Rust"
+    level: "intermediate"
+    yearsExperience: 1
+    projectsCount: 8
+    
+  - id: 6
+    name: "Go"
+    level: "intermediate"
+    yearsExperience: 2
+    projectsCount: 12
+    
+  - id: 7
+    name: "TypeScript"
+    level: "advanced"
+    yearsExperience: 3
+    projectsCount: 20
+
+## USER PROFILE DEFAULTS
+defaultProfiles:
+  - username: "CodeLegend42"
+    title: "Full-Stack Champion"
+    bio: "Conquering bugs and building digital empires. 5+ years of battle-tested experience in the coding arena."
+    isOnline: true
+    avatar: null
+    joinDate: "2023-01-15"
+    location: "Digital Realm"
+    website: "https://codelegend42.dev"
+    
+## SAMPLE PROJECTS
+projects:
+  - id: "project_001"
+    name: "Apex Game Engine"
+    description: "High-performance 3D game engine built with C++"
+    status: "active"
+    language: "C++"
+    stars: 156
+    forks: 23
+    lastUpdated: "2024-01-15T08:00:00Z"
+    
+  - id: "project_002"
+    name: "Neural Network Framework"
+    description: "Deep learning framework optimized for performance"
+    status: "active"
+    language: "Python"
+    stars: 89
+    forks: 12
+    lastUpdated: "2024-01-14T15:30:00Z"
+    
+  - id: "project_003"
+    name: "React Component Library"
+    description: "Reusable UI components for modern web apps"
+    status: "completed"
+    language: "TypeScript"
+    stars: 234
+    forks: 45
+    lastUpdated: "2024-01-13T11:20:00Z"
+
+## SAMPLE USERS
+users:
+  - id: "user_001"
+    username: "WraithRunner"
+    profile:
+      firstName: "Alex"
+      lastName: "Chen"
+      avatar: "👻"
+      title: "Game Developer"
+      bio: "Stealth mode activated. Building the next generation of gaming experiences."
+      
+  - id: "user_002"
+    username: "PathfinderBot"
+    profile:
+      firstName: "Sarah"
+      lastName: "Johnson"
+      avatar: "🤖"
+      title: "AI Engineer"
+      bio: "Navigating the future with artificial intelligence and machine learning."
+      
+  - id: "user_003"
+    username: "CodeLegend42"
+    profile:
+      firstName: "Jordan"
+      lastName: "Smith"
+      avatar: "⚡"
+      title: "Full-Stack Champion"
+      bio: "Conquering bugs and building digital empires."
+
+## COMMITS DATA
+commits:
+  - id: 1
+    hash: "a1b2c3d"
+    message: "Fix memory leak in rendering system"
+    author: "WraithRunner"
+    timestamp: "2 hours ago"
+    filesChanged: 3
+    projectId: "project_001"
+    
+  - id: 2
+    hash: "e4f5g6h"
+    message: "Add neural network optimization"
+    author: "PathfinderBot"
+    timestamp: "5 hours ago"
+    filesChanged: 7
+    projectId: "project_002"
+    
+  - id: 3
+    hash: "i7j8k9l"
+    message: "Update component documentation"
+    author: "CodeLegend42"
+    timestamp: "1 day ago"
+    filesChanged: 12
+    projectId: "project_003"

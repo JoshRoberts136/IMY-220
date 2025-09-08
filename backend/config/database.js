@@ -30,8 +30,9 @@ const connectDB = async () => {
 
   } catch (error) {
     console.error('❌ MongoDB connection failed:', error.message);
-    // Exit process with failure
-    process.exit(1);
+    console.log('⚠️  Server will continue running without MongoDB connection');
+    console.log('📝 API endpoints with hardcoded data will still work');
+    // Don't exit the process, let the server continue running
   }
 };
 

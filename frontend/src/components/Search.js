@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import apiService from '../utils/apiService';
 import '../styles.css';
 
 const Search = ({ onSearchResults }) => {
@@ -6,17 +7,32 @@ const Search = ({ onSearchResults }) => {
   const [isSearching, setIsSearching] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [tags, setTags] = useState([]);
+  const [categories, setCategories] = useState([]);
   const searchRef = useRef(null);
 
-  // Mock search suggestions
-  const mockSuggestions = [
-    { type: 'user', name: 'WraithRunner', subtitle: 'Senior Legend' },
-    { type: 'user', name: 'OctaneSpeed', subtitle: 'Speed Demon' },
-    { type: 'project', name: 'Battle Royale Engine', subtitle: '#JavaScript #React' },
-    { type: 'project', name: 'Jump Pad Physics', subtitle: '#Python #Physics' },
-    { type: 'hashtag', name: '#JavaScript', subtitle: '45 projects' },
-    { type: 'hashtag', name: '#React', subtitle: '32 projects' }
-  ];
+  useEffect(() => {
+    // Fetch tags and categories for suggestions
+    const fetchSuggestionsData = async () => {
+      try {
+        const [tagsResponse, categoriesResponse] = await Promise.all([
+          apiService.getTags(),
+          apiService.getCategories()
+        ]);
+
+        if (tagsResponse.success) {
+          setTags(tagsResponse.data);
+        }
+        if (categoriesResponse.success) {
+          setCategories(categoriesResponse.data);
+        }
+      } catch (error) {
+        console.error('Error fetching suggestions data:', error);
+      }
+    };
+
+    fetchSuggestionsData();
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -30,21 +46,53 @@ const Search = ({ onSearchResults }) => {
     };
   }, []);
 
-  const handleSearch = (query) => {
+  const handleSearch = async (query) => {
     setSearchQuery(query);
     if (query.length > 0) {
       setIsSearching(true);
-      // Filter suggestions based on query
-      const filtered = mockSuggestions.filter(item =>
-        item.name.toLowerCase().includes(query.toLowerCase())
-      );
-      setSuggestions(filtered);
+
+      // Generate suggestions from tags and categories
+      const tagSuggestions = tags
+        .filter(tag => tag.name.toLowerCase().includes(query.toLowerCase()))
+        .slice(0, 3)
+        .map(tag => ({
+          type: 'hashtag',
+          name: `#${tag.name}`,
+          subtitle: `${tag.count} posts`
+        }));
+
+      const categorySuggestions = categories
+        .filter(cat => cat.toLowerCase().includes(query.toLowerCase()))
+        .slice(0, 2)
+        .map(cat => ({
+          type: 'category',
+          name: cat,
+          subtitle: 'Category'
+        }));
+
+      const allSuggestions = [...tagSuggestions, ...categorySuggestions];
+
+      // If we have search results from API, add them
+      try {
+        if (query.length > 2) { // Only search if query is long enough
+          const searchResponse = await apiService.getPosts({ search: query, limit: 3 });
+          if (searchResponse.success && searchResponse.data.length > 0) {
+            const postSuggestions = searchResponse.data.map(post => ({
+              type: 'project',
+              name: post.title,
+              subtitle: `by ${post.author.username}`,
+              post: post
+            }));
+            allSuggestions.unshift(...postSuggestions);
+          }
+        }
+      } catch (error) {
+        console.error('Search error:', error);
+      }
+
+      setSuggestions(allSuggestions);
       setShowSuggestions(true);
-     
-      // Simulate search delay
-      setTimeout(() => {
-        setIsSearching(false);
-      }, 300);
+      setIsSearching(false);
     } else {
       setSuggestions([]);
       setShowSuggestions(false);
@@ -55,7 +103,23 @@ const Search = ({ onSearchResults }) => {
     setSearchQuery(suggestion.name);
     setShowSuggestions(false);
     if (onSearchResults) {
-      onSearchResults(suggestion);
+      // Pass additional context based on suggestion type
+      const result = {
+        ...suggestion,
+        query: suggestion.name,
+        type: suggestion.type
+      };
+
+      if (suggestion.type === 'hashtag') {
+        result.query = suggestion.name.substring(1); // Remove #
+        result.searchType = 'tag';
+      } else if (suggestion.type === 'category') {
+        result.searchType = 'category';
+      } else if (suggestion.type === 'project' && suggestion.post) {
+        result.postId = suggestion.post._id;
+      }
+
+      onSearchResults(result);
     }
   };
 
@@ -64,6 +128,7 @@ const Search = ({ onSearchResults }) => {
       case 'user': return '👤';
       case 'project': return '📁';
       case 'hashtag': return '#';
+      case 'category': return '🏷️';
       default: return '🔍';
     }
   };
@@ -73,6 +138,7 @@ const Search = ({ onSearchResults }) => {
       case 'user': return '#8b0000';
       case 'project': return '#ff3333';
       case 'hashtag': return '#666';
+      case 'category': return '#0066cc';
       default: return '#8b0000';
     }
   };

@@ -604,4 +604,232 @@ router.get('/tags', async (req, res) => {
   }
 });
 
+// ==================== MESSAGES ROUTES ====================
+
+// Get all messages (team communications)
+router.get('/messages', async (req, res) => {
+  try {
+    const { page = 1, limit = 20 } = req.query;
+    
+    // For now, return hardcoded messages data
+    // In a real app, this would query a Messages collection
+    const messages = [
+      {
+        id: 1,
+        user: 'WraithRunner',
+        message: 'Fixed hitbox detection bugs',
+        timestamp: '2 hours ago',
+        userId: 'user_001',
+        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        id: 2,
+        user: 'PathfinderBot',
+        message: 'Working on trajectory calculations',
+        timestamp: '6 hours ago',
+        userId: 'user_002',
+        createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        id: 3,
+        user: 'CodeLegend42',
+        message: 'Optimized rendering pipeline',
+        timestamp: '1 day ago',
+        userId: 'user_003',
+        createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+      }
+    ];
+    
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + parseInt(limit);
+    const paginatedMessages = messages.slice(startIndex, endIndex);
+    
+    res.json({
+      success: true,
+      count: paginatedMessages.length,
+      total: messages.length,
+      page: parseInt(page),
+      pages: Math.ceil(messages.length / limit),
+      data: paginatedMessages
+    });
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Server Error',
+      message: error.message
+    });
+  }
+});
+
+// ==================== FILES ROUTES ====================
+
+// Get all files
+router.get('/files', async (req, res) => {
+  try {
+    const { projectId, status } = req.query;
+    
+    let files = [
+      {
+        id: 1,
+        name: 'engine/core.cpp',
+        status: 'checked-in',
+        lastModified: '2 hours ago',
+        size: '45.2 KB',
+        author: 'WraithRunner',
+        projectId: 'project_001'
+      },
+      {
+        id: 2,
+        name: 'hitbox/detection.js',
+        status: 'checked-out',
+        lastModified: '4 hours ago',
+        size: '12.8 KB',
+        author: 'PathfinderBot',
+        projectId: 'project_001'
+      },
+      {
+        id: 3,
+        name: 'networking/server.py',
+        status: 'available',
+        lastModified: '1 day ago',
+        size: '28.5 KB',
+        author: 'CodeLegend42',
+        projectId: 'project_002'
+      },
+      {
+        id: 4,
+        name: 'ui/components.tsx',
+        status: 'checked-in',
+        lastModified: '3 hours ago',
+        size: '18.9 KB',
+        author: 'ReactMaster',
+        projectId: 'project_003'
+      }
+    ];
+    
+    // Filter by projectId if provided
+    if (projectId) {
+      files = files.filter(file => file.projectId === projectId);
+    }
+    
+    // Filter by status if provided
+    if (status) {
+      files = files.filter(file => file.status === status);
+    }
+    
+    res.json({
+      success: true,
+      count: files.length,
+      data: files
+    });
+  } catch (error) {
+    console.error('Error fetching files:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Server Error',
+      message: error.message
+    });
+  }
+});
+
+// ==================== LANGUAGES ROUTES ====================
+
+// Get programming languages/skills
+router.get('/languages', async (req, res) => {
+  try {
+    const { userId } = req.query;
+    
+    const languages = [
+      { id: 1, name: 'Java', level: 'expert', yearsExperience: 5, projectsCount: 25 },
+      { id: 2, name: 'C++', level: 'expert', yearsExperience: 4, projectsCount: 18 },
+      { id: 3, name: 'Python', level: 'advanced', yearsExperience: 3, projectsCount: 22 },
+      { id: 4, name: 'JavaScript', level: 'advanced', yearsExperience: 4, projectsCount: 30 },
+      { id: 5, name: 'Rust', level: 'intermediate', yearsExperience: 1, projectsCount: 8 },
+      { id: 6, name: 'Go', level: 'intermediate', yearsExperience: 2, projectsCount: 12 },
+      { id: 7, name: 'TypeScript', level: 'advanced', yearsExperience: 3, projectsCount: 20 }
+    ];
+    
+    res.json({
+      success: true,
+      count: languages.length,
+      data: languages
+    });
+  } catch (error) {
+    console.error('Error fetching languages:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Server Error',
+      message: error.message
+    });
+  }
+});
+
+// ==================== COMMITS ROUTES ====================
+
+// Get commits
+router.get('/commits', async (req, res) => {
+  try {
+    const { projectId, page = 1, limit = 20 } = req.query;
+    
+    let commits = [
+      {
+        id: 1,
+        hash: 'a1b2c3d',
+        message: 'Fix memory leak in rendering system',
+        author: 'WraithRunner',
+        timestamp: '2 hours ago',
+        filesChanged: 3,
+        projectId: 'project_001',
+        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        id: 2,
+        hash: 'e4f5g6h',
+        message: 'Add neural network optimization',
+        author: 'PathfinderBot',
+        timestamp: '5 hours ago',
+        filesChanged: 7,
+        projectId: 'project_002',
+        createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        id: 3,
+        hash: 'i7j8k9l',
+        message: 'Update component documentation',
+        author: 'CodeLegend42',
+        timestamp: '1 day ago',
+        filesChanged: 12,
+        projectId: 'project_003',
+        createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+      }
+    ];
+    
+    // Filter by projectId if provided
+    if (projectId) {
+      commits = commits.filter(commit => commit.projectId === projectId);
+    }
+    
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + parseInt(limit);
+    const paginatedCommits = commits.slice(startIndex, endIndex);
+    
+    res.json({
+      success: true,
+      count: paginatedCommits.length,
+      total: commits.length,
+      page: parseInt(page),
+      pages: Math.ceil(commits.length / limit),
+      data: paginatedCommits
+    });
+  } catch (error) {
+    console.error('Error fetching commits:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Server Error',
+      message: error.message
+    });
+  }
+});
+
 module.exports = router;

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Code, FileText, Tag, Users } from 'lucide-react';
+import apiService from '../utils/apiService';
 
 const CreateProject = ({ isOpen, onClose, onSave }) => {
   const [formData, setFormData] = useState({
@@ -10,6 +11,8 @@ const CreateProject = ({ isOpen, onClose, onSave }) => {
     visibility: 'public',
     repository: ''
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     setFormData({
@@ -18,10 +21,44 @@ const CreateProject = ({ isOpen, onClose, onSave }) => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSave(formData);
-    onClose();
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Map form data to API format
+      const postData = {
+        title: formData.name,
+        content: formData.description,
+        tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()) : [],
+        category: formData.languages || 'general',
+        status: formData.visibility === 'public' ? 'published' : 'draft'
+      };
+
+      const response = await apiService.createPost(postData);
+
+      if (response.success) {
+        onSave(response.data);
+        onClose();
+        // Reset form
+        setFormData({
+          name: '',
+          description: '',
+          tags: '',
+          languages: '',
+          visibility: 'public',
+          repository: ''
+        });
+      } else {
+        setError(response.message || 'Failed to create project');
+      }
+    } catch (err) {
+      console.error('Error creating project:', err);
+      setError(err.message || 'Failed to create project');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -132,17 +169,25 @@ const CreateProject = ({ isOpen, onClose, onSave }) => {
             />
           </div>
 
+          {error && (
+            <div className="error-message" style={{ color: 'red', marginBottom: '10px' }}>
+              {error}
+            </div>
+          )}
+
           <div className="buttons-container">
             <button
               type="submit"
               className="form-submit submit-button-inline"
+              disabled={loading}
             >
-              Create Project
+              {loading ? 'Creating...' : 'Create Project'}
             </button>
             <button
               type="button"
               onClick={onClose}
               className="cancel-button-inline"
+              disabled={loading}
             >
               Cancel
             </button>

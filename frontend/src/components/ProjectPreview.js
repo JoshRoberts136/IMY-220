@@ -1,11 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import apiService from '../utils/apiService';
 import '../styles.css';
 
 // Export mock data for use in other components
 
 const ProjectPreview = ({ activity }) => {
   const navigate = useNavigate();
+  const [likes, setLikes] = useState(activity?.likes || 0);
+  const [isLiked, setIsLiked] = useState(activity?.isLikedByUser || false);
+  const [liking, setLiking] = useState(false);
+  const [showCommentForm, setShowCommentForm] = useState(false);
+  const [commentText, setCommentText] = useState('');
+  const [commenting, setCommenting] = useState(false);
 
   // Use provided activity or first default activity
   const currentActivity = activity || defaultActivities[0];
@@ -46,6 +53,54 @@ const ProjectPreview = ({ activity }) => {
     return icons[type] || '📋';
   };
 
+  const handleLike = async (e) => {
+    e.stopPropagation();
+    if (liking) return;
+
+    try {
+      setLiking(true);
+      const response = await apiService.likePost(currentActivity.id);
+
+      if (response.success) {
+        setIsLiked(response.data.isLikedByUser);
+        setLikes(response.data.likeCount);
+      }
+    } catch (error) {
+      console.error('Error liking post:', error);
+    } finally {
+      setLiking(false);
+    }
+  };
+
+  const handleComment = async (e) => {
+    e.stopPropagation();
+    if (commenting) return;
+
+    if (!showCommentForm) {
+      setShowCommentForm(true);
+      return;
+    }
+
+    if (!commentText.trim()) return;
+
+    try {
+      setCommenting(true);
+      const response = await apiService.addComment(currentActivity.id, {
+        content: commentText.trim()
+      });
+
+      if (response.success) {
+        setCommentText('');
+        setShowCommentForm(false);
+        // Could update comment count here if available
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    } finally {
+      setCommenting(false);
+    }
+  };
+
   return (
     <div className="activity-item activity-item-cursor" onClick={handleProjectClick}>
       {/* Activity Header */}
@@ -81,23 +136,19 @@ const ProjectPreview = ({ activity }) => {
 
       {/* Activity Footer */}
       <div className="activity-footer">
-        <button 
-          className="like-button"
-          onClick={(e) => {
-            e.stopPropagation();
-            console.log('Liked project:', currentActivity.project.id);
-          }}
+        <button
+          className={`like-button ${isLiked ? 'liked' : ''}`}
+          onClick={handleLike}
+          disabled={liking}
         >
-          ❤️ {currentActivity.likes}
+          {isLiked ? '❤️' : '🤍'} {likes}
         </button>
-        <button 
+        <button
           className="comment-button"
-          onClick={(e) => {
-            e.stopPropagation();
-            console.log('Comment on:', currentActivity.project.id);
-          }}
+          onClick={handleComment}
+          disabled={commenting}
         >
-          💬 Comment
+          💬 {showCommentForm ? (commenting ? 'Posting...' : 'Post') : 'Comment'}
         </button>
         <button 
           className="share-button"
@@ -136,6 +187,37 @@ const ProjectPreview = ({ activity }) => {
           )}
         </div>
       </div>
+
+      {/* Comment Form */}
+      {showCommentForm && (
+        <div className="comment-form" onClick={(e) => e.stopPropagation()}>
+          <textarea
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
+            placeholder="Write a comment..."
+            className="comment-input"
+            rows="3"
+          />
+          <div className="comment-actions">
+            <button
+              onClick={() => {
+                setShowCommentForm(false);
+                setCommentText('');
+              }}
+              className="cancel-comment-btn"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleComment}
+              disabled={!commentText.trim() || commenting}
+              className="submit-comment-btn"
+            >
+              {commenting ? 'Posting...' : 'Comment'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Hover Effect Indicator */}
       <div className="project-hover-indicator">

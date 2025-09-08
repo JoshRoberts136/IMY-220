@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Code, FileText, Tag, Users, GitBranch, Shield } from 'lucide-react';
+import apiService from '../utils/apiService';
 import '../styles.css';
 
 function EditProject({ isOpen, onClose, project, onSave }) {
@@ -11,6 +12,8 @@ function EditProject({ isOpen, onClose, project, onSave }) {
     visibility: 'public',
     repository: '',
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // Update form data when project changes
   React.useEffect(() => {
@@ -33,31 +36,46 @@ function EditProject({ isOpen, onClose, project, onSave }) {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    setError(null);
+
     // Basic validation
     if (!formData.name.trim()) {
-      alert('Please enter a project name');
+      setError('Please enter a project name');
       return;
     }
-    
+
     if (!formData.description.trim()) {
-      alert('Please enter a project description');
+      setError('Please enter a project description');
       return;
     }
-    
-    const processedData = {
-      ...formData,
-      name: formData.name.trim(),
-      description: formData.description.trim(),
-      tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
-      languages: formData.languages ? formData.languages.split(',').map(lang => lang.trim()).filter(lang => lang) : [],
-      repository: formData.repository.trim()
-    };
-    
-    if (onSave) onSave(processedData);
-    if (onClose) onClose();
+
+    setLoading(true);
+
+    try {
+      const processedData = {
+        title: formData.name.trim(),
+        content: formData.description.trim(),
+        tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
+        category: formData.languages || 'general',
+        status: formData.visibility === 'public' ? 'published' : 'draft'
+      };
+
+      const response = await apiService.updatePost(project.id, processedData);
+
+      if (response.success) {
+        if (onSave) onSave(response.data);
+        if (onClose) onClose();
+      } else {
+        setError(response.message || 'Failed to update project');
+      }
+    } catch (err) {
+      console.error('Error updating project:', err);
+      setError(err.message || 'Failed to update project');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // If not using modal mode, just return a button
@@ -89,6 +107,12 @@ function EditProject({ isOpen, onClose, project, onSave }) {
         </div>
 
         <form onSubmit={handleSubmit}>
+          {error && (
+            <div className="error-message" style={{ color: 'red', marginBottom: '15px' }}>
+              {error}
+            </div>
+          )}
+
           <div className="form-group">
             <label className="form-label">
               <FileText size={16} className="form-label-icon" />
@@ -186,13 +210,15 @@ function EditProject({ isOpen, onClose, project, onSave }) {
             <button
               type="submit"
               className="form-submit"
+              disabled={loading}
             >
-              Save Changes
+              {loading ? 'Saving...' : 'Save Changes'}
             </button>
             <button
               type="button"
               onClick={onClose}
               className="cancel-button"
+              disabled={loading}
             >
               Cancel
             </button>

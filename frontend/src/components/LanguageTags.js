@@ -1,15 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import apiService from '../utils/apiService';
 
 const LanguageTags = () => {
-  const [languages] = useState([
-    { name: 'Java', level: 'expert' },
-    { name: 'C++', level: 'expert' },
-    { name: 'Python', level: 'advanced' },
-    { name: 'JavaScript', level: 'advanced' },
-    { name: 'Rust', level: 'intermediate' },
-    { name: 'Go', level: 'intermediate' },
-    { name: 'TypeScript', level: 'advanced' },
-  ]);
+  const [languages, setLanguages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchLanguages = async () => {
+      try {
+        setLoading(true);
+        const response = await apiService.getLanguages();
+        if (response.success) {
+          setLanguages(response.data);
+        }
+      } catch (err) {
+        console.error('Error fetching languages:', err);
+        setError('Failed to load languages');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLanguages();
+  }, []);
 
   const getLevelColor = (level) => {
     switch (level) {
@@ -29,18 +43,45 @@ const LanguageTags = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div>
+        <div className="section-title"></div>
+        <div className="language-tags-container">
+          <div className="text-center text-gray-400">Loading languages...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div>
+        <div className="section-title"></div>
+        <div className="language-tags-container">
+          <div className="text-center text-red-400">{error}</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="section-title"></div>
       <div className="language-tags-container">
-        {languages.map((lang, index) => (
-          <div
-            key={index}
-            className={`language-tag language-tag-${lang.level}`}
-          >
-            #{lang.name}
-          </div>
-        ))}
+        {languages.length > 0 ? (
+          languages.map((lang) => (
+            <div
+              key={lang.id}
+              className={`language-tag language-tag-${lang.level}`}
+              title={`${lang.yearsExperience} years experience, ${lang.projectsCount} projects`}
+            >
+              #{lang.name}
+            </div>
+          ))
+        ) : (
+          <div className="text-center text-gray-400">No languages found</div>
+        )}
       </div>
     </div>
   );
