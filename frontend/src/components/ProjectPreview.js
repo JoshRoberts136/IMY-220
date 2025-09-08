@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import apiService from '../utils/apiService';
 import '../styles.css';
 
 // Export mock data for use in other components
+export const defaultActivities = [
+  { id: 1, user: { name: 'WraithRunner', avatar: '👻', isOnline: true }, action: 'checked in', project: { id: '1', name: 'Battle Royale Engine', description: 'Fixed hitbox detection', stars: 15, forks: 5, lastUpdated: '2 hours ago' }, message: 'Fixed hitbox detection', timestamp: '2 hours ago', projectImage: '🎮', likes: 15, type: 'checkin' },
+  { id: 2, user: { name: 'OctaneSpeed', avatar: '⚡', isOnline: true }, action: 'created', project: { id: '2', name: 'Jump Pad Physics', description: 'New project for movement', stars: 8, forks: 3, lastUpdated: '4 hours ago' }, message: 'New project for movement', timestamp: '4 hours ago', projectImage: '🚀', likes: 8, type: 'create' },
+  { id: 3, user: { name: 'PathfinderBot', avatar: '🤖', isOnline: false }, action: 'checked out', project: { id: '3', name: 'Zipline Simulator', description: 'Working on trajectory', stars: 12, forks: 4, lastUpdated: '6 hours ago' }, message: 'Working on trajectory', timestamp: '6 hours ago', projectImage: '📐', likes: 12, type: 'checkout' },
+  { id: 4, user: { name: 'LifelineDoc', avatar: '🏥', isOnline: true }, action: 'updated', project: { id: '4', name: 'Healing Algorithm', description: 'Optimized health regeneration', stars: 20, forks: 6, lastUpdated: '8 hours ago' }, message: 'Optimized health regeneration', timestamp: '8 hours ago', projectImage: '💊', likes: 20, type: 'update' },
+  { id: 5, user: { name: 'GibraltarShield', avatar: '🛡️', isOnline: true }, action: 'checked in', project: { id: '5', name: 'Defense Protocol', description: 'Added dome shield cooldown', stars: 18, forks: 5, lastUpdated: '12 hours ago' }, message: 'Added dome shield cooldown', timestamp: '12 hours ago', projectImage: '⚡', likes: 18, type: 'checkin' },
+  { id: 6, user: { name: 'BloodhoundTracker', avatar: '👁️', isOnline: false }, action: 'forked', project: { id: '6', name: 'Scan Detection System', description: 'Created improved tracking', stars: 22, forks: 7, lastUpdated: '1 day ago' }, message: 'Created improved tracking', timestamp: '1 day ago', projectImage: '🔍', likes: 22, type: 'fork' }
+];
 
 const ProjectPreview = ({ activity }) => {
   const navigate = useNavigate();
-  const [likes, setLikes] = useState(activity?.likes || 0);
-  const [isLiked, setIsLiked] = useState(activity?.isLikedByUser || false);
-  const [liking, setLiking] = useState(false);
-  const [showCommentForm, setShowCommentForm] = useState(false);
-  const [commentText, setCommentText] = useState('');
-  const [commenting, setCommenting] = useState(false);
 
   // Use provided activity or first default activity
   const currentActivity = activity || defaultActivities[0];
@@ -53,56 +54,8 @@ const ProjectPreview = ({ activity }) => {
     return icons[type] || '📋';
   };
 
-  const handleLike = async (e) => {
-    e.stopPropagation();
-    if (liking) return;
-
-    try {
-      setLiking(true);
-      const response = await apiService.likePost(currentActivity.id);
-
-      if (response.success) {
-        setIsLiked(response.data.isLikedByUser);
-        setLikes(response.data.likeCount);
-      }
-    } catch (error) {
-      console.error('Error liking post:', error);
-    } finally {
-      setLiking(false);
-    }
-  };
-
-  const handleComment = async (e) => {
-    e.stopPropagation();
-    if (commenting) return;
-
-    if (!showCommentForm) {
-      setShowCommentForm(true);
-      return;
-    }
-
-    if (!commentText.trim()) return;
-
-    try {
-      setCommenting(true);
-      const response = await apiService.addComment(currentActivity.id, {
-        content: commentText.trim()
-      });
-
-      if (response.success) {
-        setCommentText('');
-        setShowCommentForm(false);
-        // Could update comment count here if available
-      }
-    } catch (error) {
-      console.error('Error adding comment:', error);
-    } finally {
-      setCommenting(false);
-    }
-  };
-
   return (
-    <div className="activity-item activity-item-cursor" onClick={handleProjectClick}>
+    <div className="activity-item" onClick={handleProjectClick} style={{ cursor: 'pointer' }}>
       {/* Activity Header */}
       <div className="activity-header">
         <div className="user-info" onClick={handleUserClick}>
@@ -115,8 +68,8 @@ const ProjectPreview = ({ activity }) => {
             <div className="activity-time">{formatTimeAgo(currentActivity.timestamp)}</div>
           </div>
         </div>
-        <div
-          className="action-badge action-badge-dynamic"
+        <div 
+          className="action-badge" 
           style={{ backgroundColor: getActionColor(currentActivity.type) }}
         >
           {getActionIcon(currentActivity.type)} {currentActivity.action}
@@ -136,19 +89,23 @@ const ProjectPreview = ({ activity }) => {
 
       {/* Activity Footer */}
       <div className="activity-footer">
-        <button
-          className={`like-button ${isLiked ? 'liked' : ''}`}
-          onClick={handleLike}
-          disabled={liking}
+        <button 
+          className="like-button"
+          onClick={(e) => {
+            e.stopPropagation();
+            console.log('Liked project:', currentActivity.project.id);
+          }}
         >
-          {isLiked ? '❤️' : '🤍'} {likes}
+          ❤️ {currentActivity.likes}
         </button>
-        <button
+        <button 
           className="comment-button"
-          onClick={handleComment}
-          disabled={commenting}
+          onClick={(e) => {
+            e.stopPropagation();
+            console.log('Comment on:', currentActivity.project.id);
+          }}
         >
-          💬 {showCommentForm ? (commenting ? 'Posting...' : 'Post') : 'Comment'}
+          💬 Comment
         </button>
         <button 
           className="share-button"
@@ -187,37 +144,6 @@ const ProjectPreview = ({ activity }) => {
           )}
         </div>
       </div>
-
-      {/* Comment Form */}
-      {showCommentForm && (
-        <div className="comment-form" onClick={(e) => e.stopPropagation()}>
-          <textarea
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
-            placeholder="Write a comment..."
-            className="comment-input"
-            rows="3"
-          />
-          <div className="comment-actions">
-            <button
-              onClick={() => {
-                setShowCommentForm(false);
-                setCommentText('');
-              }}
-              className="cancel-comment-btn"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleComment}
-              disabled={!commentText.trim() || commenting}
-              className="submit-comment-btn"
-            >
-              {commenting ? 'Posting...' : 'Comment'}
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Hover Effect Indicator */}
       <div className="project-hover-indicator">

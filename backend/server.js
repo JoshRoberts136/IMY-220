@@ -1,60 +1,12 @@
 const express = require('express');
 const path = require('path');
-const cors = require('cors');
-require('dotenv').config();
-
-// Import database connection
-const connectDB = require('./config/database');
-
-// Connect to MongoDB
-connectDB();
-
 const app = express();
-const port = process.env.PORT || 3000;
+const port = 3000;
 
-// Middleware
-app.use(express.json()); // Parse JSON bodies
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
-app.use(cors()); // Enable CORS for frontend-backend communication
-
-// Serve static files
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Import routes
-const authRoutes = require('./routes/auth');
-const apiRoutes = require('./routes/api');
-
-// Use routes
-app.use('/api/auth', authRoutes);
-app.use('/api', apiRoutes);
-
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    message: 'Server is running',
-    timestamp: new Date().toISOString()
-  });
+app.post('/api/login', (req, res) => {
 });
 
-// Catch-all handler: send back React app for any non-API routes
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/index.html'));
+app.post('/api/signup', (req, res) => {
 });
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ 
-    error: 'Something went wrong!',
-    message: err.message 
-  });
-});
-
-app.listen(port, () => {
-  console.log(`🚀 Server running on port ${port}`);
-  console.log(`📱 Frontend: http://localhost:${port}`);
-  console.log(`🔌 API: http://localhost:${port}/api`);
-});
-
-module.exports = app;
