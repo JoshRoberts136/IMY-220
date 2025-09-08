@@ -1,117 +1,94 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import ProjectPreview from './ProjectPreview';
-import apiService from '../utils/apiService';
 import '../styles.css';
 
 const ProjectsSection = () => {
-  const [activeTab, setActiveTab] = useState('all');
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState('owned');
+  const [projects] = useState([
+    {
+      name: 'E-Commerce Beast',
+      description: 'Full-stack e-commerce platform with real-time inventory',
+      stars: 42,
+      forks: 18,
+      lastUpdated: '2 hours ago',
+      role: 'owner',
+    },
+    {
+      name: 'AI Chat Companion',
+      description: 'React-based chat interface with AI integration',
+      stars: 28,
+      forks: 12,
+      lastUpdated: '1 day ago',
+      role: 'owner',
+    },
+    {
+      name: 'Code Arena Platform',
+      description: 'Collaborative coding platform for teams',
+      stars: 156,
+      forks: 67,
+      lastUpdated: '3 days ago',
+      role: 'member',
+    },
+    {
+      name: 'Data Visualization Suite',
+      description: 'Interactive charts and graphs library',
+      stars: 89,
+      forks: 34,
+      lastUpdated: '1 week ago',
+      role: 'member',
+    },
+  ]);
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        setLoading(true);
-        const response = await apiService.getPosts({ status: 'published', limit: 20 });
-        if (response.success) {
-          setProjects(response.data);
-        }
-      } catch (err) {
-        console.error('Error fetching projects:', err);
-        setError('Failed to load projects');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProjects();
-  }, []);
-
-  const filteredProjects = projects.filter(p => {
-    if (activeTab === 'all') return true;
-    // TODO: Filter by current user when authentication is implemented
-    // For now, show all projects in both tabs
-    return true;
-  });
+  const filteredProjects = projects.filter(p =>
+    activeTab === 'owned' ? p.role === 'owner' : p.role === 'member'
+  );
 
   const projectActivities = filteredProjects.map(project => ({
-    id: project._id,
-    user: {
-      name: project.author.username,
-      avatar: project.author.profile?.avatar || '👤',
-      isOnline: true
-    },
-    action: 'created',
+    id: project.name.toLowerCase().replace(/\s/g, '-'),
+    user: { name: 'CodeLegend42', avatar: '👤', isOnline: true },
+    action: project.role === 'owner' ? 'created' : 'contributed to',
     project: {
-      id: project._id,
-      name: project.title,
-      description: project.content,
-      stars: project.likes?.length || 0,
-      forks: 0,
-      lastUpdated: new Date(project.createdAt).toLocaleDateString(),
+      id: project.name.toLowerCase().replace(/\s/g, '-'),
+      name: project.name,
+      description: project.description,
+      stars: project.stars,
+      forks: project.forks,
+      lastUpdated: project.lastUpdated,
     },
-    message: project.content,
-    timestamp: new Date(project.createdAt).toLocaleDateString(),
+    message: project.description,
+    timestamp: project.lastUpdated,
     projectImage: '📂',
-    likes: project.likes?.length || 0,
-    type: 'create',
+    likes: project.stars,
+    type: project.role === 'owner' ? 'create' : 'update',
   }));
 
-  if (loading) {
-    return (
-      <div className="projects-section-container">
-        <div className="section-title">Legend's Projects</div>
-        <div className="scrollable-section">
-          <div className="scrollable-content">
-            <div className="text-center text-gray-400">Loading projects...</div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="projects-section-container">
-        <div className="section-title">Legend's Projects</div>
-        <div className="scrollable-section">
-          <div className="scrollable-content">
-            <div className="text-center text-red-400">{error}</div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="projects-section-container">
-      <div className="section-title">Legend's Projects</div>
+    <div>
+    <div className="section-title">Legend's Projects</div>
       <div className="tabs-placeholder">
         <div
-          className={`tab-placeholder ${activeTab === 'all' ? 'active' : ''} tab-cursor`}
-          onClick={() => setActiveTab('all')}
+          className={`tab-placeholder ${activeTab === 'owned' ? 'active' : ''}`}
+          onClick={() => setActiveTab('owned')}
+          style={{ cursor: 'pointer' }}
         >
-          All Projects
+          Owned
         </div>
         <div
-          className={`tab-placeholder ${activeTab === 'my' ? 'active' : ''} tab-cursor`}
-          onClick={() => setActiveTab('my')}
+          className={`tab-placeholder ${activeTab === 'member' ? 'active' : ''}`}
+          onClick={() => setActiveTab('member')}
+          style={{ cursor: 'pointer' }}
         >
-          My Projects
+          Member
         </div>
       </div>
-      <div className="scrollable-section">
-        <div className="scrollable-content">
-          {projectActivities.length > 0 ? (
-            projectActivities.map((activity) => (
-              <ProjectPreview key={activity.id} activity={activity} />
-            ))
-          ) : (
-            <div className="text-center text-gray-400">No projects found</div>
-          )}
-        </div>
+    <div className="scrollable-section">
+      
+      <div className="scrollable-content">
+        {projectActivities.slice(0, 2).map((activity) => (
+          <ProjectPreview key={activity.id} activity={activity} />
+        ))}
       </div>
+    </div>
     </div>
   );
 };

@@ -1,73 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Files from './Files';
 import Messages from './Messages';
 import EditProject from './EditProject';
 import LanguageTags from './LanguageTags';
 import ActivityFeed from './ActivityFeed';
-import apiService from '../utils/apiService';
 import '../styles.css';
 import { User, Trophy, Edit3, Plus } from 'lucide-react';
 
-const ProjectCard = ({ projectId = 'default' }) => {
+const ProjectCard = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [project, setProject] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchProject = async () => {
-      try {
-        setLoading(true);
-        // For now, fetch the first post as an example
-        const response = await apiService.getPosts({ limit: 1 });
-        if (response.success && response.data.length > 0) {
-          const post = response.data[0];
-          // Transform post data to project format
-          setProject({
-            id: post._id,
-            name: post.title,
-            description: post.content,
-            image: '📝',
-            owner: {
-              name: post.author.username,
-              avatar: post.author.profile?.avatar || '👤',
-              isOnline: true
-            },
-            members: [
-              {
-                name: post.author.username,
-                avatar: post.author.profile?.avatar || '👤',
-                role: 'Author',
-                isOnline: true
-              }
-            ],
-            stats: {
-              stars: post.likes?.length || 0,
-              forks: 0,
-              commits: 0,
-              issues: 0
-            },
-            tags: post.tags || [],
-            languages: [post.category || 'General'],
-            visibility: post.status === 'published' ? 'public' : 'private',
-            repository: '',
-            created: new Date(post.createdAt).toLocaleDateString(),
-            lastUpdated: new Date(post.updatedAt || post.createdAt).toLocaleDateString(),
-          });
-        } else {
-          setError('No projects found');
-        }
-      } catch (err) {
-        console.error('Error fetching project:', err);
-        setError('Failed to load project');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProject();
-  }, []);
+  const [project, setProject] = useState({
+    id: '1',
+    name: 'Battle Royale Engine',
+    description: 'A high-performance battle royale game engine with advanced hitbox detection, real-time physics, and optimized networking for 100+ players.',
+    image: '🎮',
+    owner: { name: 'WraithRunner', avatar: '👻', isOnline: true },
+    members: [
+      { name: 'WraithRunner', avatar: '👻', role: 'Project Lead', isOnline: true },
+      { name: 'PathfinderBot', avatar: '🤖', role: 'AI Developer', isOnline: false },
+      { name: 'OctaneSpeed', avatar: '⚡', role: 'Physics Engineer', isOnline: true },
+    ],
+    stats: { stars: 15, forks: 5, commits: 150, issues: 3 },
+    tags: ['Game Engine', 'Real-time', 'Multiplayer'],
+    languages: ['JavaScript', 'Python', 'C++'],
+    visibility: 'public',
+    repository: 'https://github.com/wraith/battle-royale-engine',
+    created: '3 months ago',
+    lastUpdated: '2 hours ago',
+  });
 
   const handleEditProject = () => {
     setIsEditModalOpen(true);
@@ -91,32 +52,6 @@ const ProjectCard = ({ projectId = 'default' }) => {
       setShowSuccessMessage(false);
     }, 3000);
   };
-
-  if (loading) {
-    return (
-      <div>
-        <div className="apex-bg">
-          <div className="hex-pattern"></div>
-        </div>
-        <div className="project-hero">
-          <div className="text-center text-gray-400">Loading project...</div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !project) {
-    return (
-      <div>
-        <div className="apex-bg">
-          <div className="hex-pattern"></div>
-        </div>
-        <div className="project-hero">
-          <div className="text-center text-red-400">{error || 'Project not found'}</div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div>
