@@ -14,103 +14,66 @@ const ViewFriend = ({ userId }) => {
 
   const fetchFriends = async () => {
     try {
-      console.log('Fetching friends...');
-      const response = await apiService.getFriends();
-      console.log('Friends API response:', response);
+      console.log('Fetching friends for userId:', userId);
+      setLoading(true);
       
-      if (response.success) {
-        setFriends(response.friends || []);
+      const currentUser = apiService.getUser();
+      const currentUserId = currentUser?.id;
+      
+      // Check if viewing own profile or someone else's
+      const isOwnProfile = !userId || userId === currentUserId;
+      
+      let friendIds = [];
+      
+      if (isOwnProfile) {
+        // Get current user's friends from getFriends endpoint
+        const response = await apiService.getFriends();
+        console.log('Own profile - Friends API response:', response);
+        
+        if (response.success) {
+          setFriends(response.friends || []);
+          return;
+        }
       } else {
-        // If API fails, use dummy data
-        setFriends([
-          {
-            id: 1,
-            username: 'AlexCode92',
-            status: 'online',
-            avatar: '👨‍💻',
-            title: 'Frontend Wizard',
-            joined: '2022',
-            mutualProjects: 3
-          },
-          {
-            id: 2,
-            username: 'SarahScript',
-            status: 'offline',
-            avatar: '👩‍💼',
-            title: 'Full-Stack Dev',
-            joined: '2021',
-            mutualProjects: 5
-          },
-          {
-            id: 3,
-            username: 'DevNinja404',
-            status: 'online',
-            avatar: '🥷',
-            title: 'Backend Master',
-            joined: '2020',
-            mutualProjects: 2
+        // Get other user's friends from their user data
+        const response = await apiService.getUserById(userId);
+        console.log('Other profile - User API response:', response);
+        
+        if (response.success) {
+          friendIds = response.friends || [];
+        }
+      }
+      
+      // If we have friendIds (viewing someone else's profile), fetch their details
+      if (friendIds.length > 0) {
+        const friendDetails = [];
+        
+        for (const friendId of friendIds) {
+          try {
+            const friendResponse = await apiService.getUserById(friendId);
+            if (friendResponse && friendResponse.success !== false) {
+              friendDetails.push({
+                id: friendResponse.id,
+                username: friendResponse.username,
+                avatar: friendResponse.profile?.avatar || '👤',
+                title: friendResponse.profile?.title || 'Developer',
+                status: friendResponse.isActive ? 'online' : 'offline',
+                mutualProjects: 0 // Can calculate this later if needed
+              });
+            }
+          } catch (err) {
+            console.log(`Could not fetch friend ${friendId}`);
           }
-        ]);
+        }
+        
+        setFriends(friendDetails);
+      } else if (!isOwnProfile) {
+        // Viewing someone else's profile and they have no friends
+        setFriends([]);
       }
     } catch (error) {
       console.error('Error fetching friends:', error);
-      // Fallback to dummy data
-      setFriends([
-        {
-          id: 1,
-          username: 'AlexCode92',
-          status: 'online',
-          avatar: '👨‍💻',
-          title: 'Frontend Wizard',
-          joined: '2022',
-          mutualProjects: 3
-        },
-        {
-          id: 2,
-          username: 'SarahScript',
-          status: 'offline',
-          avatar: '👩‍💼',
-          title: 'Full-Stack Dev',
-          joined: '2021',
-          mutualProjects: 5
-        },
-        {
-          id: 3,
-          username: 'DevNinja404',
-          status: 'online',
-          avatar: '🥷',
-          title: 'Backend Master',
-          joined: '2020',
-          mutualProjects: 2
-        },
-        {
-          id: 4,
-          username: 'ReactQueen',
-          status: 'away',
-          avatar: '👸',
-          title: 'UI/UX Expert',
-          joined: '2023',
-          mutualProjects: 1
-        },
-        {
-          id: 5,
-          username: 'CodeWizard',
-          status: 'online',
-          avatar: '🧙‍♂️',
-          title: 'Algorithm Sage',
-          joined: '2019',
-          mutualProjects: 4
-        },
-        {
-          id: 6,
-          username: 'ByteHunter',
-          status: 'offline',
-          avatar: '🏹',
-          title: 'Security Pro',
-          joined: '2022',
-          mutualProjects: 2
-        }
-      ]);
+      setFriends([]);
     } finally {
       setLoading(false);
     }
