@@ -19,6 +19,7 @@ const HomeFeed = () => {
   const fetchProjects = async () => {
     try {
       const response = await apiService.getProjects();
+      console.log('Projects response:', response);
       if (response.success) {
         setProjects(response.projects || []);
       }
@@ -32,6 +33,7 @@ const HomeFeed = () => {
   const fetchFriends = async () => {
     try {
       const response = await apiService.getFriends();
+      console.log('Friends response:', response);
       if (response.success) {
         setFriends(response.friends || []);
       }
@@ -46,14 +48,25 @@ const HomeFeed = () => {
       return projects;
     } else {
       // Squad Feed - show only friends' projects
-      const friendIds = friends.map(friend => friend.id || friend._id);
-      return projects.filter(project => friendIds.includes(project.ownedBy));
+      const friendIds = friends.map(friend => friend.id || friend._id?.toString());
+      console.log('Friend IDs:', friendIds);
+      
+      const filtered = projects.filter(project => {
+        const projectOwnerId = project.ownedBy || project.id;
+        console.log('Checking project owner:', projectOwnerId, 'against friends:', friendIds);
+        return friendIds.includes(projectOwnerId);
+      });
+      
+      console.log('Filtered projects:', filtered);
+      return filtered;
     }
   };
 
   if (loading) {
     return <div className="homefeed-container">Loading projects...</div>;
   }
+
+  const filteredProjects = getFilteredProjects();
 
   return (
     <div className="homefeed-container">
@@ -72,28 +85,36 @@ const HomeFeed = () => {
         </div>
       </div>
       <div className="activity-feed">
-        {getFilteredProjects().map((project) => {
-          const activity = {
-            id: project._id,
-            user: { 
-              name: project.ownerName || 'Unknown', 
-              avatar: project.ownerAvatar || '👤', 
-              isOnline: true 
-            },
-            action: 'created',
-            project: {
-              id: project._id,
-              name: project.name,
-              description: project.description
-            },
-            message: project.description,
-            timestamp: '1 day ago',
-            projectImage: '💻',
-            likes: project.likes || 0,
-            type: 'create'
-          };
-          return <ProjectPreview key={project._id} activity={activity} />;
-        })}
+        {filteredProjects.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
+            {activeTab === 'local' ? 
+              'No projects from your squad yet. Add some friends or switch to Arena Feed!' : 
+              'No projects available yet.'}
+          </div>
+        ) : (
+          filteredProjects.map((project) => {
+            const activity = {
+              id: project._id || project.id,
+              user: { 
+                name: project.ownerName || 'Unknown', 
+                avatar: project.ownerAvatar || '👤', 
+                isOnline: true 
+              },
+              action: 'created',
+              project: {
+                id: project._id || project.id,
+                name: project.name,
+                description: project.description
+              },
+              message: project.description,
+              timestamp: '1 day ago',
+              projectImage: '💻',
+              likes: project.likes || 0,
+              type: 'create'
+            };
+            return <ProjectPreview key={project._id || project.id} activity={activity} />;
+          })
+        )}
       </div>
     </div>
   );
