@@ -92,7 +92,7 @@ const EditProfile = ({ isOpen, onClose, user, onSave }) => {
           </button>
         </div>
         {error && (
-          <div className="error-message" style={{ color: 'red', marginBottom: '1rem' }}>
+          <div className="error-message">
             {error}
           </div>
         )}

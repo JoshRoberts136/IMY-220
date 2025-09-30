@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '../styles.css';
 
 function Messages() {
   const [messages] = useState([
@@ -7,15 +8,17 @@ function Messages() {
   ]);
 
   return (
-    <div className="content-section mb-5">
+    <div className="content-section messages-section">
       <h3 className="section-title">Team Comms</h3>
       {messages.map((msg, index) => (
         <div 
           key={index} 
-          className="mb-2.5 bg-apex-light-gray p-4 rounded-lg"
+          className="message-item"
         >
-          <div className="text-white font-semibold mb-1">{msg.user}: {msg.message}</div>
-          <div className="text-gray-400 text-xs">{msg.timestamp}</div>
+          <div className="message-text">
+            {msg.user}: {msg.message}
+          </div>
+          <div className="message-timestamp">{msg.timestamp}</div>
         </div>
       ))}
     </div>

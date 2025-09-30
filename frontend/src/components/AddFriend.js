@@ -117,8 +117,8 @@ const AddFriend = ({ targetUserId, onFriendshipChange }) => {
 
   if (loading) {
     return (
-      <button className="btn" style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: 0.7, cursor: 'not-allowed' }} disabled>
-        <Clock style={{ width: '16px', height: '16px' }} />
+      <button className="btn btn-loading" disabled>
+        <Clock className="icon-sm" />
         Loading...
       </button>
     );
@@ -126,8 +126,8 @@ const AddFriend = ({ targetUserId, onFriendshipChange }) => {
 
   if (error) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        <span style={{ color: '#ff6b6b', fontSize: '14px' }}>{error}</span>
+      <div className="error-container-inline">
+        <span className="error-text">{error}</span>
         <button
           className="btn-secondary"
           onClick={checkFriendshipStatus}
@@ -144,37 +144,37 @@ const AddFriend = ({ targetUserId, onFriendshipChange }) => {
     
     case 'friends':
       return (
-        <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: 0.7, cursor: 'not-allowed' }} disabled>
-          <Check style={{ width: '16px', height: '16px' }} />
+        <button className="btn btn-primary btn-disabled" disabled>
+          <Check className="icon-sm" />
           Friends
         </button>
       );
     
     case 'sent':
       return (
-        <button className="btn" style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: 0.7, cursor: 'not-allowed' }} disabled>
-          <Clock style={{ width: '16px', height: '16px' }} />
+        <button className="btn btn-disabled" disabled>
+          <Clock className="icon-sm" />
           Request Sent
         </button>
       );
     
     case 'received':
       return (
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="button-group">
           <button
             className="btn btn-primary"
-            style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+            className="btn-with-icon"
             onClick={handleAcceptFriendRequest}
           >
-            <Check style={{ width: '16px', height: '16px' }} />
+            <Check className="icon-sm" />
             Accept
           </button>
           <button
             className="btn-secondary"
-            style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+            className="btn-with-icon"
             onClick={handleDeclineFriendRequest}
           >
-            <X style={{ width: '16px', height: '16px' }} />
+            <X className="icon-sm" />
             Decline
           </button>
         </div>
@@ -184,11 +184,11 @@ const AddFriend = ({ targetUserId, onFriendshipChange }) => {
       return (
         <button
           className="btn"
-          style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+          className="btn-with-icon"
           onClick={handleSendFriendRequest}
           disabled={loading}
         >
-          <UserPlus style={{ width: '16px', height: '16px' }} />
+          <UserPlus className="icon-sm" />
           Add Friend
         </button>
       );

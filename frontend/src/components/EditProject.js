@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Code, FileText, Tag, GitBranch, Shield } from 'lucide-react';
 import apiService from '../utils/apiService';
+import '../styles.css';
 
 function EditProject({ isOpen, onClose, project, onSave }) {
   const [formData, setFormData] = useState({
@@ -78,7 +79,7 @@ function EditProject({ isOpen, onClose, project, onSave }) {
   if (isOpen === undefined) {
     return (
       <button 
-        className="flex items-center gap-2 bg-transparent text-apex-orange border-2 border-apex-orange rounded px-5 py-2.5 cursor-pointer transition-all duration-300 mt-4 hover:bg-apex-orange hover:text-white"
+        className="edit-button"
         onClick={() => console.log('Edit project clicked')}
       >
         <FileText size={16} />
@@ -92,24 +93,21 @@ function EditProject({ isOpen, onClose, project, onSave }) {
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <div className="flex justify-between items-center mb-6">
+        <div className="modal-header">
           <h2 className="modal-title">Edit Project</h2>
-          <button
-            onClick={onClose}
-            className="bg-transparent border-none text-gray-400 cursor-pointer p-1 rounded transition-colors duration-300 hover:text-apex-orange"
-          >
+          <button onClick={onClose} className="close-button">
             <X size={24} />
           </button>
         </div>
 
         <form onSubmit={handleSubmit}>
           {error && (
-            <div className="text-red-500 mb-4">{error}</div>
+            <div className="error-message-form">{error}</div>
           )}
 
           <div className="form-group">
-            <label className="form-label flex items-center">
-              <FileText size={16} className="mr-2" />
+            <label className="form-label label-with-icon">
+              <FileText size={16} className="label-icon" />
               Project Name
             </label>
             <input
@@ -129,7 +127,8 @@ function EditProject({ isOpen, onClose, project, onSave }) {
               name="description"
               value={formData.description}
               onChange={handleChange}
-              className="form-input resize-y min-h-[80px]"
+              className="form-input"
+              className="textarea-resizable"
               rows="3"
               placeholder="Describe your project"
               required
@@ -137,8 +136,8 @@ function EditProject({ isOpen, onClose, project, onSave }) {
           </div>
 
           <div className="form-group">
-            <label className="form-label flex items-center">
-              <Tag size={16} className="mr-2" />
+            <label className="form-label label-with-icon">
+              <Tag size={16} className="label-icon" />
               Tags
             </label>
             <input
@@ -152,8 +151,8 @@ function EditProject({ isOpen, onClose, project, onSave }) {
           </div>
 
           <div className="form-group">
-            <label className="form-label flex items-center">
-              <Code size={16} className="mr-2" />
+            <label className="form-label label-with-icon">
+              <Code size={16} className="label-icon" />
               Languages
             </label>
             <input
@@ -167,8 +166,8 @@ function EditProject({ isOpen, onClose, project, onSave }) {
           </div>
 
           <div className="form-group">
-            <label className="form-label flex items-center">
-              <Shield size={16} className="mr-2" />
+            <label className="form-label label-with-icon">
+              <Shield size={16} className="label-icon" />
               Visibility
             </label>
             <select
@@ -184,8 +183,8 @@ function EditProject({ isOpen, onClose, project, onSave }) {
           </div>
 
           <div className="form-group">
-            <label className="form-label flex items-center">
-              <GitBranch size={16} className="mr-2" />
+            <label className="form-label label-with-icon">
+              <GitBranch size={16} className="label-icon" />
               Repository URL
             </label>
             <input
@@ -198,10 +197,11 @@ function EditProject({ isOpen, onClose, project, onSave }) {
             />
           </div>
 
-          <div className="flex gap-4 mt-8">
+          <div className="buttons-container">
             <button
               type="submit"
-              className={`form-submit flex-1 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+              className="form-submit"
+              className={loading ? 'button-disabled' : ''}
               disabled={loading}
             >
               {loading ? 'Saving...' : 'Save Changes'}
@@ -209,7 +209,7 @@ function EditProject({ isOpen, onClose, project, onSave }) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-5 py-4 bg-transparent border-2 border-gray-600 rounded-md text-gray-400 font-rajdhani font-bold text-lg cursor-pointer transition-all duration-300 uppercase tracking-wider hover:border-apex-orange hover:text-apex-orange"
+              className="cancel-button"
               disabled={loading}
             >
               Cancel

@@ -86,7 +86,7 @@ const HomeFeed = () => {
       </div>
       <div className="activity-feed">
         {filteredProjects.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
+          <div className="empty-feed-message">
             {activeTab === 'local' ? 
               'No projects from your squad yet. Add some friends or switch to Arena Feed!' : 
               'No projects available yet.'}

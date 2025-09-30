@@ -134,7 +134,7 @@ const ProjectsSection = ({ userId }) => {
     return (
       <div className="content-section">
         <div className="section-title">Projects</div>
-        <div style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Loading projects...</div>
+        <div className="loading-projects-message">Loading projects...</div>
       </div>
     );
   }
@@ -164,7 +164,7 @@ const ProjectsSection = ({ userId }) => {
             <ProjectPreview key={activity.id} activity={activity} />
           ))
         ) : (
-          <div style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
+          <div className="no-projects-message">
             No {activeTab} projects yet
           </div>
         )}

@@ -135,7 +135,7 @@ const ActivityFeed = ({ userId }) => {
     return (
       <div className="content-section">
         <div className="section-title">Recent Activity</div>
-        <div style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Loading activity...</div>
+        <div className="loading-message">Loading activity...</div>
       </div>
     );
   }
@@ -149,7 +149,7 @@ const ActivityFeed = ({ userId }) => {
             <ProjectPreview key={activity.id} activity={activity} />
           ))
         ) : (
-          <div style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
+          <div className="no-activity-message">
             No recent activity yet. Start coding!
           </div>
         )}

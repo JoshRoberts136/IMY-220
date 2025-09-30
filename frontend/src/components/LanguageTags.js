@@ -12,44 +12,28 @@ const LanguageTags = () => {
     { name: 'TypeScript', level: 'advanced' },
   ]);
 
-  const getLanguageStyle = (level) => {
+  const getLanguageClass = (level) => {
     switch (level) {
       case 'expert':
-        return {
-          background: 'var(--apex-red)',
-          padding: '10px 14px',
-          fontSize: '16px'
-        };
+        return 'language-tag-expert';
       case 'advanced':
-        return {
-          background: 'var(--apex-orange)',
-          padding: '8px 12px',
-          fontSize: '14px'
-        };
+        return 'language-tag-advanced';
       case 'intermediate':
-        return {
-          background: '#4a5568',
-          padding: '6px 10px',
-          fontSize: '12px'
-        };
+        return 'language-tag-intermediate';
       default:
-        return {
-          background: '#4a5568',
-          padding: '6px 10px',
-          fontSize: '12px'
-        };
+        return 'language-tag-beginner';
     }
   };
 
   return (
-    <div className="content-section" style={{ marginBottom: '20px' }}>
+    <div className="content-section language-tags-section">
       <div className="section-title">Favorite Languages</div>
       <div className="language-tags-container">
         {languages.map((lang, index) => (
           <div
             key={index}
             className="language-tag"
-            style={getLanguageStyle(lang.level)}
+            className={getLanguageClass(lang.level)}
           >
             #{lang.name}
           </div>

@@ -43,7 +43,7 @@ function Login() {
 
   return (
     <form className="auth-form active" onSubmit={handleSubmit}>
-      {error && <div className="error-message" style={{color: 'red', marginBottom: '10px'}}>{error}</div>}
+      {error && <div className="error-message">{error}</div>}
       <div className="form-group">
         <label className="form-label" htmlFor="loginEmail">Legend ID</label>
         <input

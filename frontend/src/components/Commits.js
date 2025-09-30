@@ -71,7 +71,7 @@ const Commits = ({ projectId }) => {
                 <div 
                   className="commit-author"
                   onClick={() => handleUserClick(commit.userId)}
-                  style={{ cursor: 'pointer' }}
+                  className="clickable-author"
                 >
                   <span className="commit-avatar">{commit.userAvatar}</span>
                   <span className="commit-username">{commit.username || commit.author}</span>

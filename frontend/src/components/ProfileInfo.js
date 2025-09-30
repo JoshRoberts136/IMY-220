@@ -95,27 +95,27 @@ const ProfileInfo = ({ profileData, isOwnProfile, targetUserId }) => {
   };
 
   return (
-    <div className="content-section" style={{ marginBottom: '20px' }}>
+    <div className="content-section profile-info-section">
       <div className="section-title">
         {isOwnProfile ? 'Legend Profile' : `${user.username}'s Profile`}
       </div>
       
       <div className="profile-container">
-        <div className="user-avatar" style={{ width: '120px', height: '120px', fontSize: '64px' }}>
-          <User style={{ width: '64px', height: '64px', color: '#9ca3af' }} />
+        <div className="user-avatar user-avatar-large">
+          <User className="avatar-icon-large" />
         </div>
         
         <div className="profile-info">
-          <div className="flex items-center gap-3 mb-2" style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-            <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: 'white', margin: 0 }}>{user.username}</h1>
-            <div className="online-badge" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <Trophy style={{ width: '16px', height: '16px' }} />
+          <div className="profile-header-row">
+            <h1 className="profile-username-title">{user.username}</h1>
+            <div className="online-badge">
+              <Trophy className="badge-icon" />
               <span>Legend</span>
             </div>
           </div>
           
-          <p style={{ color: '#d1d5db', marginBottom: '8px', fontSize: '16px' }}>{user.title}</p>
-          <p style={{ color: '#9ca3af', fontSize: '14px', marginBottom: '16px', lineHeight: '1.5' }}>{user.bio}</p>
+          <p className="profile-title-text">{user.title}</p>
+          <p className="profile-bio-text">{user.bio}</p>
           
           <div className="buttons-container-profile">
             {isOwnProfile ? (
@@ -124,14 +124,14 @@ const ProfileInfo = ({ profileData, isOwnProfile, targetUserId }) => {
                   onClick={() => setIsEditingProfile(true)}
                   className="edit-profile-button"
                 >
-                  <Edit3 style={{ width: '16px', height: '16px' }} />
+                  <Edit3 className="button-icon" />
                   Edit Profile
                 </button>
                 <button
                   onClick={() => setIsCreatingProject(true)}
                   className="create-project-button"
                 >
-                  <Plus style={{ width: '16px', height: '16px' }} />
+                  <Plus className="button-icon" />
                   Create Project
                 </button>
               </>

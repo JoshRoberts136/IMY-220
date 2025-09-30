@@ -141,19 +141,19 @@ const ViewFriend = ({ userId }) => {
 
   if (loading) {
     return (
-      <div className="content-section" style={{ marginBottom: '20px' }}>
+      <div className="content-section view-friend-section">
         <div className="section-title">Friends</div>
-        <div style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Loading friends...</div>
+        <div className="loading-friends-message">Loading friends...</div>
       </div>
     );
   }
 
   return (
-    <div className="content-section" style={{ marginBottom: '20px' }}>
+    <div className="content-section view-friend-section">
       <div className="section-title">Friends ({friends.length})</div>
       <div className="friends-container">
         {friends.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '20px', color: '#888' }}>
+          <div className="no-friends-message">
             No friends yet. Start connecting with other developers!
           </div>
         ) : (
@@ -167,10 +167,7 @@ const ViewFriend = ({ userId }) => {
                 {friend.avatar || friend.profile?.avatar || '👤'}
                 <div 
                   className="friend-status-indicator"
-                  style={{ 
-                    backgroundColor: getStatusColor(friend.status || 'offline'),
-                    boxShadow: friend.status === 'online' ? '0 0 8px #00ff88' : 'none'
-                  }}
+                  className={`friend-status-dot ${friend.status === 'online' ? 'status-online' : friend.status === 'away' ? 'status-away' : 'status-offline'}`}
                 ></div>
               </div>
               
@@ -182,7 +179,7 @@ const ViewFriend = ({ userId }) => {
                   {friend.profile?.title || friend.title || 'Developer'}
                 </div>
                 <div className="friend-status-projects">
-                  <span style={{ color: getStatusColor(friend.status || 'offline') }}>
+                  <span className={`status-text ${friend.status === 'online' ? 'text-online' : friend.status === 'away' ? 'text-away' : 'text-offline'}`}>
                     {getStatusText(friend.status || 'offline')}
                   </span>
                   <span className="friend-separator">•</span>

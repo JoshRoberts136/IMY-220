@@ -2,24 +2,24 @@ import React from 'react';
 import '../styles.css';
 
 const ProfileStats = ({ stats }) => (
-  <div className="bg-gray-800 p-6 rounded-lg border border-red-900">
-    <h3 className="text-xl font-semibold text-red-500 mb-4">Legend Stats</h3>
-    <div className="grid grid-cols-2 gap-4">
-      <div className="text-center">
-        <div className="text-2xl font-bold text-white">{stats.projects}</div>
-        <div className="text-gray-400 text-sm">Projects</div>
+  <div className="content-section profile-stats-container">
+    <h3 className="section-title">Legend Stats</h3>
+    <div className="analytics-grid">
+      <div className="analytics-item">
+        <span className="analytics-value">{stats.projects}</span>
+        <span className="analytics-label">Projects</span>
       </div>
-      <div className="text-center">
-        <div className="text-2xl font-bold text-white">{stats.commits}</div>
-        <div className="text-gray-400 text-sm">Commits</div>
+      <div className="analytics-item">
+        <span className="analytics-value">{stats.commits}</span>
+        <span className="analytics-label">Commits</span>
       </div>
-      <div className="text-center">
-        <div className="text-2xl font-bold text-white">{stats.followers}</div>
-        <div className="text-gray-400 text-sm">Followers</div>
+      <div className="analytics-item">
+        <span className="analytics-value">{stats.followers}</span>
+        <span className="analytics-label">Followers</span>
       </div>
-      <div className="text-center">
-        <div className="text-2xl font-bold text-white">{stats.following}</div>
-        <div className="text-gray-400 text-sm">Following</div>
+      <div className="analytics-item">
+        <span className="analytics-value">{stats.following}</span>
+        <span className="analytics-label">Following</span>
       </div>
     </div>
   </div>

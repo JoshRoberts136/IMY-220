@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import apiService from '../utils/apiService';
+import '../styles.css';
 
 const ProfileDetails = () => {
   const [user, setUser] = useState({
@@ -26,11 +27,11 @@ const ProfileDetails = () => {
   return (
     <div>
       <div className="section-title">Profile Details</div>
-      <p className="text-gray-300 mb-2">Status: {user.isOnline ? 'Online' : 'Offline'}</p>
-      <p className="text-gray-300 mb-2">Username: {user.username}</p>
-      <p className="text-gray-300 mb-2">Title: {user.title}</p>
-      <p className="text-gray-300 mb-2">Joined: {user.joined}</p>
-      <p className="text-gray-300 mb-2">Location: {user.location}</p>
+      <p className="profile-detail">Status: {user.isOnline ? 'Online' : 'Offline'}</p>
+      <p className="profile-detail">Username: {user.username}</p>
+      <p className="profile-detail">Title: {user.title}</p>
+      <p className="profile-detail">Joined: {user.joined}</p>
+      <p className="profile-detail">Location: {user.location}</p>
     </div>
   );
 };
