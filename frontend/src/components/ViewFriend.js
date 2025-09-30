@@ -1,7 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import apiService from '../utils/apiService';
 
-const ViewFriend = () => {
-  const [friends] = useState([
+const ViewFriend = ({ userId }) => {
+  const [friends, setFriends] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchFriends();
+  }, [userId]);
+
+  const fetchFriends = async () => {
+    try {
+      const response = await apiService.getFriends();
+      if (response.success) {
+        setFriends(response.friends || []);
+      }
+    } catch (error) {
+      console.error('Error fetching friends:', error);
+      // Fallback to dummy data
+      setFriends([
     {
       id: 1,
       username: 'AlexCode92',
@@ -56,7 +75,16 @@ const ViewFriend = () => {
       joined: '2022',
       mutualProjects: 2
     }
-  ]);
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFriendClick = (friend) => {
+    const friendId = friend.id || friend._id || friend.username;
+    navigate(`/profile/${friendId}`);
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -76,21 +104,29 @@ const ViewFriend = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div>
+        <div className="section-title">Friends</div>
+        <div>Loading...</div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="section-title">Friends ({friends.length})</div>
       <div className="friends-container">
         {friends.map((friend) => (
           <div
-            key={friend.id}
+            key={friend.id || friend._id}
             className="friend-item"
+            onClick={() => handleFriendClick(friend)}
+            style={{ cursor: 'pointer' }}
           >
             <div className="friend-avatar">
               {friend.avatar}
-              <div className="friend-status-indicator" style={{
-                background: getStatusColor(friend.status),
-                boxShadow: friend.status === 'online' ? '0 0 8px #00ff88' : 'none'
-              }}></div>
+              <div className={`friend-status-indicator friend-status-indicator-${friend.status}`}></div>
             </div>
             
             <div className="friend-info">
@@ -98,15 +134,15 @@ const ViewFriend = () => {
                 {friend.username}
               </div>
               <div className="friend-title">
-                {friend.title}
+                {friend.profile?.title || friend.title || 'Developer'}
               </div>
               <div className="friend-status-projects">
-                <span style={{ color: getStatusColor(friend.status) }}>
+                <span className={`friend-status-text-${friend.status}`}>
                   {getStatusText(friend.status)}
                 </span>
-                <span style={{ color: '#666' }}>•</span>
-                <span style={{ color: '#888' }}>
-                  {friend.mutualProjects} mutual projects
+                <span className="friend-separator">•</span>
+                <span className="friend-projects-count">
+                  {friend.mutualProjects || 0} mutual projects
                 </span>
               </div>
             </div>

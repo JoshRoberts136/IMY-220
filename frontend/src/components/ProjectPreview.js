@@ -24,8 +24,11 @@ const ProjectPreview = ({ activity }) => {
 
   const handleUserClick = (e) => {
     e.stopPropagation(); // Prevent project navigation when clicking user
-    // Navigate to user profile when implemented
-    // navigate(`/profile/${currentActivity.user.id}`);
+    // Navigate to user profile - use username or id from activity
+    const userId = currentActivity.user.id || currentActivity.user.name;
+    if (userId) {
+      navigate(`/profile/${userId}`);
+    }
   };
 
   const formatTimeAgo = (timestamp) => {
@@ -55,7 +58,7 @@ const ProjectPreview = ({ activity }) => {
   };
 
   return (
-    <div className="activity-item" onClick={handleProjectClick} style={{ cursor: 'pointer' }}>
+    <div className="activity-item activity-item-cursor" onClick={handleProjectClick}>
       {/* Activity Header */}
       <div className="activity-header">
         <div className="user-info" onClick={handleUserClick}>
@@ -68,9 +71,8 @@ const ProjectPreview = ({ activity }) => {
             <div className="activity-time">{formatTimeAgo(currentActivity.timestamp)}</div>
           </div>
         </div>
-        <div 
-          className="action-badge" 
-          style={{ backgroundColor: getActionColor(currentActivity.type) }}
+        <div
+          className={`action-badge action-badge-${currentActivity.type}`}
         >
           {getActionIcon(currentActivity.type)} {currentActivity.action}
         </div>

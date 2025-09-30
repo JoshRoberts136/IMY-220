@@ -1,9 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProjectPreview from './ProjectPreview';
+import apiService from '../utils/apiService';
 import '../styles.css';
 
-const ActivityFeed = () => {
-  const [activities] = useState([
+const ActivityFeed = ({ userId }) => {
+  const [activities, setActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchUserActivity();
+  }, [userId]);
+
+  const fetchUserActivity = async () => {
+    try {
+      const targetUserId = userId || apiService.getUser()?.id;
+      if (!targetUserId) return;
+
+      // Get user's commits
+      const commitsResponse = await apiService.request(`/projects/user-commits/${targetUserId}`);
+      
+      if (commitsResponse.success) {
+        const commitActivities = commitsResponse.commits.map(commit => ({
+          id: commit._id,
+          user: { 
+            name: commit.author, 
+            avatar: '👤', 
+            isOnline: true 
+          },
+          action: 'Committed to',
+          project: {
+            id: commit.projectId,
+            name: commit.projectName || 'Unknown Project',
+            description: commit.message
+          },
+          message: commit.message,
+          timestamp: new Date(commit.timestamp).toLocaleDateString(),
+          projectImage: '💻',
+          likes: 0,
+          type: 'commit'
+        }));
+        setActivities(commitActivities);
+      }
+    } catch (error) {
+      console.error('Error fetching user activity:', error);
+      // Fallback to dummy data
+      setActivities([
     {
       id: '1',
       user: { name: 'CodeLegend42', avatar: '👤', isOnline: true },
@@ -75,19 +116,36 @@ const ActivityFeed = () => {
       projectImage: '📊',
       likes: 12,
       type: 'commit',
-    },
+    }
   ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="activity-feed-container">
+        <div className="section-title">Recent Activity</div>
+        <div>Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="activity-feed-container">
       <div className="section-title">
-        Recent Legend Activity
+        Recent Activity
       </div>
       <div className="scrollable-section">
         <div className="scrollable-content">
-          {activities.map((activity) => (
-            <ProjectPreview key={activity.id} activity={activity} />
-          ))}
+          {activities.length > 0 ? (
+            activities.map((activity) => (
+              <ProjectPreview key={activity.id} activity={activity} />
+            ))
+          ) : (
+            <div className="text-gray-400">No recent activity</div>
+          )}
         </div>
       </div>
     </div>

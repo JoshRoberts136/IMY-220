@@ -2543,3 +2543,132 @@ div[style*="background: #4a5568"]:hover {
   color: white;
   transform: translateY(-1px);
 }
+/* Inline style replacements - added for refactoring */
+
+/* ViewFriend.js styles */
+.friend-status-indicator-online {
+  background: #00ff88;
+  box-shadow: 0 0 8px #00ff88;
+}
+
+.friend-status-indicator-away {
+  background: #ffa500;
+  box-shadow: none;
+}
+
+.friend-status-indicator-offline {
+  background: #666666;
+  box-shadow: none;
+}
+
+.friend-status-text-online {
+  color: #00ff88;
+}
+
+.friend-status-text-away {
+  color: #ffa500;
+}
+
+.friend-status-text-offline {
+  color: #666666;
+}
+
+.friend-separator {
+  color: #666;
+}
+
+.friend-projects-count {
+  color: #888;
+}
+
+/* Search.js styles */
+.suggestion-icon-user {
+  color: #8b0000;
+}
+
+.suggestion-icon-project {
+  color: #ff3333;
+}
+
+.suggestion-icon-hashtag {
+  color: #666;
+}
+
+.suggestion-icon-default {
+  color: #8b0000;
+}
+
+/* ProjectsSection.js styles */
+.tab-cursor-pointer {
+  cursor: pointer;
+}
+
+/* ProjectPreview.js styles */
+.activity-item-cursor {
+  cursor: pointer;
+}
+
+.action-badge-checkin {
+  background-color: #00ff88;
+}
+
+.action-badge-checkout {
+  background-color: #ff6b35;
+}
+
+.action-badge-create {
+  background-color: #8b0000;
+}
+
+.action-badge-update {
+  background-color: #00bfff;
+}
+
+.action-badge-fork {
+  background-color: #ff3333;
+}
+
+/* LanguageTags.js styles */
+.language-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.language-tag-expert {
+  background: var(--apex-red);
+  border-radius: 20px;
+  color: white;
+  font-weight: 600;
+  padding: 10px 14px;
+  font-size: 16px;
+}
+
+.language-tag-advanced {
+  background: var(--apex-orange);
+  border-radius: 20px;
+  color: white;
+  font-weight: 600;
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+.language-tag-intermediate {
+  background: #4a5568;
+  border-radius: 20px;
+  color: white;
+  font-weight: 600;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+/* EditProject.js and CreateProject.js styles */
+.error-message-inline {
+  color: red;
+  margin-bottom: 15px;
+}
+
+.error-message-inline-create {
+  color: red;
+  margin-bottom: 10px;
+}

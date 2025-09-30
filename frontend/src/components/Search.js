@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import apiService from '../utils/apiService';
 import '../styles.css';
 
 const Search = ({ onSearchResults }) => {
@@ -7,16 +9,7 @@ const Search = ({ onSearchResults }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchRef = useRef(null);
-
-  // Mock search suggestions
-  const mockSuggestions = [
-    { type: 'user', name: 'WraithRunner', subtitle: 'Senior Legend' },
-    { type: 'user', name: 'OctaneSpeed', subtitle: 'Speed Demon' },
-    { type: 'project', name: 'Battle Royale Engine', subtitle: '#JavaScript #React' },
-    { type: 'project', name: 'Jump Pad Physics', subtitle: '#Python #Physics' },
-    { type: 'hashtag', name: '#JavaScript', subtitle: '45 projects' },
-    { type: 'hashtag', name: '#React', subtitle: '32 projects' }
-  ];
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -30,30 +23,104 @@ const Search = ({ onSearchResults }) => {
     };
   }, []);
 
-  const handleSearch = (query) => {
+  const handleSearch = async (query) => {
     setSearchQuery(query);
-    if (query.length > 0) {
+    
+    if (query.length > 1) {
       setIsSearching(true);
-      // Filter suggestions based on query
-      const filtered = mockSuggestions.filter(item =>
-        item.name.toLowerCase().includes(query.toLowerCase())
-      );
-      setSuggestions(filtered);
-      setShowSuggestions(true);
-     
-      // Simulate search delay
-      setTimeout(() => {
+      
+      try {
+        console.log('Searching for:', query);
+        
+        // Search for users and projects
+        const [usersResult, projectsResult] = await Promise.all([
+          apiService.request('/users'),
+          apiService.request('/projects')
+        ]);
+
+        console.log('Users result:', usersResult);
+        console.log('Users success?', usersResult.success);
+        console.log('Has users array?', usersResult.users);
+        console.log('Users array length?', usersResult.users?.length);
+        console.log('Projects result:', projectsResult);
+
+        const results = [];
+        
+        // Filter users
+        if (usersResult.success && usersResult.users) {
+          console.log('Raw users:', usersResult.users);
+          console.log('First user:', usersResult.users[0]);
+          
+          const matchingUsers = usersResult.users
+            .filter(user => {
+              console.log('Checking user:', user.username, user.id);
+              const matchUsername = user.username?.toLowerCase().includes(query.toLowerCase());
+              const matchEmail = user.email?.toLowerCase().includes(query.toLowerCase());
+              console.log('Match results:', { matchUsername, matchEmail });
+              return matchUsername || matchEmail;
+            })
+            .slice(0, 3)
+            .map(user => ({
+              type: 'user',
+              id: user.id,
+              name: user.username,
+              subtitle: user.profile?.title || user.email,
+              avatar: user.profile?.avatar || '👤'
+            }));
+          
+          console.log('Matching users:', matchingUsers);
+          results.push(...matchingUsers);
+        }
+        
+        // Filter projects
+        if (projectsResult.success && projectsResult.projects) {
+          const matchingProjects = projectsResult.projects
+            .filter(project => {
+              const matchName = project.name?.toLowerCase().includes(query.toLowerCase());
+              const matchDesc = project.description?.toLowerCase().includes(query.toLowerCase());
+              return matchName || matchDesc;
+            })
+            .slice(0, 3)
+            .map(project => ({
+              type: 'project',
+              id: project.id,
+              name: project.name,
+              subtitle: project.description || project.language,
+              language: project.language
+            }));
+          
+          console.log('Matching projects:', matchingProjects);
+          results.push(...matchingProjects);
+        }
+        
+        console.log('All results:', results);
+        setSuggestions(results);
+        setShowSuggestions(results.length > 0);
+        
+      } catch (error) {
+        console.error('Search error:', error);
+        setSuggestions([]);
+      } finally {
         setIsSearching(false);
-      }, 300);
+      }
     } else {
       setSuggestions([]);
       setShowSuggestions(false);
+      setIsSearching(false);
     }
   };
 
   const handleSuggestionClick = (suggestion) => {
     setSearchQuery(suggestion.name);
     setShowSuggestions(false);
+    
+    // Navigate based on type
+    if (suggestion.type === 'user') {
+      navigate(`/profile/${suggestion.id}`);
+    } else if (suggestion.type === 'project') {
+      navigate(`/projects/${suggestion.id}`);
+    }
+    
     if (onSearchResults) {
       onSearchResults(suggestion);
     }
@@ -106,8 +173,8 @@ const Search = ({ onSearchResults }) => {
               className="search-suggestion"
               onClick={() => handleSuggestionClick(suggestion)}
             >
-              <div className="suggestion-icon suggestion-icon-dynamic" style={{ color: getTypeColor(suggestion.type) }}>
-                {getTypeIcon(suggestion.type)}
+              <div className={`suggestion-icon suggestion-icon-${suggestion.type}`}>
+                {suggestion.avatar || getTypeIcon(suggestion.type)}
               </div>
               <div className="suggestion-content">
                 <div className="suggestion-name">{suggestion.name}</div>

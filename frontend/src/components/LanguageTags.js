@@ -11,38 +11,20 @@ const LanguageTags = () => {
     { name: 'TypeScript', level: 'advanced' },
   ]);
 
-  const getLevelColor = (level) => {
-    switch (level) {
-      case 'expert': return 'var(--apex-red)';
-      case 'advanced': return 'var(--apex-orange)';
-      case 'intermediate': return '#4a5568';
-      default: return '#666';
-    }
-  };
-
-  const getLevelSize = (level) => {
-    switch (level) {
-      case 'expert': return { padding: '10px 14px', fontSize: '16px' };
-      case 'advanced': return { padding: '8px 12px', fontSize: '14px' };
-      case 'intermediate': return { padding: '6px 10px', fontSize: '12px' };
-      default: return { padding: '4px 8px', fontSize: '11px' };
-    }
-  };
-
   return (
-    <div>
+    <div className="content-section">
       <div className="section-title">Favorite Languages</div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+      <div className="flex flex-wrap gap-2.5 pb-2.5">
         {languages.map((lang, index) => (
           <div
             key={index}
-            style={{
-              background: getLevelColor(lang.level),
-              borderRadius: '20px',
-              color: 'white',
-              fontWeight: '600',
-              ...getLevelSize(lang.level),
-            }}
+            className={`rounded-[20px] text-white font-semibold transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 ${
+              lang.level === 'expert' 
+                ? 'bg-apex-red px-3.5 py-2.5 text-base' 
+                : lang.level === 'advanced'
+                ? 'bg-apex-orange px-3 py-2 text-sm'
+                : 'bg-gray-600 px-2.5 py-1.5 text-xs'
+            }`}
           >
             #{lang.name}
           </div>

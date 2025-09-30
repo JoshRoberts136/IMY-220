@@ -6,12 +6,13 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const storedAuth = localStorage.getItem('isAuthenticated');
-    if (storedAuth) setIsAuthenticated(JSON.parse(storedAuth));
+    const token = localStorage.getItem('authToken');
+    const user = localStorage.getItem('currentUser');
+    setIsAuthenticated(!!(token && user));
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('isAuthenticated', JSON.parse(isAuthenticated));
+    localStorage.setItem('isAuthenticated', isAuthenticated);
   }, [isAuthenticated]);
 
   return (

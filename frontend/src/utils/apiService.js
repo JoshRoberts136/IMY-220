@@ -50,7 +50,7 @@ class ApiService {
   }
 
   async signup(userData) {
-    const response = await this.request('/auth/signup', {
+    const response = await this.request('/auth/register', {
       method: 'POST',
       body: JSON.stringify(userData),
     });
@@ -116,6 +116,212 @@ class ApiService {
     const user = this.getUser();
     return !!(token && user);
   }
+
+  // ==================== PROJECT API METHODS ====================
+
+  async getProjects(filters = {}) {
+    const queryString = new URLSearchParams(filters).toString();
+    const endpoint = queryString ? `/projects?${queryString}` : '/projects';
+    return this.request(endpoint);
+  }
+
+  async getProject(id) {
+    return this.request(`/projects/${id}`);
+  }
+
+  async createProject(projectData) {
+    return this.request('/projects', {
+      method: 'POST',
+      body: JSON.stringify(projectData),
+    });
+  }
+
+  async updateProject(id, projectData) {
+    return this.request(`/projects/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(projectData),
+    });
+  }
+
+  async deleteProject(id) {
+    return this.request(`/projects/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async checkoutProject(id) {
+    return this.request(`/projects/${id}/checkout`, {
+      method: 'POST',
+    });
+  }
+
+  async checkinProject(id, checkinData) {
+    return this.request(`/projects/${id}/checkin`, {
+      method: 'POST',
+      body: JSON.stringify(checkinData),
+    });
+  }
+
+  async getProjectActivity(id, filters = {}) {
+    const queryString = new URLSearchParams(filters).toString();
+    const endpoint = queryString ? `/projects/${id}/activity?${queryString}` : `/projects/${id}/activity`;
+    return this.request(endpoint);
+  }
+
+  async downloadProjectFiles(id) {
+    return this.request(`/projects/${id}/download`);
+  }
+
+  async addProjectMember(projectId, userId) {
+    return this.request(`/projects/${projectId}/members`, {
+      method: 'POST',
+      body: JSON.stringify({ userId }),
+    });
+  }
+
+  async removeProjectMember(projectId, userId) {
+    return this.request(`/projects/${projectId}/members/${userId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async transferProjectOwnership(projectId, newOwnerId) {
+    return this.request(`/projects/${projectId}/transfer-ownership`, {
+      method: 'POST',
+      body: JSON.stringify({ newOwnerId }),
+    });
+  }
+
+  // ==================== FRIENDS API METHODS ====================
+
+  async getFriends(filters = {}) {
+    const queryString = new URLSearchParams(filters).toString();
+    const endpoint = queryString ? `/friends?${queryString}` : '/friends';
+    return this.request(endpoint);
+  }
+
+  async sendFriendRequest(friendId, message = '') {
+    return this.request('/friends/request', {
+      method: 'POST',
+      body: JSON.stringify({ friendId, message }),
+    });
+  }
+
+  async getReceivedFriendRequests(filters = {}) {
+    const queryString = new URLSearchParams(filters).toString();
+    const endpoint = queryString ? `/friends/requests?${queryString}` : '/friends/requests';
+    return this.request(endpoint);
+  }
+
+  async getSentFriendRequests(filters = {}) {
+    // This endpoint doesn't exist in the backend yet, but we'll add it
+    const queryString = new URLSearchParams(filters).toString();
+    const endpoint = queryString ? `/friends/sent?${queryString}` : '/friends/sent';
+    return this.request(endpoint);
+  }
+
+  async acceptFriendRequest(requestId) {
+    return this.request(`/friends/request/${requestId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ action: 'accept' }),
+    });
+  }
+
+  async declineFriendRequest(requestId) {
+    return this.request(`/friends/request/${requestId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ action: 'decline' }),
+    });
+  }
+
+  async removeFriend(friendId) {
+    return this.request(`/friends/${friendId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async checkFriendshipStatus(userId) {
+    return this.request(`/friends/status/${userId}`);
+  }
+
+  async getMutualProjects(friendId) {
+    return this.request(`/friends/mutual-projects/${friendId}`);
+  }
+
+  // ==================== SEARCH API METHODS ====================
+
+  async search(query, filters = {}) {
+    const searchParams = new URLSearchParams({ query, ...filters });
+    return this.request(`/search?${searchParams}`);
+  }
+
+  async searchHashtags(query, limit = 10) {
+    return this.request(`/search/hashtags?query=${encodeURIComponent(query)}&limit=${limit}`);
+  }
+
+  async searchTypes(query = '') {
+    return this.request(`/search/types?query=${encodeURIComponent(query)}`);
+  }
+
+  async advancedSearch(searchData) {
+    return this.request('/search/advanced', {
+      method: 'POST',
+      body: JSON.stringify(searchData),
+    });
+  }
+
+  async getSearchSuggestions(query, type = 'all', limit = 5) {
+    return this.request(`/search/suggestions?query=${encodeURIComponent(query)}&type=${type}&limit=${limit}`);
+  }
+
+  // ==================== ACTIVITY API METHODS ====================
+
+  async getActivityFeed(filters = {}) {
+    const queryString = new URLSearchParams(filters).toString();
+    const endpoint = queryString ? `/activity?${queryString}` : '/activity';
+    return this.request(endpoint);
+  }
+
+  async getActivityStats(filters = {}) {
+    const queryString = new URLSearchParams(filters).toString();
+    const endpoint = queryString ? `/activity/stats?${queryString}` : '/activity/stats';
+    return this.request(endpoint);
+  }
+
+  async getTrendingProjects(filters = {}) {
+    const queryString = new URLSearchParams(filters).toString();
+    const endpoint = queryString ? `/activity/trending?${queryString}` : '/activity/trending';
+    return this.request(endpoint);
+  }
+
+  async getUserActivity(userId, filters = {}) {
+    const queryString = new URLSearchParams(filters).toString();
+    const endpoint = queryString ? `/activity/user/${userId}?${queryString}` : `/activity/user/${userId}`;
+    return this.request(endpoint);
+  }
+
+  // ==================== USER PROFILE API METHODS ====================
+
+  async getProfile() {
+    return this.request('/auth/profile');
+  }
+
+  async updateProfile(profileData) {
+    return this.request('/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify({ profile: profileData }),
+    });
+  }
+
+  async getUserProfile(userId) {
+    return this.request(`/users/${userId}/profile`);
+  }
+
+  async getUserById(userId) {
+    return this.request(`/users/${userId}`);
+  }
+
+  // ==================== HEALTH CHECK ====================
 
   async checkHealth() {
     try {

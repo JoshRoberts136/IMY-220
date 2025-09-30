@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { X, Code, FileText, Tag, Users, GitBranch, Shield } from 'lucide-react';
+import { X, Code, FileText, Tag, GitBranch, Shield } from 'lucide-react';
 import apiService from '../utils/apiService';
-import '../styles.css';
 
 function EditProject({ isOpen, onClose, project, onSave }) {
   const [formData, setFormData] = useState({
@@ -15,7 +14,6 @@ function EditProject({ isOpen, onClose, project, onSave }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Update form data when project changes
   React.useEffect(() => {
     if (project) {
       setFormData({
@@ -40,7 +38,6 @@ function EditProject({ isOpen, onClose, project, onSave }) {
     e.preventDefault();
     setError(null);
 
-    // Basic validation
     if (!formData.name.trim()) {
       setError('Please enter a project name');
       return;
@@ -78,11 +75,10 @@ function EditProject({ isOpen, onClose, project, onSave }) {
     }
   };
 
-  // If not using modal mode, just return a button
   if (isOpen === undefined) {
     return (
       <button 
-        className="edit-button"
+        className="flex items-center gap-2 bg-transparent text-apex-orange border-2 border-apex-orange rounded px-5 py-2.5 cursor-pointer transition-all duration-300 mt-4 hover:bg-apex-orange hover:text-white"
         onClick={() => console.log('Edit project clicked')}
       >
         <FileText size={16} />
@@ -96,11 +92,11 @@ function EditProject({ isOpen, onClose, project, onSave }) {
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <div className="modal-header">
+        <div className="flex justify-between items-center mb-6">
           <h2 className="modal-title">Edit Project</h2>
           <button
             onClick={onClose}
-            className="close-button"
+            className="bg-transparent border-none text-gray-400 cursor-pointer p-1 rounded transition-colors duration-300 hover:text-apex-orange"
           >
             <X size={24} />
           </button>
@@ -108,14 +104,12 @@ function EditProject({ isOpen, onClose, project, onSave }) {
 
         <form onSubmit={handleSubmit}>
           {error && (
-            <div className="error-message" style={{ color: 'red', marginBottom: '15px' }}>
-              {error}
-            </div>
+            <div className="text-red-500 mb-4">{error}</div>
           )}
 
           <div className="form-group">
-            <label className="form-label">
-              <FileText size={16} className="form-label-icon" />
+            <label className="form-label flex items-center">
+              <FileText size={16} className="mr-2" />
               Project Name
             </label>
             <input
@@ -130,14 +124,12 @@ function EditProject({ isOpen, onClose, project, onSave }) {
           </div>
 
           <div className="form-group">
-            <label className="form-label">
-              Description
-            </label>
+            <label className="form-label">Description</label>
             <textarea
               name="description"
               value={formData.description}
               onChange={handleChange}
-              className="form-input form-textarea"
+              className="form-input resize-y min-h-[80px]"
               rows="3"
               placeholder="Describe your project"
               required
@@ -145,8 +137,8 @@ function EditProject({ isOpen, onClose, project, onSave }) {
           </div>
 
           <div className="form-group">
-            <label className="form-label">
-              <Tag size={16} className="form-label-icon" />
+            <label className="form-label flex items-center">
+              <Tag size={16} className="mr-2" />
               Tags
             </label>
             <input
@@ -160,8 +152,8 @@ function EditProject({ isOpen, onClose, project, onSave }) {
           </div>
 
           <div className="form-group">
-            <label className="form-label">
-              <Code size={16} className="form-label-icon" />
+            <label className="form-label flex items-center">
+              <Code size={16} className="mr-2" />
               Languages
             </label>
             <input
@@ -175,8 +167,8 @@ function EditProject({ isOpen, onClose, project, onSave }) {
           </div>
 
           <div className="form-group">
-            <label className="form-label">
-              <Shield size={16} className="form-label-icon" />
+            <label className="form-label flex items-center">
+              <Shield size={16} className="mr-2" />
               Visibility
             </label>
             <select
@@ -192,8 +184,8 @@ function EditProject({ isOpen, onClose, project, onSave }) {
           </div>
 
           <div className="form-group">
-            <label className="form-label">
-              <GitBranch size={16} className="form-label-icon" />
+            <label className="form-label flex items-center">
+              <GitBranch size={16} className="mr-2" />
               Repository URL
             </label>
             <input
@@ -206,10 +198,10 @@ function EditProject({ isOpen, onClose, project, onSave }) {
             />
           </div>
 
-          <div className="buttons-container">
+          <div className="flex gap-4 mt-8">
             <button
               type="submit"
-              className="form-submit"
+              className={`form-submit flex-1 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
               disabled={loading}
             >
               {loading ? 'Saving...' : 'Save Changes'}
@@ -217,7 +209,7 @@ function EditProject({ isOpen, onClose, project, onSave }) {
             <button
               type="button"
               onClick={onClose}
-              className="cancel-button"
+              className="flex-1 px-5 py-4 bg-transparent border-2 border-gray-600 rounded-md text-gray-400 font-rajdhani font-bold text-lg cursor-pointer transition-all duration-300 uppercase tracking-wider hover:border-apex-orange hover:text-apex-orange"
               disabled={loading}
             >
               Cancel

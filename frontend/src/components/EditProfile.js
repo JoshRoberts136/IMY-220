@@ -1,15 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Mail, MapPin, Calendar, Globe, X } from 'lucide-react';
+import apiService from '../utils/apiService';
 
 const EditProfile = ({ isOpen, onClose, user, onSave }) => {
   const [formData, setFormData] = useState({
-    username: user?.username || 'CodeLegend42',
-    title: user?.title || 'Full-Stack Champion',
-    bio: user?.bio || 'Conquering bugs and building digital empires. 5+ years of battle-tested experience in the coding arena.',
-    email: user?.email || 'codelegend42@apex.com',
-    location: user?.location || 'Digital Realm',
-    joinDate: user?.joinDate || 'January 2020',
+    username: '',
+    title: '',
+    bio: '',
+    email: '',
+    location: '',
+    joinDate: '',
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchUserProfile();
+    }
+  }, [isOpen]);
+
+  const fetchUserProfile = () => {
+    const currentUser = apiService.getUser();
+    if (currentUser) {
+      setFormData({
+        username: currentUser.username || '',
+        title: currentUser.profile?.title || '',
+        bio: currentUser.profile?.bio || '',
+        email: currentUser.email || '',
+        location: currentUser.profile?.location || '',
+        joinDate: currentUser.createdAt || '',
+      });
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -20,7 +43,28 @@ const EditProfile = ({ isOpen, onClose, user, onSave }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(formData);
+    
+    const currentUser = apiService.getUser();
+    if (currentUser) {
+      const updatedUser = {
+        ...currentUser,
+        username: formData.username,
+        email: formData.email,
+        profile: {
+          ...currentUser.profile,
+          title: formData.title,
+          bio: formData.bio,
+          location: formData.location
+        }
+      };
+      
+      apiService.setUser(updatedUser);
+      
+      if (onSave) {
+        onSave(formData);
+      }
+    }
+    
     onClose();
   };
 
@@ -47,6 +91,11 @@ const EditProfile = ({ isOpen, onClose, user, onSave }) => {
             <X size={24} />
           </button>
         </div>
+        {error && (
+          <div className="error-message" style={{ color: 'red', marginBottom: '1rem' }}>
+            {error}
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label">

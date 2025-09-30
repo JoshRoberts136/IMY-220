@@ -1,13 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import apiService from '../utils/apiService';
 
 const ProfileDetails = () => {
-  const [user] = useState({
-    username: 'CodeLegend42',
-    title: 'Full-Stack Champion',
-    isOnline: true,
-    joined: 'January 2020',
-    location: 'Digital Realm',
+  const [user, setUser] = useState({
+    username: 'Loading...',
+    title: 'Loading...',
+    isOnline: false,
+    joined: 'Loading...',
+    location: 'Loading...',
   });
+
+  useEffect(() => {
+    const currentUser = apiService.getUser();
+    if (currentUser) {
+      setUser({
+        username: currentUser.username || 'Unknown User',
+        title: currentUser.profile?.title || 'Developer',
+        isOnline: currentUser.isActive || false,
+        joined: currentUser.createdAt ? new Date(currentUser.createdAt).toLocaleDateString() : 'Unknown',
+        location: currentUser.profile?.location || 'Unknown',
+      });
+    }
+  }, []);
 
   return (
     <div>

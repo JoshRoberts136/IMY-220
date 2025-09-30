@@ -66,9 +66,6 @@ Your server now includes these MongoDB-powered endpoints:
 - `GET /api/users/:id` - Get user by ID
 - `POST /api/users` - Create new user
 
-### Posts
-- `GET /api/posts` - Get all published posts (with pagination)
-- `POST /api/posts` - Create new post
 
 ### Statistics
 - `GET /api/stats` - Get database statistics
@@ -100,31 +97,6 @@ fetch('/api/users', {
 .then(data => console.log(data));
 ```
 
-### Create a Post
-```javascript
-fetch('/api/posts', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    title: 'My First Post',
-    content: 'This is the content of my first post!',
-    author: 'USER_ID_HERE', // Replace with actual user ID
-    tags: ['first-post', 'hello-world'],
-    category: 'general'
-  })
-})
-.then(response => response.json())
-.then(data => console.log(data));
-```
-
-### Get All Posts
-```javascript
-fetch('/api/posts?page=1&limit=10')
-  .then(response => response.json())
-  .then(data => console.log(data));
-```
 
 ## 🏗️ Database Schema
 

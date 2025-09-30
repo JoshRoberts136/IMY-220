@@ -28,15 +28,14 @@ const CreateProject = ({ isOpen, onClose, onSave }) => {
 
     try {
       // Map form data to API format
-      const postData = {
-        title: formData.name,
-        content: formData.description,
-        tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()) : [],
-        category: formData.languages || 'general',
-        status: formData.visibility === 'public' ? 'published' : 'draft'
+      const projectData = {
+        name: formData.name,
+        description: formData.description,
+        hashtags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()) : [],
+        type: formData.languages || 'web-application'
       };
-
-      const response = await apiService.createPost(postData);
+      
+      const response = await apiService.createProject(projectData);
 
       if (response.success) {
         onSave(response.data);
@@ -170,7 +169,7 @@ const CreateProject = ({ isOpen, onClose, onSave }) => {
           </div>
 
           {error && (
-            <div className="error-message" style={{ color: 'red', marginBottom: '10px' }}>
+            <div className="error-message error-message-inline-create">
               {error}
             </div>
           )}
@@ -199,3 +198,5 @@ const CreateProject = ({ isOpen, onClose, onSave }) => {
 };
 
 export default CreateProject;
+
+

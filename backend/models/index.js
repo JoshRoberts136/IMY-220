@@ -1,8 +1,12 @@
 // Export all models from a single file for easier imports
 const User = require('./User');
-const Post = require('./Post');
+const Project = require('./Project');
+const CheckIn = require('./CheckIn');
+const FriendRequest = require('./FriendRequest');
 
 module.exports = {
   User,
-  Post
+  Project,
+  CheckIn,
+  FriendRequest
 };

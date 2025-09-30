@@ -11,10 +11,6 @@ function Files() {
   return (
     <div className="content-section">
       <h3 className="section-title">Arsenal Files</h3>
-      <div className="tabs-placeholder">
-        <div className="tab-placeholder active">Files</div>
-        <div className="tab-placeholder">Commits</div>
-      </div>
       {files.map((file, index) => (
         <div key={index} className="file-item">
           <span>{file.name}</span>

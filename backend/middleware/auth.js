@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { User } = require('../models');
+const mongoose = require('mongoose');
 
 // Middleware to protect routes
 const authenticateToken = async (req, res, next) => {
@@ -25,10 +25,19 @@ const authenticateToken = async (req, res, next) => {
     }
 
     // Verify the token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
     
     // Get user from database
-    const user = await User.findById(decoded.userId).select('-password');
+    let user;
+    if (mongoose.Types.ObjectId.isValid(decoded.userId)) {
+      user = await mongoose.connection.db.collection('Users').findOne({
+        _id: new mongoose.Types.ObjectId(decoded.userId)
+      });
+    } else {
+      user = await mongoose.connection.db.collection('Users').findOne({
+        id: decoded.userId
+      });
+    }
     
     if (!user || !user.isActive) {
       return res.status(401).json({
@@ -38,8 +47,9 @@ const authenticateToken = async (req, res, next) => {
       });
     }
 
-    // Add user to request object
-    req.user = user;
+    // Add user to request object (remove password)
+    const { password, ...userWithoutPassword } = user;
+    req.user = userWithoutPassword;
     next();
     
   } catch (error) {
@@ -83,11 +93,22 @@ const optionalAuth = async (req, res, next) => {
       return next();
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId).select('-password');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    
+    let user;
+    if (mongoose.Types.ObjectId.isValid(decoded.userId)) {
+      user = await mongoose.connection.db.collection('Users').findOne({
+        _id: new mongoose.Types.ObjectId(decoded.userId)
+      });
+    } else {
+      user = await mongoose.connection.db.collection('Users').findOne({
+        id: decoded.userId
+      });
+    }
     
     if (user && user.isActive) {
-      req.user = user;
+      const { password, ...userWithoutPassword } = user;
+      req.user = userWithoutPassword;
     }
     
     next();

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from './AuthContext';
+import apiService from '../utils/apiService';
 import '../styles.css';
 
 function Signup() {
@@ -9,26 +10,50 @@ function Signup() {
   const [legendId, setLegendId] = useState('');
   const [passcode, setPasscode] = useState('');
   const [confirmPasscode, setConfirmPasscode] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
   const { setIsAuthenticated } = useContext(AuthContext);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
+
     if (passcode !== confirmPasscode) {
-      console.log('Passcodes do not match');
+      setError('Passcodes do not match');
+      setLoading(false);
       return;
     }
-    if (legendId && passcode && legendName) {
-      console.log('Signup successful with:', { legendName, legendId, passcode });
-      setIsAuthenticated(true);
-      navigate('/home');
-    } else {
-      console.log('Signup failed');
+
+    try {
+      const response = await apiService.signup({
+        username: legendName,
+        email: legendId,
+        password: passcode,
+        profile: {
+          firstName: legendName.split(' ')[0] || legendName,
+          lastName: legendName.split(' ')[1] || ''
+        }
+      });
+
+      if (response.success) {
+        console.log('Signup successful with:', { legendName, legendId });
+        setIsAuthenticated(true);
+        navigate('/home');
+      } else {
+        setError(response.message || 'Signup failed');
+      }
+    } catch (error) {
+      setError(error.message || 'Signup failed');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <form className="auth-form active" onSubmit={handleSubmit}>
+      {error && <div className="error-message" style={{color: 'red', marginBottom: '10px'}}>{error}</div>}
       <div className="form-group">
         <label className="form-label" htmlFor="regUsername">Legend Name</label>
         <input 
@@ -39,6 +64,7 @@ function Signup() {
           value={legendName} 
           onChange={(e) => setLegendName(e.target.value)} 
           required 
+          disabled={loading}
         />
       </div>
       <div className="form-group">
@@ -51,6 +77,7 @@ function Signup() {
           value={legendId} 
           onChange={(e) => setLegendId(e.target.value)} 
           required 
+          disabled={loading}
         />
       </div>
       <div className="form-group">
@@ -63,6 +90,7 @@ function Signup() {
           value={passcode} 
           onChange={(e) => setPasscode(e.target.value)} 
           required 
+          disabled={loading}
         />
       </div>
       <div className="form-group">
@@ -75,9 +103,12 @@ function Signup() {
           value={confirmPasscode} 
           onChange={(e) => setConfirmPasscode(e.target.value)} 
           required 
+          disabled={loading}
         />
       </div>
-      <button type="submit" className="form-submit">Become Champion</button>
+      <button type="submit" className="form-submit" disabled={loading}>
+        {loading ? 'Creating Legend...' : 'Become Champion'}
+      </button>
     </form>
   );
 }

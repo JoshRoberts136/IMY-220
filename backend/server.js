@@ -1,12 +1,130 @@
+require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const path = require('path');
-const app = express();
-const port = 3000;
+const mongoose = require('mongoose');
 
+// Configure mongoose to buffer commands when disconnected
+mongoose.set('bufferCommands', true);
+
+// Import database connection
+const connectDB = require('./config/database');
+
+// Import routes
+const apiRoutes = require('./routes/api');
+const authRoutes = require('./routes/auth');
+const projectRoutes = require('./routes/projects');
+const friendRoutes = require('./routes/friends');
+const searchRoutes = require('./routes/search');
+const userRoutes = require('./routes/users');
+const { router: activityRoutes } = require('./routes/activity');
+
+// Initialize Express app
+const app = express();
+const port = process.env.PORT || 3000;
+
+// Connect to MongoDB
+connectDB();
+
+// Middleware
+app.use(cors());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Serve static files from public directory
 app.use(express.static(path.join(__dirname, '../public')));
 
-app.post('/api/login', (req, res) => {
+// API Routes
+app.use('/api/auth', authRoutes);
+app.use('/api', apiRoutes);
+app.use('/api/projects', projectRoutes);
+app.use('/api/friends', friendRoutes);
+app.use('/api/search', searchRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/activity', activityRoutes);
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Server is running successfully!',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
 });
 
-app.post('/api/signup', (req, res) => {
+// Handle React Router - serve index.html for any non-API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public', 'index.html'));
 });
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  
+  // Mongoose validation error
+  if (err.name === 'ValidationError') {
+    return res.status(400).json({
+      success: false,
+      error: 'Validation Error',
+      message: err.message
+    });
+  }
+  
+  // JWT errors
+  if (err.name === 'JsonWebTokenError') {
+    return res.status(401).json({
+      success: false,
+      error: 'Invalid token',
+      message: 'Authentication failed'
+    });
+  }
+  
+  if (err.name === 'TokenExpiredError') {
+    return res.status(401).json({
+      success: false,
+      error: 'Token expired',
+      message: 'Please login again'
+    });
+  }
+  
+  // Default error
+  res.status(500).json({
+    success: false,
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'production' ? 
+      'Something went wrong' : 
+      err.message
+  });
+});
+
+// Handle 404 for API routes
+app.use('/api/*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    error: 'API endpoint not found',
+    message: `Route ${req.method} ${req.path} does not exist`
+  });
+});
+
+// Start server
+app.listen(port, () => {
+  console.log(`🚀 Server running on http://localhost:${port}`);
+  console.log(`📱 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`💻 Frontend served from: ${path.join(__dirname, '../public')}`);
+  console.log(`🔗 API endpoints available at: http://localhost:${port}/api`);
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  process.exit(1);
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (error) => {
+  console.error('Unhandled Rejection:', error);
+  process.exit(1);
+});
+
+module.exports = app;
