@@ -3,245 +3,82 @@ const mongoose = require('mongoose');
 const { authenticateToken } = require('../middleware/auth');
 const router = express.Router();
 
-// Send friend request
-router.post('/request', authenticateToken, async (req, res) => {
+// Get friends list - reads from User's friends array
+router.get('/', authenticateToken, async (req, res) => {
   try {
-    const { friendId } = req.body;
-    const userId = req.user._id || req.user.id;
+    const user = req.user;
+    const userId = user.id || user._id?.toString();
     
-    // For testing purposes, if friendId is a placeholder, just return success
-    if (friendId === '<existing-user-id>') {
-      return res.status(201).json({
-        success: true,
-        message: 'Friend request sent successfully (test mode)',
-        request: {
-          id: `request_${Date.now()}`,
-          fromUserId: userId.toString(),
-          toUserId: friendId,
-          status: 'pending',
-          createdAt: new Date()
-        }
-      });
-    }
+    console.log('=== FETCHING FRIENDS ===');
+    console.log('User ID:', userId);
     
-    if (friendId === userId.toString()) {
-      return res.status(400).json({
-        success: false,
-        message: 'You cannot send a friend request to yourself'
-      });
-    }
+    // Get the current user to access their friends array
+    const currentUser = await mongoose.connection.db.collection('Users').findOne({ id: userId });
     
-    // Check if friend user exists
-    let friendQuery;
-    if (mongoose.Types.ObjectId.isValid(friendId)) {
-      friendQuery = { _id: new mongoose.Types.ObjectId(friendId) };
-    } else {
-      friendQuery = { id: friendId };
-    }
-    
-    const friendUser = await mongoose.connection.db.collection('Users').findOne(friendQuery);
-    if (!friendUser) {
+    if (!currentUser) {
+      console.log('User not found');
       return res.status(404).json({
         success: false,
         message: 'User not found'
       });
     }
     
-    // Check if friend request already exists
-    const existingRequest = await mongoose.connection.db.collection('FriendRequests').findOne({
-      $or: [
-        { fromUserId: userId.toString(), toUserId: friendId },
-        { fromUserId: friendId, toUserId: userId.toString() }
-      ]
-    });
+    const friendIds = currentUser.friends || [];
+    console.log('Friend IDs from user.friends array:', friendIds);
     
-    if (existingRequest) {
-      return res.status(400).json({
-        success: false,
-        message: 'Friend request already exists'
+    if (friendIds.length === 0) {
+      console.log('No friends found');
+      return res.json({
+        success: true,
+        friends: []
       });
     }
     
-    // Check if they are already friends
-    const existingFriendship = await mongoose.connection.db.collection('Friendships').findOne({
-      $or: [
-        { userId1: userId.toString(), userId2: friendId },
-        { userId1: friendId, userId2: userId.toString() }
-      ]
-    });
+    // Get all projects to calculate mutual projects
+    const allProjects = await mongoose.connection.db.collection('Projects').find({}).toArray();
+    console.log('Total projects in database:', allProjects.length);
     
-    if (existingFriendship) {
-      return res.status(400).json({
-        success: false,
-        message: 'You are already friends with this user'
+    // Get friend user info for each friend ID
+    const friends = await Promise.all(friendIds.map(async (friendId) => {
+      const friendUser = await mongoose.connection.db.collection('Users').findOne({ id: friendId });
+      
+      if (!friendUser) {
+        console.log('Friend not found:', friendId);
+        return null;
+      }
+      
+      // Calculate mutual projects (projects where both users are members)
+      const mutualProjects = allProjects.filter(project => {
+        const members = project.members || [];
+        const hasCurrentUser = members.includes(userId);
+        const hasFriend = members.includes(friendId);
+        return hasCurrentUser && hasFriend;
       });
-    }
-    
-    // Create friend request
-    const friendRequest = {
-      id: `request_${Date.now()}`,
-      fromUserId: userId.toString(),
-      toUserId: friendId,
-      status: 'pending',
-      createdAt: new Date()
-    };
-    
-    await mongoose.connection.db.collection('FriendRequests').insertOne(friendRequest);
-    
-    res.status(201).json({
-      success: true,
-      message: 'Friend request sent successfully',
-      request: friendRequest
-    });
-  } catch (error) {
-    console.error('Error sending friend request:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error sending friend request'
-    });
-  }
-});
-
-// Get pending friend requests
-router.get('/requests', authenticateToken, async (req, res) => {
-  try {
-    const userId = req.user._id || req.user.id;
-    
-    const requests = await mongoose.connection.db.collection('FriendRequests').find({
-      toUserId: userId.toString(),
-      status: 'pending'
-    }).toArray();
-    
-    // Get user info for each request
-    const requestsWithUserInfo = await Promise.all(requests.map(async (request) => {
-      const fromUser = await mongoose.connection.db.collection('Users').findOne({
-        _id: new mongoose.Types.ObjectId(request.fromUserId)
-      });
+      
+      console.log(`Found friend: ${friendUser.username}, mutual projects: ${mutualProjects.length}`);
       
       return {
-        ...request,
-        fromUser: fromUser ? {
-          id: fromUser._id,
-          username: fromUser.username,
-          profile: fromUser.profile
-        } : null
-      };
-    }));
-    
-    res.json({
-      success: true,
-      requests: requestsWithUserInfo
-    });
-  } catch (error) {
-    console.error('Error fetching friend requests:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching friend requests'
-    });
-  }
-});
-
-// Accept/decline friend request
-router.put('/request/:requestId', authenticateToken, async (req, res) => {
-  try {
-    const { requestId } = req.params;
-    const { action } = req.body; // 'accept' or 'decline'
-    const userId = req.user._id || req.user.id;
-    
-    // Find the friend request
-    const request = await mongoose.connection.db.collection('FriendRequests').findOne({
-      _id: new mongoose.Types.ObjectId(requestId),
-      toUserId: userId.toString(),
-      status: 'pending'
-    });
-    
-    if (!request) {
-      return res.status(404).json({
-        success: false,
-        message: 'Friend request not found'
-      });
-    }
-    
-    if (action === 'accept') {
-      // Create friendship
-      const friendship = {
-        id: `friendship_${Date.now()}`,
-        userId1: request.fromUserId,
-        userId2: request.toUserId,
-        createdAt: new Date()
-      };
-      
-      await mongoose.connection.db.collection('Friendships').insertOne(friendship);
-      
-      // Update request status
-      await mongoose.connection.db.collection('FriendRequests').updateOne(
-        { _id: request._id },
-        { $set: { status: 'accepted', acceptedAt: new Date() } }
-      );
-      
-      res.json({
-        success: true,
-        message: 'Friend request accepted',
-        friendship
-      });
-    } else if (action === 'decline') {
-      // Update request status
-      await mongoose.connection.db.collection('FriendRequests').updateOne(
-        { _id: request._id },
-        { $set: { status: 'declined', declinedAt: new Date() } }
-      );
-      
-      res.json({
-        success: true,
-        message: 'Friend request declined'
-      });
-    } else {
-      res.status(400).json({
-        success: false,
-        message: 'Invalid action. Use "accept" or "decline"'
-      });
-    }
-  } catch (error) {
-    console.error('Error handling friend request:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error handling friend request'
-    });
-  }
-});
-
-// Get friends list
-router.get('/', authenticateToken, async (req, res) => {
-  try {
-    const userId = req.user._id || req.user.id;
-    
-    const friendships = await mongoose.connection.db.collection('Friendships').find({
-      $or: [
-        { userId1: userId.toString() },
-        { userId2: userId.toString() }
-      ]
-    }).toArray();
-    
-    // Get friend user info
-    const friends = await Promise.all(friendships.map(async (friendship) => {
-      const friendId = friendship.userId1 === userId.toString() ? 
-        friendship.userId2 : friendship.userId1;
-      
-      const friendUser = await mongoose.connection.db.collection('Users').findOne({
-        _id: new mongoose.Types.ObjectId(friendId)
-      });
-      
-      return friendUser ? {
-        id: friendUser._id,
+        id: friendUser.id,
+        _id: friendUser._id,
         username: friendUser.username,
+        email: friendUser.email,
         profile: friendUser.profile,
-        friendshipDate: friendship.createdAt
-      } : null;
+        isActive: friendUser.isActive,
+        status: friendUser.isActive ? 'online' : 'offline',
+        avatar: friendUser.profile?.avatar || '👤',
+        title: friendUser.profile?.title || 'Developer',
+        mutualProjects: mutualProjects.length
+      };
     }));
+    
+    // Filter out any null values (users that weren't found)
+    const validFriends = friends.filter(friend => friend !== null);
+    
+    console.log('Returning friends:', validFriends.length);
     
     res.json({
       success: true,
-      friends: friends.filter(friend => friend !== null)
+      friends: validFriends
     });
   } catch (error) {
     console.error('Error fetching friends:', error);
@@ -252,102 +89,203 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
-// Get sent friend requests
-router.get('/sent', authenticateToken, async (req, res) => {
-  try {
-    const userId = req.user._id || req.user.id;
-    
-    const requests = await mongoose.connection.db.collection('FriendRequests').find({
-      fromUserId: userId.toString(),
-      status: 'pending'
-    }).toArray();
-    
-    // Get user info for each request
-    const requestsWithUserInfo = await Promise.all(requests.map(async (request) => {
-      const toUser = await mongoose.connection.db.collection('Users').findOne({
-        _id: new mongoose.Types.ObjectId(request.toUserId)
-      });
-      
-      return {
-        ...request,
-        toUser: toUser ? {
-          id: toUser._id,
-          username: toUser.username,
-          profile: toUser.profile
-        } : null
-      };
-    }));
-    
-    res.json({
-      success: true,
-      requests: requestsWithUserInfo
-    });
-  } catch (error) {
-    console.error('Error fetching sent friend requests:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching sent friend requests'
-    });
-  }
-});
-
 // Check friendship status with a specific user
 router.get('/status/:userId', authenticateToken, async (req, res) => {
   try {
-    const currentUserId = req.user._id || req.user.id;
+    const currentUser = req.user;
+    const currentUserId = currentUser.id || currentUser._id?.toString();
     const targetUserId = req.params.userId;
     
-    if (currentUserId.toString() === targetUserId) {
+    console.log('Checking friendship status:', { currentUserId, targetUserId });
+    
+    if (currentUserId === targetUserId) {
       return res.json({
         success: true,
         status: 'self'
       });
     }
     
-    // Check if they are friends
-    const friendship = await mongoose.connection.db.collection('Friendships').findOne({
-      $or: [
-        { userId1: currentUserId.toString(), userId2: targetUserId },
-        { userId1: targetUserId, userId2: currentUserId.toString() }
-      ]
-    });
+    // Get current user's friends array
+    const user = await mongoose.connection.db.collection('Users').findOne({ id: currentUserId });
     
-    if (friendship) {
+    if (!user) {
       return res.json({
         success: true,
-        status: 'friends',
-        friendshipDate: friendship.createdAt
+        status: 'none'
       });
     }
     
-    // Check for pending friend requests
-    const pendingRequest = await mongoose.connection.db.collection('FriendRequests').findOne({
-      $or: [
-        { fromUserId: currentUserId.toString(), toUserId: targetUserId, status: 'pending' },
-        { fromUserId: targetUserId, toUserId: currentUserId.toString(), status: 'pending' }
-      ]
-    });
+    const friendIds = user.friends || [];
+    const isFriend = friendIds.includes(targetUserId);
     
-    if (pendingRequest) {
-      const status = pendingRequest.fromUserId === currentUserId.toString() ? 'sent' : 'received';
-      return res.json({
-        success: true,
-        status: status,
-        requestId: pendingRequest._id,
-        requestDate: pendingRequest.createdAt
-      });
-    }
-    
-    // No relationship
     res.json({
       success: true,
-      status: 'none'
+      status: isFriend ? 'friends' : 'none'
     });
   } catch (error) {
     console.error('Error checking friendship status:', error);
     res.status(500).json({
       success: false,
       message: 'Error checking friendship status'
+    });
+  }
+});
+
+// Add friend (simplified - directly adds to friends array)
+router.post('/add', authenticateToken, async (req, res) => {
+  try {
+    const { friendId } = req.body;
+    const currentUser = req.user;
+    const userId = currentUser.id || currentUser._id?.toString();
+    
+    console.log('=== ADDING FRIEND ===');
+    console.log('Current user:', userId);
+    console.log('Friend to add:', friendId);
+    
+    if (friendId === userId) {
+      return res.status(400).json({
+        success: false,
+        message: 'You cannot add yourself as a friend'
+      });
+    }
+    
+    // Check if friend user exists
+    const friendUser = await mongoose.connection.db.collection('Users').findOne({ id: friendId });
+    if (!friendUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    
+    // Get current user
+    const user = await mongoose.connection.db.collection('Users').findOne({ id: userId });
+    const friendIds = user.friends || [];
+    
+    // Check if already friends
+    if (friendIds.includes(friendId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'You are already friends with this user'
+      });
+    }
+    
+    // Add friend to both users' friends arrays
+    await mongoose.connection.db.collection('Users').updateOne(
+      { id: userId },
+      { $push: { friends: friendId } }
+    );
+    
+    await mongoose.connection.db.collection('Users').updateOne(
+      { id: friendId },
+      { $push: { friends: userId } }
+    );
+    
+    console.log('Friend added successfully');
+    
+    res.json({
+      success: true,
+      message: 'Friend added successfully'
+    });
+  } catch (error) {
+    console.error('Error adding friend:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error adding friend'
+    });
+  }
+});
+
+// Remove friend
+router.delete('/:friendId', authenticateToken, async (req, res) => {
+  try {
+    const { friendId } = req.params;
+    const currentUser = req.user;
+    const userId = currentUser.id || currentUser._id?.toString();
+    
+    console.log('=== REMOVING FRIEND ===');
+    console.log('Current user:', userId);
+    console.log('Friend to remove:', friendId);
+    
+    // Remove friend from both users' friends arrays
+    await mongoose.connection.db.collection('Users').updateOne(
+      { id: userId },
+      { $pull: { friends: friendId } }
+    );
+    
+    await mongoose.connection.db.collection('Users').updateOne(
+      { id: friendId },
+      { $pull: { friends: userId } }
+    );
+    
+    console.log('Friend removed successfully');
+    
+    res.json({
+      success: true,
+      message: 'Friend removed successfully'
+    });
+  } catch (error) {
+    console.error('Error removing friend:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error removing friend'
+    });
+  }
+});
+
+// Get mutual projects with a friend
+router.get('/mutual-projects/:friendId', authenticateToken, async (req, res) => {
+  try {
+    const currentUser = req.user;
+    const userId = currentUser.id || currentUser._id?.toString();
+    const friendId = req.params.friendId;
+    
+    console.log('Finding mutual projects between:', { userId, friendId });
+    
+    // Find all projects where both users are members
+    const mutualProjects = await mongoose.connection.db.collection('Projects')
+      .find({
+        members: { $all: [userId, friendId] }
+      })
+      .toArray();
+    
+    console.log('Found mutual projects:', mutualProjects.length);
+    
+    // Get owner info for each project
+    const projectsWithOwners = await Promise.all(
+      mutualProjects.map(async (project) => {
+        const owner = await mongoose.connection.db.collection('Users').findOne({
+          id: project.ownedBy
+        });
+        
+        return {
+          id: project.id,
+          _id: project._id,
+          name: project.name,
+          description: project.description,
+          language: project.language,
+          stars: project.stars || 0,
+          forks: project.forks || 0,
+          hashtags: project.hashtags || [],
+          ownedBy: project.ownedBy,
+          ownerName: owner ? owner.username : 'Unknown',
+          ownerAvatar: owner ? (owner.profile?.avatar || '👤') : '👤',
+          members: project.members || [],
+          lastUpdated: project.lastUpdated,
+          createdAt: project.createdAt
+        };
+      })
+    );
+    
+    res.json({
+      success: true,
+      projects: projectsWithOwners
+    });
+  } catch (error) {
+    console.error('Error fetching mutual projects:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching mutual projects'
     });
   }
 });

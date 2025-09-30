@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { UserPlus, Check, X, Clock } from 'lucide-react';
 import apiService from '../utils/apiService';
+import '../styles.css';
 
 const AddFriend = ({ targetUserId, onFriendshipChange }) => {
   const [friendshipStatus, setFriendshipStatus] = useState('none');
@@ -116,8 +117,8 @@ const AddFriend = ({ targetUserId, onFriendshipChange }) => {
 
   if (loading) {
     return (
-      <button className="apex-button flex items-center gap-2 opacity-70 cursor-not-allowed" disabled>
-        <Clock className="w-4 h-4 animate-spin" />
+      <button className="btn" style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: 0.7, cursor: 'not-allowed' }} disabled>
+        <Clock style={{ width: '16px', height: '16px' }} />
         Loading...
       </button>
     );
@@ -125,10 +126,10 @@ const AddFriend = ({ targetUserId, onFriendshipChange }) => {
 
   if (error) {
     return (
-      <div className="flex flex-col gap-2">
-        <span className="text-red-500 text-sm">{error}</span>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <span style={{ color: '#ff6b6b', fontSize: '14px' }}>{error}</span>
         <button
-          className="apex-button-secondary"
+          className="btn-secondary"
           onClick={checkFriendshipStatus}
         >
           Retry
@@ -143,35 +144,37 @@ const AddFriend = ({ targetUserId, onFriendshipChange }) => {
     
     case 'friends':
       return (
-        <button className="apex-button apex-button-primary flex items-center gap-2 opacity-70 cursor-not-allowed" disabled>
-          <Check className="w-4 h-4" />
+        <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: 0.7, cursor: 'not-allowed' }} disabled>
+          <Check style={{ width: '16px', height: '16px' }} />
           Friends
         </button>
       );
     
     case 'sent':
       return (
-        <button className="apex-button flex items-center gap-2 opacity-70 cursor-not-allowed" disabled>
-          <Clock className="w-4 h-4" />
+        <button className="btn" style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: 0.7, cursor: 'not-allowed' }} disabled>
+          <Clock style={{ width: '16px', height: '16px' }} />
           Request Sent
         </button>
       );
     
     case 'received':
       return (
-        <div className="flex gap-2">
+        <div style={{ display: 'flex', gap: '8px' }}>
           <button
-            className="apex-button apex-button-primary flex items-center gap-2"
+            className="btn btn-primary"
+            style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
             onClick={handleAcceptFriendRequest}
           >
-            <Check className="w-4 h-4" />
+            <Check style={{ width: '16px', height: '16px' }} />
             Accept
           </button>
           <button
-            className="apex-button-secondary flex items-center gap-2"
+            className="btn-secondary"
+            style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
             onClick={handleDeclineFriendRequest}
           >
-            <X className="w-4 h-4" />
+            <X style={{ width: '16px', height: '16px' }} />
             Decline
           </button>
         </div>
@@ -180,11 +183,12 @@ const AddFriend = ({ targetUserId, onFriendshipChange }) => {
     default:
       return (
         <button
-          className="apex-button flex items-center gap-2"
+          className="btn"
+          style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
           onClick={handleSendFriendRequest}
           disabled={loading}
         >
-          <UserPlus className="w-4 h-4" />
+          <UserPlus style={{ width: '16px', height: '16px' }} />
           Add Friend
         </button>
       );

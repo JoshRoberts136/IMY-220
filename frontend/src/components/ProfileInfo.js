@@ -4,6 +4,7 @@ import EditProfile from './EditProfile';
 import CreateProject from './CreateProject';
 import AddFriend from './AddFriend';
 import apiService from '../utils/apiService';
+import '../styles.css';
 
 const ProfileInfo = ({ profileData, isOwnProfile, targetUserId }) => {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -94,40 +95,43 @@ const ProfileInfo = ({ profileData, isOwnProfile, targetUserId }) => {
   };
 
   return (
-    <div className="content-section">
+    <div className="content-section" style={{ marginBottom: '20px' }}>
       <div className="section-title">
         {isOwnProfile ? 'Legend Profile' : `${user.username}'s Profile`}
       </div>
-      <div className="flex gap-5 items-center mb-5">
-        <div className="w-[120px] h-[120px] bg-apex-orange/20 rounded-full flex items-center justify-center border-2 border-apex-orange">
-          <User className="w-16 h-16 text-gray-400" />
+      
+      <div className="profile-container">
+        <div className="user-avatar" style={{ width: '120px', height: '120px', fontSize: '64px' }}>
+          <User style={{ width: '64px', height: '64px', color: '#9ca3af' }} />
         </div>
-        <div className="flex-1">
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl font-bold text-white">{user.username}</h1>
-            <div className="flex items-center gap-1 bg-red-600 px-2 py-1 rounded-full">
-              <Trophy className="w-4 h-4 text-white" />
-              <span className="text-sm text-white font-semibold">Legend</span>
+        
+        <div className="profile-info">
+          <div className="flex items-center gap-3 mb-2" style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+            <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: 'white', margin: 0 }}>{user.username}</h1>
+            <div className="online-badge" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <Trophy style={{ width: '16px', height: '16px' }} />
+              <span>Legend</span>
             </div>
           </div>
-          <p className="text-gray-300 mb-2">{user.title}</p>
-          <p className="text-gray-400 text-sm mb-4">{user.bio}</p>
           
-          <div className="flex gap-2.5">
+          <p style={{ color: '#d1d5db', marginBottom: '8px', fontSize: '16px' }}>{user.title}</p>
+          <p style={{ color: '#9ca3af', fontSize: '14px', marginBottom: '16px', lineHeight: '1.5' }}>{user.bio}</p>
+          
+          <div className="buttons-container-profile">
             {isOwnProfile ? (
               <>
                 <button
                   onClick={() => setIsEditingProfile(true)}
-                  className="flex items-center gap-2 bg-apex-orange text-white border-none rounded px-5 py-2.5 cursor-pointer transition-all duration-300 hover:bg-apex-red"
+                  className="edit-profile-button"
                 >
-                  <Edit3 className="w-4 h-4" />
+                  <Edit3 style={{ width: '16px', height: '16px' }} />
                   Edit Profile
                 </button>
                 <button
                   onClick={() => setIsCreatingProject(true)}
-                  className="flex items-center gap-2 bg-transparent text-apex-orange border-2 border-apex-orange rounded px-5 py-2.5 cursor-pointer transition-all duration-300 hover:bg-apex-orange hover:text-white"
+                  className="create-project-button"
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus style={{ width: '16px', height: '16px' }} />
                   Create Project
                 </button>
               </>
