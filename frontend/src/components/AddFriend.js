@@ -36,24 +36,68 @@ const AddFriend = ({ targetUserId, onFriendshipChange }) => {
     }
   };
 
-  const handleSendFriendRequest = async () => {
+  const handleAddFriend = async () => {
     try {
       setLoading(true);
       setError('');
       
-      const response = await apiService.sendFriendRequest(targetUserId);
+      const currentUser = apiService.getUser();
+      
+      // Use the add friend endpoint that directly adds to friends array
+      const response = await apiService.request('/friends/add', {
+        method: 'POST',
+        body: JSON.stringify({ friendId: targetUserId })
+      });
       
       if (response.success) {
-        setFriendshipStatus('sent');
+        // Update both users' friends arrays directly
+        const updatedUser = {
+          ...currentUser,
+          friends: [...(currentUser.friends || []), targetUserId]
+        };
+        apiService.setUser(updatedUser);
+        
+        setFriendshipStatus('friends');
         if (onFriendshipChange) {
-          onFriendshipChange('sent');
+          onFriendshipChange('friends');
         }
       } else {
-        setError(response.message || 'Failed to send friend request');
+        setError(response.message || 'Failed to add friend');
       }
     } catch (error) {
-      console.error('Error sending friend request:', error);
-      setError('Failed to send friend request');
+      console.error('Error adding friend:', error);
+      setError('Failed to add friend');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRemoveFriend = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      
+      const response = await apiService.removeFriend(targetUserId);
+      
+      if (response.success) {
+        // Update current user's friends array
+        const currentUser = apiService.getUser();
+        const updatedUser = {
+          ...currentUser,
+          friends: (currentUser.friends || []).filter(id => id !== targetUserId)
+        };
+        apiService.setUser(updatedUser);
+        
+        setFriendshipStatus('none');
+        if (onFriendshipChange) {
+          onFriendshipChange('none');
+        }
+      } else {
+        setError(response.message || 'Failed to remove friend');
+      }
+    } catch (error) {
+      console.error('Error removing friend:', error);
+      setError('Failed to remove friend');
     } finally {
       setLoading(false);
     }
@@ -144,9 +188,13 @@ const AddFriend = ({ targetUserId, onFriendshipChange }) => {
     
     case 'friends':
       return (
-        <button className="btn btn-primary btn-disabled" disabled>
-          <Check className="icon-sm" />
-          Friends
+        <button 
+          className="btn btn-secondary btn-with-icon"
+          onClick={handleRemoveFriend}
+          disabled={loading}
+        >
+          <X className="icon-sm" />
+          Remove Friend
         </button>
       );
     
@@ -183,9 +231,8 @@ const AddFriend = ({ targetUserId, onFriendshipChange }) => {
     default:
       return (
         <button
-          className="btn"
-          className="btn-with-icon"
-          onClick={handleSendFriendRequest}
+          className="btn btn-primary btn-with-icon"
+          onClick={handleAddFriend}
           disabled={loading}
         >
           <UserPlus className="icon-sm" />
