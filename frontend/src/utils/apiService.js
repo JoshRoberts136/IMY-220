@@ -192,6 +192,23 @@ class ApiService {
     });
   }
 
+  // ==================== COMMIT API METHODS ====================
+
+  async createCommit(commitData) {
+    return this.request('/commits', {
+      method: 'POST',
+      body: JSON.stringify(commitData),
+    });
+  }
+
+  async getProjectCommits(projectId) {
+    return this.request(`/projects/project-commits/${projectId}`);
+  }
+
+  async getUserCommits(userId) {
+    return this.request(`/projects/user-commits/${userId}`);
+  }
+
   // ==================== FRIENDS API METHODS ====================
 
   async getFriends(filters = {}) {

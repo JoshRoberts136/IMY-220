@@ -17,6 +17,7 @@ const projectRoutes = require('./routes/projects');
 const friendRoutes = require('./routes/friends');
 const searchRoutes = require('./routes/search');
 const userRoutes = require('./routes/users');
+const commitRoutes = require('./routes/commits');
 const { router: activityRoutes } = require('./routes/activity');
 
 // Initialize Express app
@@ -41,6 +42,7 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/friends', friendRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/commits', commitRoutes);
 app.use('/api/activity', activityRoutes);
 
 // Health check endpoint

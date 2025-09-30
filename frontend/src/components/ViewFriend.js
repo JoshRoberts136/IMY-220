@@ -166,8 +166,7 @@ const ViewFriend = ({ userId }) => {
               <div className="friend-avatar">
                 {friend.avatar || friend.profile?.avatar || '👤'}
                 <div 
-                  className="friend-status-indicator"
-                  className={`friend-status-dot ${friend.status === 'online' ? 'status-online' : friend.status === 'away' ? 'status-away' : 'status-offline'}`}
+                  className={`friend-status-indicator friend-status-dot ${friend.status === 'online' ? 'status-online' : friend.status === 'away' ? 'status-away' : 'status-offline'}`}
                 ></div>
               </div>
               

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { User, Mail, MapPin, Calendar, Globe, X } from 'lucide-react';
 import apiService from '../utils/apiService';
 
@@ -82,7 +83,7 @@ const EditProfile = ({ isOpen, onClose, user, onSave }) => {
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div className="modal-overlay">
       <div className="modal-content">
         <div className="modal-header">
@@ -134,7 +135,8 @@ const EditProfile = ({ isOpen, onClose, user, onSave }) => {
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

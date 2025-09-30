@@ -285,7 +285,7 @@ const ProjectCard = () => {
       <div className="grid-2">
         <div>
             
-            <Files />
+            <Files projectId={project.id} project={project} onCommitCreated={fetchProjectData} />
         </div>
         
         <div>
