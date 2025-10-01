@@ -1,5 +1,5 @@
 # Use Node.js 18 as base image
-FROM node:18-alpine
+FROM node:18
 
 # Set working directory
 WORKDIR /app
@@ -16,8 +16,8 @@ COPY . .
 # Build the frontend
 RUN npm run build
 
-# Expose port 3000 for the backend
-EXPOSE 3000
+# Expose ports for frontend (3000) and backend 
+EXPOSE 3000 3000
 
-# Start the backend server (which will serve the built frontend)
-CMD ["node", "backend/server.js"]
+# Run the development script
+CMD ["npm", "run", "dev"]
