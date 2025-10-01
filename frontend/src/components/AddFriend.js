@@ -210,16 +210,14 @@ const AddFriend = ({ targetUserId, onFriendshipChange }) => {
       return (
         <div className="button-group">
           <button
-            className="btn btn-primary"
-            className="btn-with-icon"
+            className="btn btn-primary btn-with-icon"
             onClick={handleAcceptFriendRequest}
           >
             <Check className="icon-sm" />
             Accept
           </button>
           <button
-            className="btn-secondary"
-            className="btn-with-icon"
+            className="btn btn-secondary btn-with-icon"
             onClick={handleDeclineFriendRequest}
           >
             <X className="icon-sm" />

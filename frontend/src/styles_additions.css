@@ -364,4 +364,94 @@
   gap: 20px;
 }
 
+/* AddMemberToProject styles */
+.user-select-list {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid rgba(139, 0, 0, 0.3);
+  border-radius: 8px;
+  background: rgba(20, 20, 20, 0.5);
+}
 
+.user-select-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid rgba(139, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.user-select-item:last-child {
+  border-bottom: none;
+}
+
+.user-select-item:hover {
+  background: rgba(139, 0, 0, 0.1);
+}
+
+.user-select-item.selected {
+  background: rgba(139, 0, 0, 0.2);
+  border-color: var(--apex-orange);
+}
+
+.user-select-avatar {
+  width: 40px;
+  height: 40px;
+  background: rgba(139, 0, 0, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--apex-orange);
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.user-select-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-select-name {
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.user-select-email {
+  color: #888;
+  font-size: 12px;
+}
+
+.selected-check {
+  color: var(--apex-orange);
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.no-results-message {
+  text-align: center;
+  padding: 20px;
+  color: #888;
+  font-size: 14px;
+}
+
+.btn-remove-member {
+  background: transparent;
+  border: 1px solid #ff4444;
+  color: #ff4444;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  margin-left: 8px;
+}
+
+.btn-remove-member:hover {
+  background: #ff4444;
+  color: white;
+}

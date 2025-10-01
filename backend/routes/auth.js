@@ -5,7 +5,6 @@ const { ObjectId } = require('mongodb');
 const User = require('../models/userModel');
 const router = express.Router();
 
-// Generate JWT token
 const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET || 'your-secret-key', {
     expiresIn: '24h'
@@ -19,7 +18,6 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     console.log('Email:', email);
 
-    // Find user by email using the string id field
     const user = await User.db.collection('Users').findOne({ email: email });
     console.log('User found:', user ? user.username : 'null');
 
@@ -46,11 +44,9 @@ router.post('/login', async (req, res) => {
 
     console.log('Password validation successful');
 
-    // Generate JWT token using the string id
     const token = generateToken(user.id);
     console.log('Generated token:', token ? 'SUCCESS' : 'FAILED');
 
-    // Update last login
     await User.db.collection('Users').updateOne(
       { id: user.id },
       { $set: { lastLogin: new Date() } }
@@ -77,14 +73,12 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Simple register route
 router.post('/register', async (req, res) => {
   try {
     console.log('=== REGISTER REQUEST RECEIVED ===');
     console.log('Request body:', req.body);
     const { username, email, password, profile } = req.body;
 
-    // Check if user already exists in Users collection
     const existingUser = await User.db.collection('Users').findOne({
       $or: [{ email }, { username }]
     });
@@ -96,10 +90,8 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new user in Users collection with string id
     const newUser = {
       id: `user_${Date.now()}`,
       username,
@@ -119,7 +111,6 @@ router.post('/register', async (req, res) => {
     const result = await User.db.collection('Users').insertOne(newUser);
     console.log('User created:', result.insertedId);
 
-    // Generate JWT token using the string id
     const token = generateToken(newUser.id);
 
     res.status(201).json({
@@ -143,7 +134,6 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Verify token
 router.get('/verify', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
@@ -153,7 +143,6 @@ router.get('/verify', async (req, res) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
     
-    // Find user by string id
     const user = await User.db.collection('Users').findOne({ id: decoded.userId });
     
     if (!user) {
@@ -176,7 +165,6 @@ router.get('/verify', async (req, res) => {
   }
 });
 
-// Update current user profile
 router.put('/profile', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
@@ -199,7 +187,6 @@ router.put('/profile', async (req, res) => {
       }
     };
 
-    // Use string id
     const result = await User.db.collection('Users').findOneAndUpdate(
       { id: decoded.userId },
       updateData,

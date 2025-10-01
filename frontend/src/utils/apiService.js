@@ -117,8 +117,6 @@ class ApiService {
     return !!(token && user);
   }
 
-  // ==================== PROJECT API METHODS ====================
-
   async getProjects(filters = {}) {
     const queryString = new URLSearchParams(filters).toString();
     const endpoint = queryString ? `/projects?${queryString}` : '/projects';
@@ -192,8 +190,6 @@ class ApiService {
     });
   }
 
-  // ==================== COMMIT API METHODS ====================
-
   async createCommit(commitData) {
     return this.request('/commits', {
       method: 'POST',
@@ -208,8 +204,6 @@ class ApiService {
   async getUserCommits(userId) {
     return this.request(`/projects/user-commits/${userId}`);
   }
-
-  // ==================== FRIENDS API METHODS ====================
 
   async getFriends(filters = {}) {
     const queryString = new URLSearchParams(filters).toString();
@@ -265,8 +259,6 @@ class ApiService {
     return this.request(`/friends/mutual-projects/${friendId}`);
   }
 
-  // ==================== SEARCH API METHODS ====================
-
   async search(query, filters = {}) {
     const searchParams = new URLSearchParams({ query, ...filters });
     return this.request(`/search?${searchParams}`);
@@ -290,8 +282,6 @@ class ApiService {
   async getSearchSuggestions(query, type = 'all', limit = 5) {
     return this.request(`/search/suggestions?query=${encodeURIComponent(query)}&type=${type}&limit=${limit}`);
   }
-
-  // ==================== ACTIVITY API METHODS ====================
 
   async getActivityFeed(filters = {}) {
     const queryString = new URLSearchParams(filters).toString();
@@ -317,8 +307,6 @@ class ApiService {
     return this.request(endpoint);
   }
 
-  // ==================== USER PROFILE API METHODS ====================
-
   async getProfile() {
     return this.request('/auth/profile');
   }
@@ -337,8 +325,6 @@ class ApiService {
   async getUserById(userId) {
     return this.request(`/users/${userId}`);
   }
-
-  // ==================== HEALTH CHECK ====================
 
   async checkHealth() {
     try {

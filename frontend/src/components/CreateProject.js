@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Code, FileText, Tag, Users } from 'lucide-react';
 import apiService from '../utils/apiService';
 
@@ -62,7 +63,7 @@ const CreateProject = ({ isOpen, onClose, onSave }) => {
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div className="modal-overlay">
       <div className="modal-content">
         <div className="modal-header">
@@ -193,7 +194,8 @@ const CreateProject = ({ isOpen, onClose, onSave }) => {
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

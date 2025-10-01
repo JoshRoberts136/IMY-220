@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Code, FileText, Tag, GitBranch, Shield } from 'lucide-react';
 import apiService from '../utils/apiService';
 import '../styles.css';
@@ -53,14 +54,15 @@ function EditProject({ isOpen, onClose, project, onSave }) {
 
     try {
       const processedData = {
-        title: formData.name.trim(),
-        content: formData.description.trim(),
+        name: formData.name.trim(),
+        description: formData.description.trim(),
         tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
-        category: formData.languages || 'general',
-        status: formData.visibility === 'public' ? 'published' : 'draft'
+        languages: formData.languages ? formData.languages.split(',').map(lang => lang.trim()).filter(lang => lang) : [],
+        visibility: formData.visibility,
+        repository: formData.repository.trim()
       };
 
-      const response = await apiService.updatePost(project.id, processedData);
+      const response = await apiService.updateProject(project.id, processedData);
 
       if (response.success) {
         if (onSave) onSave(response.data);
@@ -90,7 +92,7 @@ function EditProject({ isOpen, onClose, project, onSave }) {
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div className="modal-overlay">
       <div className="modal-content">
         <div className="modal-header">
@@ -127,8 +129,7 @@ function EditProject({ isOpen, onClose, project, onSave }) {
               name="description"
               value={formData.description}
               onChange={handleChange}
-              className="form-input"
-              className="textarea-resizable"
+              className="form-input form-textarea"
               rows="3"
               placeholder="Describe your project"
               required
@@ -200,8 +201,7 @@ function EditProject({ isOpen, onClose, project, onSave }) {
           <div className="buttons-container">
             <button
               type="submit"
-              className="form-submit"
-              className={loading ? 'button-disabled' : ''}
+              className={`form-submit ${loading ? 'button-disabled' : ''}`}
               disabled={loading}
             >
               {loading ? 'Saving...' : 'Save Changes'}
@@ -217,7 +217,8 @@ function EditProject({ isOpen, onClose, project, onSave }) {
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const { authenticateToken } = require('../middleware/auth');
 const router = express.Router();
 
-// Get friends list - reads from User's friends array
 router.get('/', authenticateToken, async (req, res) => {
   try {
     const user = req.user;
@@ -12,7 +11,6 @@ router.get('/', authenticateToken, async (req, res) => {
     console.log('=== FETCHING FRIENDS ===');
     console.log('User ID:', userId);
     
-    // Get the current user to access their friends array
     const currentUser = await mongoose.connection.db.collection('Users').findOne({ id: userId });
     
     if (!currentUser) {
@@ -34,11 +32,9 @@ router.get('/', authenticateToken, async (req, res) => {
       });
     }
     
-    // Get all projects to calculate mutual projects
     const allProjects = await mongoose.connection.db.collection('Projects').find({}).toArray();
     console.log('Total projects in database:', allProjects.length);
     
-    // Get friend user info for each friend ID
     const friends = await Promise.all(friendIds.map(async (friendId) => {
       const friendUser = await mongoose.connection.db.collection('Users').findOne({ id: friendId });
       
@@ -47,7 +43,6 @@ router.get('/', authenticateToken, async (req, res) => {
         return null;
       }
       
-      // Calculate mutual projects (projects where both users are members)
       const mutualProjects = allProjects.filter(project => {
         const members = project.members || [];
         const hasCurrentUser = members.includes(userId);
@@ -71,7 +66,6 @@ router.get('/', authenticateToken, async (req, res) => {
       };
     }));
     
-    // Filter out any null values (users that weren't found)
     const validFriends = friends.filter(friend => friend !== null);
     
     console.log('Returning friends:', validFriends.length);
@@ -89,7 +83,6 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
-// Check friendship status with a specific user
 router.get('/status/:userId', authenticateToken, async (req, res) => {
   try {
     const currentUser = req.user;
@@ -105,7 +98,6 @@ router.get('/status/:userId', authenticateToken, async (req, res) => {
       });
     }
     
-    // Get current user's friends array
     const user = await mongoose.connection.db.collection('Users').findOne({ id: currentUserId });
     
     if (!user) {
@@ -131,7 +123,6 @@ router.get('/status/:userId', authenticateToken, async (req, res) => {
   }
 });
 
-// Add friend (simplified - directly adds to friends array)
 router.post('/add', authenticateToken, async (req, res) => {
   try {
     const { friendId } = req.body;
@@ -149,7 +140,6 @@ router.post('/add', authenticateToken, async (req, res) => {
       });
     }
     
-    // Check if friend user exists
     const friendUser = await mongoose.connection.db.collection('Users').findOne({ id: friendId });
     if (!friendUser) {
       return res.status(404).json({
@@ -158,11 +148,9 @@ router.post('/add', authenticateToken, async (req, res) => {
       });
     }
     
-    // Get current user
     const user = await mongoose.connection.db.collection('Users').findOne({ id: userId });
     const friendIds = user.friends || [];
     
-    // Check if already friends
     if (friendIds.includes(friendId)) {
       return res.status(400).json({
         success: false,
@@ -170,7 +158,6 @@ router.post('/add', authenticateToken, async (req, res) => {
       });
     }
     
-    // Add friend to both users' friends arrays
     await mongoose.connection.db.collection('Users').updateOne(
       { id: userId },
       { $push: { friends: friendId } }
@@ -196,7 +183,6 @@ router.post('/add', authenticateToken, async (req, res) => {
   }
 });
 
-// Remove friend
 router.delete('/:friendId', authenticateToken, async (req, res) => {
   try {
     const { friendId } = req.params;
@@ -207,7 +193,6 @@ router.delete('/:friendId', authenticateToken, async (req, res) => {
     console.log('Current user:', userId);
     console.log('Friend to remove:', friendId);
     
-    // Remove friend from both users' friends arrays
     await mongoose.connection.db.collection('Users').updateOne(
       { id: userId },
       { $pull: { friends: friendId } }
@@ -233,7 +218,6 @@ router.delete('/:friendId', authenticateToken, async (req, res) => {
   }
 });
 
-// Get mutual projects with a friend
 router.get('/mutual-projects/:friendId', authenticateToken, async (req, res) => {
   try {
     const currentUser = req.user;
@@ -242,7 +226,6 @@ router.get('/mutual-projects/:friendId', authenticateToken, async (req, res) => 
     
     console.log('Finding mutual projects between:', { userId, friendId });
     
-    // Find all projects where both users are members
     const mutualProjects = await mongoose.connection.db.collection('Projects')
       .find({
         members: { $all: [userId, friendId] }
@@ -251,7 +234,6 @@ router.get('/mutual-projects/:friendId', authenticateToken, async (req, res) => 
     
     console.log('Found mutual projects:', mutualProjects.length);
     
-    // Get owner info for each project
     const projectsWithOwners = await Promise.all(
       mutualProjects.map(async (project) => {
         const owner = await mongoose.connection.db.collection('Users').findOne({

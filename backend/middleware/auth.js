@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 
-// Middleware to protect routes
 const authenticateToken = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
@@ -14,7 +13,7 @@ const authenticateToken = async (req, res, next) => {
       });
     }
 
-    const token = authHeader.split(' ')[1]; // Bearer <token>
+    const token = authHeader.split(' ')[1];
     
     if (!token) {
       return res.status(401).json({
@@ -24,10 +23,8 @@ const authenticateToken = async (req, res, next) => {
       });
     }
 
-    // Verify the token
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
     
-    // Get user from database
     let user;
     if (mongoose.Types.ObjectId.isValid(decoded.userId)) {
       user = await mongoose.connection.db.collection('Users').findOne({
@@ -47,7 +44,6 @@ const authenticateToken = async (req, res, next) => {
       });
     }
 
-    // Add user to request object (remove password)
     const { password, ...userWithoutPassword } = user;
     req.user = userWithoutPassword;
     next();
@@ -78,7 +74,6 @@ const authenticateToken = async (req, res, next) => {
   }
 };
 
-// Optional authentication - doesn't fail if no token
 const optionalAuth = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
@@ -114,7 +109,6 @@ const optionalAuth = async (req, res, next) => {
     next();
     
   } catch (error) {
-    // Don't fail on optional auth, just continue without user
     next();
   }
 };

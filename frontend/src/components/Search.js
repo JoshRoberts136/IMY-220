@@ -46,12 +46,14 @@ const Search = ({ onSearchResults }) => {
 
         const results = [];
         
-        // Filter users
-        if (usersResult.success && usersResult.users) {
-          console.log('Raw users:', usersResult.users);
-          console.log('First user:', usersResult.users[0]);
+        // Filter users - handle both array response and object response
+        const usersList = Array.isArray(usersResult) ? usersResult : (usersResult.users || []);
+        
+        if (usersList.length > 0) {
+          console.log('Raw users:', usersList);
+          console.log('First user:', usersList[0]);
           
-          const matchingUsers = usersResult.users
+          const matchingUsers = usersList
             .filter(user => {
               console.log('Checking user:', user.username, user.id);
               const matchUsername = user.username?.toLowerCase().includes(query.toLowerCase());

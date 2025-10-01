@@ -3,16 +3,12 @@ const mongoose = require('mongoose');
 const { authenticateToken } = require('../middleware/auth');
 const router = express.Router();
 
-// IMPORTANT: Put specific routes BEFORE parameterized routes
-
-// Get user's commits - MUST be before /:id route
 router.get('/user-commits/:userId', authenticateToken, async (req, res) => {
   try {
     const userId = req.params.userId;
     
     console.log('Fetching commits for user:', userId);
     
-    // Get commits by user (using string ID)
     const commits = await mongoose.connection.db.collection('Commits')
       .find({ userId: userId })
       .sort({ timestamp: -1 })
@@ -21,7 +17,6 @@ router.get('/user-commits/:userId', authenticateToken, async (req, res) => {
     
     console.log('Found commits:', commits.length);
     
-    // Get project names for commits
     const commitsWithProjects = await Promise.all(
       commits.map(async (commit) => {
         const project = await mongoose.connection.db.collection('Projects').findOne({
@@ -49,14 +44,12 @@ router.get('/user-commits/:userId', authenticateToken, async (req, res) => {
   }
 });
 
-// Get commits for a specific project
 router.get('/project-commits/:projectId', authenticateToken, async (req, res) => {
   try {
     const projectId = req.params.projectId;
     
     console.log('Fetching commits for project:', projectId);
     
-    // Get commits by project (using string ID)
     const commits = await mongoose.connection.db.collection('Commits')
       .find({ projectId: projectId })
       .sort({ timestamp: -1 })
@@ -64,7 +57,6 @@ router.get('/project-commits/:projectId', authenticateToken, async (req, res) =>
     
     console.log('Found commits:', commits.length);
     
-    // Get user info for each commit
     const commitsWithUsers = await Promise.all(
       commits.map(async (commit) => {
         const user = await mongoose.connection.db.collection('Users').findOne({
@@ -91,13 +83,11 @@ router.get('/project-commits/:projectId', authenticateToken, async (req, res) =>
   }
 });
 
-// Get all projects with owner info
 router.get('/', authenticateToken, async (req, res) => {
   try {
     const projects = await mongoose.connection.db.collection('Projects').find({}).toArray();
     const users = await mongoose.connection.db.collection('Users').find({}).toArray();
     
-    // Add owner info to each project
     const projectsWithOwners = projects.map(project => {
       const owner = users.find(user => user.id === project.ownedBy);
       return {
@@ -120,12 +110,10 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
-// Get project by ID
 router.get('/:id', authenticateToken, async (req, res) => {
   try {
     const projectId = req.params.id;
     
-    // Try to find by custom id first, then by _id
     let project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
     
     if (!project && mongoose.Types.ObjectId.isValid(projectId)) {
@@ -141,7 +129,6 @@ router.get('/:id', authenticateToken, async (req, res) => {
       });
     }
     
-    // Get owner info
     const owner = await mongoose.connection.db.collection('Users').findOne({
       id: project.ownedBy
     });
@@ -174,7 +161,6 @@ router.get('/:id', authenticateToken, async (req, res) => {
   }
 });
 
-// Create new project
 router.post('/', authenticateToken, async (req, res) => {
   try {
     const { name, description, status, language, hashtags } = req.body;
@@ -188,7 +174,7 @@ router.post('/', authenticateToken, async (req, res) => {
       status: status || 'active',
       language,
       ownedBy: userId,
-      members: [userId], // Owner is automatically a member
+      members: [userId],
       hashtags: hashtags || [],
       stars: 0,
       forks: 0,
@@ -214,7 +200,6 @@ router.post('/', authenticateToken, async (req, res) => {
   }
 });
 
-// Update project
 router.put('/:id', authenticateToken, async (req, res) => {
   try {
     const projectId = req.params.id;
@@ -222,7 +207,6 @@ router.put('/:id', authenticateToken, async (req, res) => {
     const user = req.user;
     const userId = user.id || user._id;
     
-    // Check if project exists and user owns it
     const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
     if (!project) {
       return res.status(404).json({
@@ -238,13 +222,11 @@ router.put('/:id', authenticateToken, async (req, res) => {
       });
     }
     
-    // Prepare update object
     const update = {
       ...updateData,
       lastUpdated: new Date().toISOString()
     };
     
-    // Remove fields that shouldn't be updated
     delete update._id;
     delete update.id;
     delete update.ownedBy;
@@ -269,14 +251,12 @@ router.put('/:id', authenticateToken, async (req, res) => {
   }
 });
 
-// Delete project
 router.delete('/:id', authenticateToken, async (req, res) => {
   try {
     const projectId = req.params.id;
     const user = req.user;
     const userId = user.id || user._id;
     
-    // Check if project exists and user owns it
     const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
     if (!project) {
       return res.status(404).json({
@@ -303,6 +283,123 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error deleting project'
+    });
+  }
+});
+
+router.post('/:id/members', authenticateToken, async (req, res) => {
+  try {
+    const projectId = req.params.id;
+    const { userId: newMemberId } = req.body;
+    const user = req.user;
+    const userId = user.id || user._id;
+    
+    console.log('Adding member to project:', { projectId, newMemberId, requesterId: userId });
+    
+    const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        message: 'Project not found'
+      });
+    }
+    
+    if (project.ownedBy !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only the project owner can add members'
+      });
+    }
+    
+    const userToAdd = await mongoose.connection.db.collection('Users').findOne({ id: newMemberId });
+    if (!userToAdd) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    
+    const members = project.members || [];
+    if (members.includes(newMemberId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'User is already a member of this project'
+      });
+    }
+    
+    await mongoose.connection.db.collection('Projects').updateOne(
+      { id: projectId },
+      { 
+        $push: { members: newMemberId },
+        $set: { lastUpdated: new Date().toISOString() }
+      }
+    );
+    
+    console.log('Member added successfully');
+    
+    res.json({
+      success: true,
+      message: 'Member added successfully'
+    });
+  } catch (error) {
+    console.error('Error adding member:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error adding member'
+    });
+  }
+});
+
+router.delete('/:id/members/:memberId', authenticateToken, async (req, res) => {
+  try {
+    const projectId = req.params.id;
+    const memberIdToRemove = req.params.memberId;
+    const user = req.user;
+    const userId = user.id || user._id;
+    
+    console.log('Removing member from project:', { projectId, memberIdToRemove, requesterId: userId });
+    
+    const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        message: 'Project not found'
+      });
+    }
+    
+    if (project.ownedBy !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only the project owner can remove members'
+      });
+    }
+    
+    if (memberIdToRemove === project.ownedBy) {
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot remove the project owner'
+      });
+    }
+    
+    await mongoose.connection.db.collection('Projects').updateOne(
+      { id: projectId },
+      { 
+        $pull: { members: memberIdToRemove },
+        $set: { lastUpdated: new Date().toISOString() }
+      }
+    );
+    
+    console.log('Member removed successfully');
+    
+    res.json({
+      success: true,
+      message: 'Member removed successfully'
+    });
+  } catch (error) {
+    console.error('Error removing member:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error removing member'
     });
   }
 });

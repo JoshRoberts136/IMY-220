@@ -32,8 +32,7 @@ const LanguageTags = () => {
         {languages.map((lang, index) => (
           <div
             key={index}
-            className="language-tag"
-            className={getLanguageClass(lang.level)}
+            className={`language-tag ${getLanguageClass(lang.level)}`}
           >
             #{lang.name}
           </div>

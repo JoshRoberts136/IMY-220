@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Files from './Files';
 import Messages from './Messages';
 import EditProject from './EditProject';
+import AddMemberToProject from './AddMemberToProject';
 import LanguageTags from './LanguageTags';
 import ActivityFeed from './ActivityFeed';
 import apiService from '../utils/apiService';
@@ -13,11 +14,14 @@ const ProjectCard = () => {
   const navigate = useNavigate();
   const { projectId } = useParams();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [project, setProject] = useState(null);
   const [projectMembers, setProjectMembers] = useState([]);
+  const [isOwner, setIsOwner] = useState(false);
+  const [isMember, setIsMember] = useState(false);
 
   const handleEditProject = () => {
     setIsEditModalOpen(true);
@@ -38,11 +42,15 @@ const ProjectCard = () => {
       setLoading(true);
       setError(null);
       
-      // Fetch project details
       const response = await apiService.getProject(projectId);
       
       if (response.success) {
-        // Format project data from database
+        const currentUser = apiService.getUser();
+        const isProjectOwner = response.ownedBy === currentUser?.id;
+        const isMember = response.members?.includes(currentUser?.id);
+        setIsOwner(isProjectOwner);
+        setIsMember(isMember);
+        
         const projectData = {
           id: response.id,
           name: response.name,
@@ -73,7 +81,6 @@ const ProjectCard = () => {
         
         setProject(projectData);
         
-        // Fetch member details if there are members
         if (response.members && response.members.length > 0) {
           fetchMemberDetails(response.members, response.ownedBy);
         }
@@ -93,13 +100,11 @@ const ProjectCard = () => {
       const memberDetails = [];
       const uniqueMemberIds = new Set(memberIds);
       
-      // Fetch details for each unique member
       for (const memberId of uniqueMemberIds) {
         try {
           const userResponse = await apiService.getUserById(memberId);
           
           if (userResponse && userResponse.success !== false) {
-            // Check if this is the owner
             const isOwner = memberId === ownerId;
             
             memberDetails.push({
@@ -107,7 +112,7 @@ const ProjectCard = () => {
               name: userResponse.username || 'Unknown User',
               avatar: userResponse.profile?.avatar || '👤',
               role: isOwner ? 'Project Owner' : 'Team Member',
-              isOnline: Math.random() > 0.5 // Random online status for demo
+              isOnline: Math.random() > 0.5
             });
           }
         } catch (err) {
@@ -115,7 +120,6 @@ const ProjectCard = () => {
         }
       }
       
-      // Sort so owner is always first
       memberDetails.sort((a, b) => {
         if (a.role === 'Project Owner') return -1;
         if (b.role === 'Project Owner') return 1;
@@ -175,11 +179,39 @@ const ProjectCard = () => {
     }));
     console.log('Project updated:', updatedProject);
     
-    // Show success message
     setShowSuccessMessage(true);
     setTimeout(() => {
       setShowSuccessMessage(false);
     }, 3000);
+  };
+
+  const handleMemberAdded = (newMember) => {
+    fetchProjectData();
+    
+    setShowSuccessMessage(true);
+    setTimeout(() => {
+      setShowSuccessMessage(false);
+    }, 3000);
+  };
+
+  const handleRemoveMember = async (memberId) => {
+    if (window.confirm('Are you sure you want to remove this member?')) {
+      try {
+        const response = await apiService.removeProjectMember(project.id, memberId);
+        
+        if (response.success) {
+          fetchProjectData();
+          
+          setShowSuccessMessage(true);
+          setTimeout(() => {
+            setShowSuccessMessage(false);
+          }, 3000);
+        }
+      } catch (error) {
+        console.error('Error removing member:', error);
+        alert('Failed to remove member');
+      }
+    }
   };
 
   if (loading && projectId) {
@@ -234,14 +266,17 @@ const ProjectCard = () => {
               ))}
             </div>
             
-            <button
-              className="edit-project-button"
-              onClick={handleEditProject}
-            >
-                <Edit3 className="w-4 h-4" />
-              Edit Project
-              
-            </button>
+            {isMember && (
+              <button
+                className="edit-project-button"
+                onClick={handleEditProject}
+                style={{ marginBottom: '20px' }}
+              >
+                  <Edit3 className="w-4 h-4" />
+                Edit Project
+                
+              </button>
+            )}
                 </div>
                 <LanguageTags />
             </div>
@@ -252,29 +287,54 @@ const ProjectCard = () => {
               projectMembers.map((member, index) => (
                 <div
                   key={index}
-                  className="member-card member-card-cursor"
-                  onClick={() => {
-                    navigate(`/profile/${member.id}`);
-                  }}
+                  className="member-card"
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
                 >
-                  <div className="member-avatar">
-                    <span className="avatar-emoji">{member.avatar}</span>
-                    {member.isOnline && <div className="online-indicator"></div>}
-                    {member.role === 'Project Owner' && <span className="crown-indicator">👑</span>}
+                  <div
+                    className="member-card-cursor"
+                    onClick={() => {
+                      navigate(`/profile/${member.id}`);
+                    }}
+                    style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}
+                  >
+                    <div className="member-avatar">
+                      <span className="avatar-emoji">{member.avatar}</span>
+                      {member.isOnline && <div className="online-indicator"></div>}
+                      {member.role === 'Project Owner' && <span className="crown-indicator">👑</span>}
+                    </div>
+                    <div className="member-info">
+                      <div className="member-name">{member.name}</div>
+                      <div className="member-role">{member.role}</div>
+                    </div>
+                    <div className="member-status">
+                      {member.isOnline ? '🟢' : '⚫'}
+                    </div>
                   </div>
-                  <div className="member-info">
-                    <div className="member-name">{member.name}</div>
-                    <div className="member-role">{member.role}</div>
-                  </div>
-                  <div className="member-status">
-                    {member.isOnline ? '🟢' : '⚫'}
-                  </div>
+                  {isOwner && member.role !== 'Project Owner' && (
+                    <button
+                      className="btn-remove-member"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveMember(member.id);
+                      }}
+                      title="Remove member"
+                    >
+                      ✕
+                    </button>
+                  )}
                 </div>
               ))
             ) : (
               <div className="text-gray-400">No members yet</div>
             )}
-            <button className="btn btn-secondary">➕ Add Member</button>
+            {isOwner && (
+              <button 
+                className="btn btn-secondary"
+                onClick={() => setIsAddMemberModalOpen(true)}
+              >
+                ➕ Add Member
+              </button>
+            )}
                 </div>
             </div>
             
@@ -282,7 +342,7 @@ const ProjectCard = () => {
         
       </div>
 
-      <div className="grid-2">
+      <div className="grid-2" style={{ maxWidth: '75%', margin: '0 auto' }}>
         <div>
             
             <Files projectId={project.id} project={project} onCommitCreated={fetchProjectData} />
@@ -323,6 +383,14 @@ const ProjectCard = () => {
         onClose={handleCloseEdit}
         project={project}
         onSave={handleSaveProject}
+      />
+      
+      <AddMemberToProject
+        isOpen={isAddMemberModalOpen}
+        onClose={() => setIsAddMemberModalOpen(false)}
+        projectId={project?.id}
+        currentMembers={project?.members}
+        onMemberAdded={handleMemberAdded}
       />
     </div>
   );

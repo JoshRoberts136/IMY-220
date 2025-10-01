@@ -3,12 +3,14 @@ import { User, Trophy, Edit3, Plus } from 'lucide-react';
 import EditProfile from './EditProfile';
 import CreateProject from './CreateProject';
 import AddFriend from './AddFriend';
+import RemoveFriend from './RemoveFriend';
 import apiService from '../utils/apiService';
 import '../styles.css';
 
 const ProfileInfo = ({ profileData, isOwnProfile, targetUserId }) => {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isCreatingProject, setIsCreatingProject] = useState(false);
+  const [friendshipStatus, setFriendshipStatus] = useState('none');
   const [user, setUser] = useState({
     username: 'CodeLegend42',
     title: 'Full-Stack Champion',
@@ -43,7 +45,23 @@ const ProfileInfo = ({ profileData, isOwnProfile, targetUserId }) => {
         });
       }
     }
-  }, [profileData, isOwnProfile]);
+    
+    // Check friendship status
+    if (!isOwnProfile && targetUserId) {
+      checkFriendshipStatus();
+    }
+  }, [profileData, isOwnProfile, targetUserId]);
+
+  const checkFriendshipStatus = async () => {
+    try {
+      const response = await apiService.checkFriendshipStatus(targetUserId);
+      if (response.success) {
+        setFriendshipStatus(response.status);
+      }
+    } catch (error) {
+      console.error('Error checking friendship status:', error);
+    }
+  };
 
   const handleSaveProfile = async (updatedData) => {
     const currentUser = apiService.getUser();
@@ -92,6 +110,7 @@ const ProfileInfo = ({ profileData, isOwnProfile, targetUserId }) => {
 
   const handleFriendshipChange = (newStatus) => {
     console.log('Friendship status changed:', newStatus);
+    setFriendshipStatus(newStatus);
   };
 
   return (
@@ -136,10 +155,17 @@ const ProfileInfo = ({ profileData, isOwnProfile, targetUserId }) => {
                 </button>
               </>
             ) : (
-              <AddFriend
-                targetUserId={targetUserId}
-                onFriendshipChange={handleFriendshipChange}
-              />
+              friendshipStatus === 'friends' ? (
+                <RemoveFriend
+                  targetUserId={targetUserId}
+                  onFriendshipChange={handleFriendshipChange}
+                />
+              ) : (
+                <AddFriend
+                  targetUserId={targetUserId}
+                  onFriendshipChange={handleFriendshipChange}
+                />
+              )
             )}
           </div>
         </div>
