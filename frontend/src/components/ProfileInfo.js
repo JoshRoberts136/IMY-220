@@ -104,8 +104,10 @@ const ProfileInfo = ({ profileData, isOwnProfile, targetUserId }) => {
     }
   };
 
-  const handleCreateProject = (projectData) => {
+  const handleCreateProject = async (projectData) => {
     console.log('New project created:', projectData);
+    // Reload the profile to refresh project lists
+    window.location.reload();
   };
 
   const handleFriendshipChange = (newStatus) => {

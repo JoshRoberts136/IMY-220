@@ -18,7 +18,10 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     console.log('Email:', email);
 
-    const user = await User.db.collection('Users').findOne({ email: email });
+    // Case-insensitive email search
+    const user = await User.db.collection('Users').findOne({ 
+      email: { $regex: new RegExp(`^${email}$`, 'i') } 
+    });
     console.log('User found:', user ? user.username : 'null');
 
     if (!user) {
@@ -79,8 +82,12 @@ router.post('/register', async (req, res) => {
     console.log('Request body:', req.body);
     const { username, email, password, profile } = req.body;
 
+    // Case-insensitive email check for existing users
     const existingUser = await User.db.collection('Users').findOne({
-      $or: [{ email }, { username }]
+      $or: [
+        { email: { $regex: new RegExp(`^${email}$`, 'i') } }, 
+        { username }
+      ]
     });
     
     if (existingUser) {
@@ -95,7 +102,7 @@ router.post('/register', async (req, res) => {
     const newUser = {
       id: `user_${Date.now()}`,
       username,
-      email,
+      email: email.toLowerCase(), // Store email in lowercase
       password: hashedPassword,
       profile: profile || {},
       isActive: true,
