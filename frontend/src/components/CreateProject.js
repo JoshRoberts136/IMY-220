@@ -28,7 +28,6 @@ const CreateProject = ({ isOpen, onClose, onSave }) => {
     setError(null);
 
     try {
-      // Map form data to API format
       const projectData = {
         name: formData.name,
         description: formData.description,
@@ -41,7 +40,6 @@ const CreateProject = ({ isOpen, onClose, onSave }) => {
       if (response.success) {
         onSave(response.data);
         onClose();
-        // Reset form
         setFormData({
           name: '',
           description: '',
