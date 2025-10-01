@@ -1,20 +1,23 @@
-# Use an official Node.js runtime as the base image
-FROM node:18
+# Use Node.js 18 as base image
+FROM node:18-alpine
 
-# Set the working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copy package files
 COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the application code
+# Copy all application files
 COPY . .
 
-# Expose ports for frontend (3000) and backend 
-EXPOSE 3000 3000
+# Build the frontend
+RUN npm run build
 
-# Run the development script
-CMD ["npm", "run", "dev"]
+# Expose port 3000 for the backend
+EXPOSE 3000
+
+# Start the backend server (which will serve the built frontend)
+CMD ["node", "backend/server.js"]

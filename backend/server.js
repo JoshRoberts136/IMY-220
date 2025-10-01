@@ -94,11 +94,11 @@ app.use('/api/*', (req, res) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`🚀 Server running on http://localhost:${port}`);
+app.listen(port, '0.0.0.0', () => {
+  console.log(`🚀 Server running on http://0.0.0.0:${port}`);
   console.log(`📱 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`💻 Frontend served from: ${path.join(__dirname, '../public')}`);
-  console.log(`🔗 API endpoints available at: http://localhost:${port}/api`);
+  console.log(`🔗 API endpoints available at: http://0.0.0.0:${port}/api`);
 });
 
 process.on('uncaughtException', (error) => {
