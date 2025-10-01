@@ -13,6 +13,7 @@ const Profile = ({ userId }) => {
   const [isOwnProfile, setIsOwnProfile] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -23,11 +24,9 @@ const Profile = ({ userId }) => {
         const currentUser = apiService.getUser();
         
         if (!userId) {
-          // No userId provided, show current user's profile
           setIsOwnProfile(true);
           setProfileData(currentUser);
         } else {
-          // Check if viewing own profile
           const isOwn = currentUser && (
             currentUser.id === userId ||
             currentUser._id === userId ||
@@ -40,13 +39,11 @@ const Profile = ({ userId }) => {
           if (isOwn) {
             setProfileData(currentUser);
           } else {
-            // Fetch other user's profile using existing API
             try {
               const response = await apiService.request(`/users/${userId}`);
               if (response.success) {
                 setProfileData(response);
               } else {
-                // Fallback to dummy data if API fails
                 setProfileData({
                   username: 'Unknown User',
                   profile: { title: 'Developer', bio: 'No bio available' },
@@ -56,7 +53,6 @@ const Profile = ({ userId }) => {
               }
             } catch (apiError) {
               console.warn('API call failed, using fallback data:', apiError);
-              // Fallback to dummy data
               setProfileData({
                 username: 'Unknown User',
                 profile: { title: 'Developer', bio: 'No bio available' },
@@ -75,7 +71,11 @@ const Profile = ({ userId }) => {
     };
 
     loadProfile();
-  }, [userId]);
+  }, [userId, refreshTrigger]);
+
+  const handleProjectCreated = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
 
   if (loading) {
     return (
@@ -110,9 +110,10 @@ const Profile = ({ userId }) => {
             profileData={profileData}
             isOwnProfile={isOwnProfile}
             targetUserId={userId}
+            onProjectCreated={handleProjectCreated}
           />
           <div className="activity-feed">
-            <ActivityFeed userId={userId} />
+            <ActivityFeed userId={userId} key={refreshTrigger} />
           </div>
         </div>
         <div className="column-right">
@@ -121,7 +122,7 @@ const Profile = ({ userId }) => {
             <LanguageTags userId={userId} />
           </div>
           <div className="projects-section">
-            <ProjectsSection userId={userId} />
+            <ProjectsSection userId={userId} key={refreshTrigger} />
           </div>
         </div>
       </div>

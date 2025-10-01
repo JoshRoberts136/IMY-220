@@ -39,6 +39,11 @@ module.exports = (env, argv) => {
       },
     },
     watch: !isProduction,
+    performance: {
+      hints: false,
+      maxEntrypointSize: 512000,
+      maxAssetSize: 512000
+    },
     plugins: [
       new webpack.DefinePlugin({
         'process.env.REACT_APP_API_URL': JSON.stringify(

@@ -7,7 +7,7 @@ import RemoveFriend from './RemoveFriend';
 import apiService from '../utils/apiService';
 import '../styles.css';
 
-const ProfileInfo = ({ profileData, isOwnProfile, targetUserId }) => {
+const ProfileInfo = ({ profileData, isOwnProfile, targetUserId, onProjectCreated }) => {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isCreatingProject, setIsCreatingProject] = useState(false);
   const [friendshipStatus, setFriendshipStatus] = useState('none');
@@ -46,7 +46,6 @@ const ProfileInfo = ({ profileData, isOwnProfile, targetUserId }) => {
       }
     }
     
-    // Check friendship status
     if (!isOwnProfile && targetUserId) {
       checkFriendshipStatus();
     }
@@ -106,8 +105,9 @@ const ProfileInfo = ({ profileData, isOwnProfile, targetUserId }) => {
 
   const handleCreateProject = async (projectData) => {
     console.log('New project created:', projectData);
-    // Reload the profile to refresh project lists
-    window.location.reload();
+    if (onProjectCreated) {
+      onProjectCreated();
+    }
   };
 
   const handleFriendshipChange = (newStatus) => {
@@ -143,9 +143,9 @@ const ProfileInfo = ({ profileData, isOwnProfile, targetUserId }) => {
               <>
                 <button
                   onClick={() => setIsEditingProfile(true)}
-                  className="edit-profile-button"
+                  className="btn btn-warning btn-with-icon"
                 >
-                  <Edit3 className="button-icon" />
+                  <Edit3 className="icon-sm" />
                   Edit Profile
                 </button>
                 <button

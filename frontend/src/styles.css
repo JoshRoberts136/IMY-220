@@ -3136,3 +3136,71 @@ div[style*="background: #4a5568"]:hover {
   background: #ff4444;
   color: white;
 }
+
+.btn-danger {
+  background: transparent;
+  border: 2px solid #ff4444;
+  color: #ff4444;
+}
+
+.btn-danger:hover {
+  background: #ff4444;
+  color: white;
+  box-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
+}
+
+.btn-warning {
+  background: transparent;
+  border: 2px solid #ffa500;
+  color: #ffa500;
+}
+
+.btn-warning:hover {
+  background: #ffa500;
+  color: white;
+  box-shadow: 0 0 20px rgba(255, 165, 0, 0.5);
+}
+
+.btn-danger-solid {
+  background: #ff4444;
+  border: 2px solid #ff4444;
+  color: white;
+  padding: 15px 30px;
+  font-weight: 700;
+}
+
+.btn-danger-solid:hover {
+  background: #cc0000;
+  border-color: #cc0000;
+  box-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
+}
+
+.delete-warning {
+  text-align: center;
+  padding: 30px 20px;
+  background: rgba(255, 68, 68, 0.1);
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.warning-icon {
+  color: #ff4444;
+  margin-bottom: 15px;
+}
+
+.warning-text {
+  color: white;
+  font-size: 18px;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.warning-text strong {
+  color: var(--apex-orange);
+}
+
+.warning-subtext {
+  color: #888;
+  font-size: 14px;
+  line-height: 1.6;
+}

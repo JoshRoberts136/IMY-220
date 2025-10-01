@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Files from './Files';
 import Messages from './Messages';
 import EditProject from './EditProject';
+import DeleteProject from './DeleteProject';
 import AddMemberToProject from './AddMemberToProject';
 import LanguageTags from './LanguageTags';
 import ActivityFeed from './ActivityFeed';
@@ -171,13 +172,8 @@ const ProjectCard = () => {
     return `${Math.floor(diffInHours / 720)} months ago`;
   };
 
-  const handleSaveProject = (updatedProject) => {
-    setProject(prevProject => ({
-      ...prevProject,
-      ...updatedProject,
-      lastUpdated: 'just now'
-    }));
-    console.log('Project updated:', updatedProject);
+  const handleSaveProject = async (updatedProject) => {
+    await fetchProjectData();
     
     setShowSuccessMessage(true);
     setTimeout(() => {
@@ -266,16 +262,21 @@ const ProjectCard = () => {
               ))}
             </div>
             
-            {isMember && (
-              <button
-                className="edit-project-button"
-                onClick={handleEditProject}
-                style={{ marginBottom: '20px' }}
-              >
-                  <Edit3 className="w-4 h-4" />
-                Edit Project
-                
-              </button>
+            {isOwner && (
+              <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                <button
+                  className="btn btn-warning btn-with-icon"
+                  onClick={handleEditProject}
+                >
+                  <Edit3 className="icon-sm" />
+                  Edit Project
+                </button>
+                <DeleteProject
+                  projectId={project.id}
+                  projectName={project.name}
+                  onDeleted={() => navigate('/home')}
+                />
+              </div>
             )}
                 </div>
                 <LanguageTags />
