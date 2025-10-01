@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { UserPlus, Check, X, Clock } from 'lucide-react';
+import Button from './Button';
 import apiService from '../utils/apiService';
-import '../styles.css';
 
 const AddFriend = ({ targetUserId, onFriendshipChange }) => {
   const [friendshipStatus, setFriendshipStatus] = useState('none');
@@ -43,14 +43,12 @@ const AddFriend = ({ targetUserId, onFriendshipChange }) => {
       
       const currentUser = apiService.getUser();
       
-      // Use the add friend endpoint that directly adds to friends array
       const response = await apiService.request('/friends/add', {
         method: 'POST',
         body: JSON.stringify({ friendId: targetUserId })
       });
       
       if (response.success) {
-        // Update both users' friends arrays directly
         const updatedUser = {
           ...currentUser,
           friends: [...(currentUser.friends || []), targetUserId]
@@ -80,7 +78,6 @@ const AddFriend = ({ targetUserId, onFriendshipChange }) => {
       const response = await apiService.removeFriend(targetUserId);
       
       if (response.success) {
-        // Update current user's friends array
         const currentUser = apiService.getUser();
         const updatedUser = {
           ...currentUser,
@@ -161,23 +158,19 @@ const AddFriend = ({ targetUserId, onFriendshipChange }) => {
 
   if (loading) {
     return (
-      <button className="btn btn-loading" disabled>
-        <Clock className="icon-sm" />
+      <Button variant="disabled" icon={Clock} disabled>
         Loading...
-      </button>
+      </Button>
     );
   }
 
   if (error) {
     return (
-      <div className="error-container-inline">
-        <span className="error-text">{error}</span>
-        <button
-          className="btn-secondary"
-          onClick={checkFriendshipStatus}
-        >
+      <div className="flex flex-col gap-2">
+        <span className="text-red-400 text-sm">{error}</span>
+        <Button variant="secondary" onClick={checkFriendshipStatus}>
           Retry
-        </button>
+        </Button>
       </div>
     );
   }
@@ -188,54 +181,53 @@ const AddFriend = ({ targetUserId, onFriendshipChange }) => {
     
     case 'friends':
       return (
-        <button 
-          className="btn btn-secondary btn-with-icon"
+        <Button
+          variant="secondary"
+          icon={X}
           onClick={handleRemoveFriend}
           disabled={loading}
         >
-          <X className="icon-sm" />
           Remove Friend
-        </button>
+        </Button>
       );
     
     case 'sent':
       return (
-        <button className="btn btn-disabled" disabled>
-          <Clock className="icon-sm" />
+        <Button variant="disabled" icon={Clock} disabled>
           Request Sent
-        </button>
+        </Button>
       );
     
     case 'received':
       return (
-        <div className="button-group">
-          <button
-            className="btn btn-primary btn-with-icon"
+        <div className="flex gap-2">
+          <Button
+            variant="primary"
+            icon={Check}
             onClick={handleAcceptFriendRequest}
           >
-            <Check className="icon-sm" />
             Accept
-          </button>
-          <button
-            className="btn btn-secondary btn-with-icon"
+          </Button>
+          <Button
+            variant="secondary"
+            icon={X}
             onClick={handleDeclineFriendRequest}
           >
-            <X className="icon-sm" />
             Decline
-          </button>
+          </Button>
         </div>
       );
     
     default:
       return (
-        <button
-          className="btn btn-primary btn-with-icon"
+        <Button
+          variant="primary"
+          icon={UserPlus}
           onClick={handleAddFriend}
           disabled={loading}
         >
-          <UserPlus className="icon-sm" />
           Add Friend
-        </button>
+        </Button>
       );
   }
 };

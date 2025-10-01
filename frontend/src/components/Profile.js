@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import ProfileInfo from './ProfileInfo';
-
 import ViewFriend from './ViewFriend';
 import LanguageTags from './LanguageTags';
 import ProjectsSection from './ProjectsSection';
 import ActivityFeed from './ActivityFeed';
+import PageContainer from './PageContainer';
 import apiService from '../utils/apiService';
 import '../styles.css';
 
@@ -79,54 +79,49 @@ const Profile = ({ userId }) => {
 
   if (loading) {
     return (
-      <div className="profile-loading">
-        <div className="apex-bg">
-          <div className="hex-pattern"></div>
-        </div>
-        <div className="loading-message">Loading profile...</div>
-      </div>
+      <PageContainer>
+        <div className="text-center py-10 text-gray-400">Loading profile...</div>
+      </PageContainer>
     );
   }
 
   if (error) {
     return (
-      <div className="profile-error">
-        <div className="apex-bg">
-          <div className="hex-pattern"></div>
-        </div>
-        <div className="error-message">{error}</div>
-      </div>
+      <PageContainer>
+        <div className="text-center py-10 text-red-500">{error}</div>
+      </PageContainer>
     );
   }
 
   return (
-    <div>
-      <div className="apex-bg">
-        <div className="hex-pattern"></div>
-      </div>
-      <div className="grid-2">
-        <div className="column-left">
+    <PageContainer>
+      {/* Two Column Grid Layout - Original Structure */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', minHeight: '78vh' }}>
+        {/* Left Column */}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
           <ProfileInfo
             profileData={profileData}
             isOwnProfile={isOwnProfile}
             targetUserId={userId}
             onProjectCreated={handleProjectCreated}
           />
-          <div className="activity-feed">
+          <div style={{ flex: 1, overflow: 'visible' }}>
             <ActivityFeed userId={userId} key={refreshTrigger} />
           </div>
         </div>
-        <div className="column-right">
-          <div className="details-languages">
+
+        {/* Right Column */}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div style={{ flexShrink: 0 }}>
             <ViewFriend userId={userId} />
             <LanguageTags userId={userId} />
           </div>
-          <div className="projects-section">
+          <div style={{ flex: 1, overflow: 'visible' }}>
             <ProjectsSection userId={userId} key={refreshTrigger} />
           </div>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 };
 

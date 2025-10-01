@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, UserPlus, Search } from 'lucide-react';
+import Button from './Button';
+import FormInput from './FormInput';
 import apiService from '../utils/apiService';
 
 const AddMemberToProject = ({ isOpen, onClose, projectId, currentMembers, onMemberAdded }) => {
@@ -96,39 +98,49 @@ const AddMemberToProject = ({ isOpen, onClose, projectId, currentMembers, onMemb
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <div className="modal-header">
-          <h2 className="modal-title">Add Member to Project</h2>
-          <button onClick={handleClose} className="close-button" disabled={loading}>
+    <div 
+      className="fixed top-0 left-0 right-0 bottom-0 bg-black/80 flex items-center justify-center backdrop-blur-sm z-[9999]"
+      onClick={handleClose}
+    >
+      <div
+        className="bg-[rgba(10,10,10,0.95)] border-2 border-apex-orange rounded-xl p-8 w-[90%] max-w-[500px] max-h-[80vh] overflow-y-auto shadow-[0_0_50px_rgba(139,0,0,0.3)] relative"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Modal Header */}
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="font-orbitron text-2xl font-bold text-apex-orange m-0">
+            Add Member to Project
+          </h2>
+          <button
+            onClick={handleClose}
+            disabled={loading}
+            className="bg-transparent border-none text-gray-400 cursor-pointer p-1 rounded transition-colors duration-300 hover:text-apex-orange disabled:opacity-50"
+          >
             <X size={24} />
           </button>
         </div>
 
         {error && (
-          <div className="error-message-form">{error}</div>
+          <div className="text-red-400 bg-red-900/20 px-4 py-3 rounded-md mb-4 text-sm">
+            {error}
+          </div>
         )}
 
         <form onSubmit={(e) => { e.preventDefault(); handleAddMember(); }}>
-          <div className="form-group">
-            <label className="form-label">
-              <Search size={16} className="form-label-icon" />
-              Search Users
-            </label>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="form-input"
-              placeholder="Search by username or email..."
-              disabled={loading}
-            />
-          </div>
+          <FormInput
+            label="Search Users"
+            icon={Search}
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by username or email..."
+            disabled={loading}
+          />
 
           {searchQuery && filteredUsers.length > 0 && (
-            <div className="form-group">
-              <label className="form-label">
-                <UserPlus size={16} className="form-label-icon" />
+            <div className="mb-6">
+              <label className="flex items-center mb-2 text-gray-300 font-semibold uppercase tracking-wide text-xs">
+                <UserPlus size={16} className="mr-2" />
                 Select User
               </label>
               <div className="user-select-list">
@@ -160,22 +172,24 @@ const AddMemberToProject = ({ isOpen, onClose, projectId, currentMembers, onMemb
             </div>
           )}
 
-          <div className="buttons-container">
-            <button
+          <div className="flex gap-4 mt-8">
+            <Button
               type="submit"
-              className="form-submit"
+              variant="primary"
               disabled={loading || !selectedUser}
+              className="flex-1"
             >
               {loading ? 'Adding Member...' : 'Add Member'}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="secondary"
               onClick={handleClose}
-              className="cancel-button"
               disabled={loading}
+              className="flex-1"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       </div>

@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from './AuthContext';
+import { Mail, Lock } from 'lucide-react';
+import FormInput from './FormInput';
+import Button from './Button';
 import apiService from '../utils/apiService';
-import '../styles.css';
 
 function Login() {
   const [legendId, setLegendId] = useState('');
@@ -42,37 +44,48 @@ function Login() {
   };
 
   return (
-    <form className="auth-form active" onSubmit={handleSubmit}>
-      {error && <div className="error-message">{error}</div>}
-      <div className="form-group">
-        <label className="form-label" htmlFor="loginEmail">Legend ID</label>
-        <input
-          type="email"
-          className="form-input"
-          id="loginEmail"
-          placeholder="your@email.com"
-          value={legendId}
-          onChange={(e) => setLegendId(e.target.value)}
-          required
-          disabled={loading}
-        />
-      </div>
-      <div className="form-group">
-        <label className="form-label" htmlFor="loginPassword">Passcode</label>
-        <input
-          type="password"
-          className="form-input"
-          id="loginPassword"
-          placeholder="Enter your passcode"
-          value={passcode}
-          onChange={(e) => setPasscode(e.target.value)}
-          required
-          disabled={loading}
-        />
-      </div>
-      <button type="submit" className="form-submit" disabled={loading}>
-        {loading ? 'Dropping In...' : 'Drop Into Arena'}
-      </button>
+    <form className="block" onSubmit={handleSubmit}>
+      {error && (
+        <div className="text-red-400 bg-red-900/20 px-4 py-3 rounded-md mb-4 text-sm">
+          {error}
+        </div>
+      )}
+      
+      <FormInput
+        label="Legend ID"
+        icon={Mail}
+        type="email"
+        id="loginEmail"
+        placeholder="your@email.com"
+        value={legendId}
+        onChange={(e) => setLegendId(e.target.value)}
+        required
+        disabled={loading}
+      />
+      
+      <FormInput
+        label="Passcode"
+        icon={Lock}
+        type="password"
+        id="loginPassword"
+        placeholder="Enter your passcode"
+        value={passcode}
+        onChange={(e) => setPasscode(e.target.value)}
+        required
+        disabled={loading}
+      />
+      
+      <Button 
+        type="submit" 
+        variant="primary" 
+        disabled={loading}
+        className="w-full !py-5 !text-lg relative overflow-hidden group"
+      >
+        <span className="relative z-10">
+          {loading ? 'Dropping In...' : 'Drop Into Arena'}
+        </span>
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
+      </Button>
     </form>
   );
 }

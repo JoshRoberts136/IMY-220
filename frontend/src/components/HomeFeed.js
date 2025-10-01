@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Search from '../components/Search';
 import ProjectPreview from './ProjectPreview';
+import PageContainer from './PageContainer';
 import apiService from '../utils/apiService';
 import '../styles.css';
 
@@ -44,32 +45,25 @@ const HomeFeed = () => {
 
   const getFilteredProjects = () => {
     if (activeTab === 'global') {
-      // Arena Feed - show all projects
       return projects;
     } else {
-      // Squad Feed - show only friends' projects
       const friendIds = friends.map(friend => friend.id || friend._id?.toString());
-      console.log('Friend IDs:', friendIds);
-      
       const filtered = projects.filter(project => {
         const projectOwnerId = project.ownedBy || project.id;
-        console.log('Checking project owner:', projectOwnerId, 'against friends:', friendIds);
         return friendIds.includes(projectOwnerId);
       });
-      
-      console.log('Filtered projects:', filtered);
       return filtered;
     }
   };
 
   if (loading) {
-    return <div className="homefeed-container">Loading projects...</div>;
+    return <PageContainer>Loading projects...</PageContainer>;
   }
 
   const filteredProjects = getFilteredProjects();
 
   return (
-    <div className="homefeed-container">
+    <PageContainer>
       <div className="feed-controls">
         <div className="feed-tabs">
           <button className={`feed-tab ${activeTab === 'local' ? 'active' : ''}`} onClick={() => setActiveTab('local')}>Squad Feed</button>
@@ -84,9 +78,10 @@ const HomeFeed = () => {
           </select>
         </div>
       </div>
-      <div className="activity-feed">
+      
+      <div className="flex flex-col gap-4 mt-5">
         {filteredProjects.length === 0 ? (
-          <div className="empty-feed-message">
+          <div className="text-center py-10 text-gray-400">
             {activeTab === 'local' ? 
               'No projects from your squad yet. Add some friends or switch to Arena Feed!' : 
               'No projects available yet.'}
@@ -116,7 +111,7 @@ const HomeFeed = () => {
           })
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 };
 

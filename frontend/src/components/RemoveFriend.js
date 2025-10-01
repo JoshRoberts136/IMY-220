@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { UserMinus, Check } from 'lucide-react';
+import Button from './Button';
 import apiService from '../utils/apiService';
-import '../styles.css';
 
 const RemoveFriend = ({ targetUserId, onFriendshipChange }) => {
   const [loading, setLoading] = useState(false);
@@ -42,36 +42,27 @@ const RemoveFriend = ({ targetUserId, onFriendshipChange }) => {
 
   if (error) {
     return (
-      <div className="error-container-inline">
-        <span className="error-text">{error}</span>
-        <button
-          className="btn-secondary"
+      <div className="flex flex-col gap-2">
+        <span className="text-red-400 text-sm">{error}</span>
+        <Button
+          variant="secondary"
           onClick={() => setError('')}
         >
           Retry
-        </button>
+        </Button>
       </div>
     );
   }
 
   return (
-    <button 
-      className="btn btn-secondary btn-with-icon"
+    <Button 
+      variant="secondary"
+      icon={loading ? Check : UserMinus}
       onClick={handleRemoveFriend}
       disabled={loading}
     >
-      {loading ? (
-        <>
-          <Check className="icon-sm" />
-          Removing...
-        </>
-      ) : (
-        <>
-          <UserMinus className="icon-sm" />
-          Remove Friend
-        </>
-      )}
-    </button>
+      {loading ? 'Removing...' : 'Remove Friend'}
+    </Button>
   );
 };
 

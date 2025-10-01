@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import Button from './Button';
 import CreateCommit from './CreateCommit';
 import apiService from '../utils/apiService';
 import '../styles.css';
@@ -98,13 +99,16 @@ function Files({ projectId, project, onCommitCreated }) {
       <div className="commits-header">
         <h3 className="section-title">Commits ({commits.length})</h3>
         {canCommit && (
-          <button
-            className="btn btn-primary btn-with-icon"
-            onClick={() => setIsCreateCommitOpen(true)}
+          <Button
+            variant="primary"
+            icon={Plus}
+            onClick={() => {
+              console.log('New Commit button clicked');
+              setIsCreateCommitOpen(true);
+            }}
           >
-            <Plus className="icon-sm" />
             New Commit
-          </button>
+          </Button>
         )}
       </div>
       

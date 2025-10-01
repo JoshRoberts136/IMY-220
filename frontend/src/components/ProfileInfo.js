@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User, Trophy, Edit3, Plus } from 'lucide-react';
+import Button from './Button';
 import EditProfile from './EditProfile';
 import CreateProject from './CreateProject';
 import AddFriend from './AddFriend';
@@ -141,20 +142,20 @@ const ProfileInfo = ({ profileData, isOwnProfile, targetUserId, onProjectCreated
           <div className="buttons-container-profile">
             {isOwnProfile ? (
               <>
-                <button
+                <Button
+                  variant="warning"
+                  icon={Edit3}
                   onClick={() => setIsEditingProfile(true)}
-                  className="btn btn-warning btn-with-icon"
                 >
-                  <Edit3 className="icon-sm" />
                   Edit Profile
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="primary"
+                  icon={Plus}
                   onClick={() => setIsCreatingProject(true)}
-                  className="create-project-button"
                 >
-                  <Plus className="button-icon" />
                   Create Project
-                </button>
+                </Button>
               </>
             ) : (
               friendshipStatus === 'friends' ? (

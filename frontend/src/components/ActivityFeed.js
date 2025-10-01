@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ProjectPreview from './ProjectPreview';
+import { Container } from './Card';
 import apiService from '../utils/apiService';
-import '../styles.css';
 
 const ActivityFeed = ({ userId }) => {
   const [activities, setActivities] = useState([]);
@@ -133,28 +133,26 @@ const ActivityFeed = ({ userId }) => {
 
   if (loading) {
     return (
-      <div className="content-section">
-        <div className="section-title">Recent Activity</div>
-        <div className="loading-message">Loading activity...</div>
-      </div>
+      <Container title="Recent Activity">
+        <div className="text-center py-5 text-gray-400">Loading activity...</div>
+      </Container>
     );
   }
 
   return (
-    <div className="content-section">
-      <div className="section-title">Recent Activity</div>
-      <div className="activity-feed">
+    <Container title="Recent Activity">
+      <div className="flex flex-col gap-4">
         {activities.length > 0 ? (
           activities.slice(0, 5).map((activity) => (
             <ProjectPreview key={activity.id} activity={activity} />
           ))
         ) : (
-          <div className="no-activity-message">
+          <div className="text-center py-10 text-gray-400">
             No recent activity yet. Start coding!
           </div>
         )}
       </div>
-    </div>
+    </Container>
   );
 };
 

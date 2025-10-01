@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles.css';
+import Card from './Card';
 
 // Export mock data for use in other components
 export const defaultActivities = [
@@ -24,7 +24,6 @@ const ProjectPreview = ({ activity }) => {
 
   const handleUserClick = (e) => {
     e.stopPropagation(); // Prevent project navigation when clicking user
-    // Navigate to user profile - use username or id from activity
     const userId = currentActivity.user.id || currentActivity.user.name;
     if (userId) {
       navigate(`/profile/${userId}`);
@@ -37,13 +36,13 @@ const ProjectPreview = ({ activity }) => {
 
   const getActionColor = (type) => {
     const colors = {
-      checkin: '#00ff88',
-      checkout: '#ff6b35', 
-      create: '#8b0000',
-      update: '#00bfff',
-      fork: '#ff3333'
+      checkin: 'bg-green-500/20 text-green-400',
+      checkout: 'bg-orange-500/20 text-orange-400', 
+      create: 'bg-apex-red/20 text-apex-red',
+      update: 'bg-blue-500/20 text-blue-400',
+      fork: 'bg-apex-orange/20 text-apex-orange'
     };
-    return colors[type] || '#666';
+    return colors[type] || 'bg-gray-500/20 text-gray-400';
   };
 
   const getActionIcon = (type) => {
@@ -58,41 +57,45 @@ const ProjectPreview = ({ activity }) => {
   };
 
   return (
-    <div className="activity-item activity-item-cursor" onClick={handleProjectClick}>
+    <Card variant="activity" hover onClick={handleProjectClick}>
       {/* Activity Header */}
-      <div className="activity-header">
-        <div className="user-info" onClick={handleUserClick}>
-          <div className="user-avatar">
-            <span className="avatar-emoji">{currentActivity.user.avatar}</span>
-            {currentActivity.user.isOnline && <div className="online-indicator"></div>}
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center gap-3 flex-1" onClick={handleUserClick}>
+          <div className="relative w-11 h-11 bg-[rgba(139,0,0,0.2)] rounded-full flex items-center justify-center border-2 border-apex-orange">
+            <span className="text-xl">{currentActivity.user.avatar}</span>
+            {currentActivity.user.isOnline && (
+              <div className="absolute bottom-0.5 right-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-gray-900 shadow-[0_0_10px_#00ff88]"></div>
+            )}
           </div>
-          <div className="user-details">
-            <div className="user-name">{currentActivity.user.name}</div>
-            <div className="activity-time">{formatTimeAgo(currentActivity.timestamp)}</div>
+          <div className="flex-1">
+            <div className="text-white font-bold text-base">{currentActivity.user.name}</div>
+            <div className="text-gray-400 text-sm">{formatTimeAgo(currentActivity.timestamp)}</div>
           </div>
         </div>
-        <div
-          className={`action-badge action-badge-${currentActivity.type}`}
-        >
+        <div className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide ${getActionColor(currentActivity.type)}`}>
           {getActionIcon(currentActivity.type)} {currentActivity.action}
         </div>
       </div>
 
       {/* Project Information */}
-      <div className="activity-content">
-        <div className="project-info">
-          <div className="project-image">{currentActivity.projectImage}</div>
-          <div className="project-details">
-            <div className="project-name">{currentActivity.project.name}</div>
-            <div className="activity-message">{currentActivity.message}</div>
+      <div className="mb-4">
+        <div className="flex gap-4 items-center">
+          <div className="w-15 h-15 bg-[rgba(139,0,0,0.2)] border-2 border-apex-orange rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+            {currentActivity.projectImage}
+          </div>
+          <div className="flex-1">
+            <div className="text-apex-red font-bold text-lg mb-1 hover:underline cursor-pointer transition-colors">
+              {currentActivity.project.name}
+            </div>
+            <div className="text-gray-300 leading-relaxed">{currentActivity.message}</div>
           </div>
         </div>
       </div>
 
       {/* Activity Footer */}
-      <div className="activity-footer">
+      <div className="flex gap-4 items-center flex-wrap">
         <button 
-          className="like-button"
+          className="flex items-center gap-1 bg-transparent border-none text-gray-400 cursor-pointer transition-all duration-200 font-rajdhani font-semibold px-3 py-1.5 rounded hover:text-red-400 hover:bg-red-400/10"
           onClick={(e) => {
             e.stopPropagation();
             console.log('Liked project:', currentActivity.project.id);
@@ -101,7 +104,7 @@ const ProjectPreview = ({ activity }) => {
           ❤️ {currentActivity.likes}
         </button>
         <button 
-          className="comment-button"
+          className="flex items-center gap-1 bg-transparent border-none text-gray-400 cursor-pointer transition-all duration-200 font-rajdhani font-semibold px-3 py-1.5 rounded hover:text-cyan-400 hover:bg-cyan-400/10"
           onClick={(e) => {
             e.stopPropagation();
             console.log('Comment on:', currentActivity.project.id);
@@ -110,7 +113,7 @@ const ProjectPreview = ({ activity }) => {
           💬 Comment
         </button>
         <button 
-          className="share-button"
+          className="flex items-center gap-1 bg-transparent border-none text-gray-400 cursor-pointer transition-all duration-200 font-rajdhani font-semibold px-3 py-1.5 rounded hover:text-blue-400 hover:bg-blue-400/10"
           onClick={(e) => {
             e.stopPropagation();
             console.log('Share project:', currentActivity.project.id);
@@ -120,9 +123,9 @@ const ProjectPreview = ({ activity }) => {
         </button>
         
         {/* Quick Action Buttons */}
-        <div className="quick-actions">
+        <div className="flex gap-2 ml-auto">
           <button 
-            className="quick-action-btn view-btn"
+            className="bg-[rgba(139,0,0,0.1)] border border-apex-orange text-apex-orange px-2 py-1 rounded-xl text-xs uppercase tracking-wide transition-all duration-200 font-semibold hover:bg-apex-orange hover:text-white hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(139,0,0,0.3)]"
             onClick={(e) => {
               e.stopPropagation();
               handleProjectClick();
@@ -134,7 +137,7 @@ const ProjectPreview = ({ activity }) => {
           
           {currentActivity.type !== 'fork' && (
             <button 
-              className="quick-action-btn fork-btn"
+              className="bg-[rgba(139,0,0,0.1)] border border-apex-orange text-apex-orange px-2 py-1 rounded-xl text-xs uppercase tracking-wide transition-all duration-200 font-semibold hover:bg-apex-red hover:text-white hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(139,0,0,0.3)]"
               onClick={(e) => {
                 e.stopPropagation();
                 console.log('Fork project:', currentActivity.project.id);
@@ -148,10 +151,10 @@ const ProjectPreview = ({ activity }) => {
       </div>
 
       {/* Hover Effect Indicator */}
-      <div className="project-hover-indicator">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[rgba(139,0,0,0.95)] text-white px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wide opacity-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 backdrop-blur-lg border border-apex-red">
         <span>Click to view project details</span>
       </div>
-    </div>
+    </Card>
   );
 };
 

@@ -6,10 +6,11 @@ import EditProject from './EditProject';
 import DeleteProject from './DeleteProject';
 import AddMemberToProject from './AddMemberToProject';
 import LanguageTags from './LanguageTags';
-import ActivityFeed from './ActivityFeed';
+import PageContainer from './PageContainer';
 import apiService from '../utils/apiService';
 import '../styles.css';
-import { User, Trophy, Edit3, Plus } from 'lucide-react';
+import { Edit3 } from 'lucide-react';
+import Button from './Button';
 
 const ProjectCard = () => {
   const navigate = useNavigate();
@@ -212,44 +213,44 @@ const ProjectCard = () => {
 
   if (loading && projectId) {
     return (
-      <div className="loading-container">
-        <div className="loading-spinner">⚡ Loading project...</div>
-      </div>
+      <PageContainer>
+        <div className="text-center py-10 text-gray-400">⚡ Loading project...</div>
+      </PageContainer>
     );
   }
 
   if (error) {
     return (
-      <div className="error-container">
-        <h2>❌ {error}</h2>
-        <button onClick={() => navigate('/home')} className="btn btn-primary">
-          Back to Home
-        </button>
-      </div>
+      <PageContainer>
+        <div className="text-center py-10">
+          <h2 className="text-red-500 mb-4">❌ {error}</h2>
+          <Button variant="primary" onClick={() => navigate('/home')}>
+            Back to Home
+          </Button>
+        </div>
+      </PageContainer>
     );
   }
 
   if (!project) {
     return (
-      <div className="error-container">
-        <h2>❌ Project not found</h2>
-        <button onClick={() => navigate('/home')} className="btn btn-primary">
-          Back to Home
-        </button>
-      </div>
+      <PageContainer>
+        <div className="text-center py-10">
+          <h2 className="text-red-500 mb-4">❌ Project not found</h2>
+          <Button variant="primary" onClick={() => navigate('/home')}>
+            Back to Home
+          </Button>
+        </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div>
-      <div className="apex-bg">
-        <div className="hex-pattern"></div>
-      </div>
-      
+    <PageContainer>
+      {/* Project Hero - Full Width */}
       <div className="project-hero">
-        <div className="project-info">
-            <div>
-                <div>
+        <div className="project-info" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+          <div style={{ width: '100%' }}>
             <h1 className="project-title">{project.name}</h1>
             <p className="project-description">{project.description}</p>
             <div className="project-meta">
@@ -263,14 +264,14 @@ const ProjectCard = () => {
             </div>
             
             {isOwner && (
-              <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-                <button
-                  className="btn btn-warning btn-with-icon"
+              <div className="project-actions">
+                <Button
+                  variant="warning"
+                  icon={Edit3}
                   onClick={handleEditProject}
                 >
-                  <Edit3 className="icon-sm" />
                   Edit Project
-                </button>
+                </Button>
                 <DeleteProject
                   projectId={project.id}
                   projectName={project.name}
@@ -278,26 +279,22 @@ const ProjectCard = () => {
                 />
               </div>
             )}
-                </div>
-                <LanguageTags />
-            </div>
-            <div>
-                <div className="sidebar">
+            
+            <LanguageTags />
+          </div>
+        </div>
+                  {/* Squad Members Sidebar */}
+        <div className="sidebar" style={{ marginBottom: '20px' }}>
             <h3 className="section-title">Squad Members</h3>
             {projectMembers.length > 0 ? (
               projectMembers.map((member, index) => (
                 <div
                   key={index}
                   className="member-card"
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px', marginBottom: '10px', background: 'rgba(45, 55, 72, 0.3)', borderRadius: '8px', border: '1px solid #333', cursor: 'pointer' }}
+                  onClick={() => navigate(`/profile/${member.id}`)}
                 >
-                  <div
-                    className="member-card-cursor"
-                    onClick={() => {
-                      navigate(`/profile/${member.id}`);
-                    }}
-                    style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}
-                  >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
                     <div className="member-avatar">
                       <span className="avatar-emoji">{member.avatar}</span>
                       {member.isOnline && <div className="online-indicator"></div>}
@@ -329,45 +326,45 @@ const ProjectCard = () => {
               <div className="text-gray-400">No members yet</div>
             )}
             {isOwner && (
-              <button 
-                className="btn btn-secondary"
+              <Button 
+                variant="secondary"
                 onClick={() => setIsAddMemberModalOpen(true)}
+                className="w-full mt-3"
               >
                 ➕ Add Member
-              </button>
+              </Button>
             )}
-                </div>
-            </div>
-            
         </div>
-        
       </div>
 
-      <div className="grid-2" style={{ maxWidth: '75%', margin: '0 auto' }}>
+      {/* Two Column Grid - Original Layout */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', minHeight: '400px' }}>
+        {/* Left Column */}
         <div>
-            
-            <Files projectId={project.id} project={project} onCommitCreated={fetchProjectData} />
+          <Files projectId={project.id} project={project} onCommitCreated={fetchProjectData} />
         </div>
         
+        {/* Right Column */}
         <div>
-            
+          
           <Messages />
+          
           <div className="project-stats-bar">
             <div className="stat-group">
-                <span className="stat-value">{project.stats.stars}</span>
-                <span className="stat-label">Stars</span>
+              <span className="stat-value">{project.stats.stars}</span>
+              <span className="stat-label">Stars</span>
             </div>
             <div className="stat-group">
-                <span className="stat-value">{project.stats.forks}</span>
-                <span className="stat-label">Forks</span>
+              <span className="stat-value">{project.stats.forks}</span>
+              <span className="stat-label">Forks</span>
             </div>
             <div className="stat-group">
-                <span className="stat-value">{project.stats.commits}</span>
-                <span className="stat-label">Commits</span>
+              <span className="stat-value">{project.stats.commits}</span>
+              <span className="stat-label">Commits</span>
             </div>
             <div className="stat-group">
-                <span className="stat-value">{project.stats.issues}</span>
-                <span className="stat-label">Issues</span>
+              <span className="stat-value">{project.stats.issues}</span>
+              <span className="stat-label">Issues</span>
             </div>
           </div>
         </div>
@@ -393,7 +390,7 @@ const ProjectCard = () => {
         currentMembers={project?.members}
         onMemberAdded={handleMemberAdded}
       />
-    </div>
+    </PageContainer>
   );
 };
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ProjectPreview from './ProjectPreview';
+import { Container } from './Card';
 import apiService from '../utils/apiService';
-import '../styles.css';
 
 const ProjectsSection = ({ userId }) => {
   const [activeTab, setActiveTab] = useState('owned');
@@ -86,27 +86,12 @@ const ProjectsSection = ({ userId }) => {
     
     if (!targetUserId) return [];
 
-    console.log('=== FILTERING DEBUG ===');
-    console.log('targetUserId:', targetUserId);
-    console.log('targetUserIdAlt:', targetUserIdAlt);
-    console.log('activeTab:', activeTab);
-    console.log('Total projects:', projects.length);
-    
-    // Log each project's ownedBy field
-    projects.forEach((p, index) => {
-      console.log(`Project ${index}: "${p.name}" ownedBy:`, p.ownedBy);
-      console.log(`  - Matches targetUserId? ${p.ownedBy === targetUserId}`);
-      console.log(`  - Matches targetUserIdAlt? ${p.ownedBy === targetUserIdAlt}`);
-    });
-
     if (activeTab === 'owned') {
       const owned = projects.filter(p => 
         p.ownedBy === targetUserId || 
         p.ownedBy === targetUserIdAlt ||
         (targetUserIdAlt && p.ownedBy?.toString() === targetUserIdAlt)
       );
-      console.log('Owned projects found:', owned.length);
-      console.log('Owned projects:', owned);
       return owned;
     } else {
       const member = projects.filter(p => {
@@ -119,8 +104,6 @@ const ProjectsSection = ({ userId }) => {
                           (!targetUserIdAlt || p.ownedBy?.toString() !== targetUserIdAlt);
         return isMember && isNotOwner;
       });
-      console.log('Member projects found:', member.length);
-      console.log('Member projects:', member);
       return member;
     }
   };
@@ -169,20 +152,22 @@ const ProjectsSection = ({ userId }) => {
 
   if (loading) {
     return (
-      <div className="content-section">
-        <div className="section-title">Projects</div>
-        <div className="loading-projects-message">Loading projects...</div>
-      </div>
+      <Container title="Projects">
+        <div className="text-center py-5 text-gray-400">Loading projects...</div>
+      </Container>
     );
   }
 
   return (
-    <div className="content-section projects-section-container">
-      <div className="section-title">Projects</div>
-      
-      <div className="tabs-placeholder">
+    <Container title="Projects" className="flex flex-col h-full">
+      {/* Tabs */}
+      <div className="flex gap-1 mb-5 bg-[rgba(20,20,20,0.5)] rounded-lg p-1">
         <button
-          className={`tab-placeholder ${activeTab === 'owned' ? 'active' : ''}`}
+          className={`flex-1 px-4 py-3 bg-transparent rounded-lg cursor-pointer font-semibold font-rajdhani uppercase tracking-wide transition-all duration-300 text-sm ${
+            activeTab === 'owned'
+              ? 'bg-gradient-to-r from-apex-orange to-apex-red text-white shadow-[0_4px_12px_rgba(139,0,0,0.3)]'
+              : 'text-gray-400 hover:bg-[rgba(139,0,0,0.2)] hover:text-white'
+          }`}
           onClick={() => setActiveTab('owned')}
         >
           Owned ({activeTab === 'owned' ? getFilteredProjects().length : projects.filter(p => {
@@ -193,25 +178,32 @@ const ProjectsSection = ({ userId }) => {
           }).length})
         </button>
         <button
-          className={`tab-placeholder ${activeTab === 'member' ? 'active' : ''}`}
+          className={`flex-1 px-4 py-3 bg-transparent rounded-lg cursor-pointer font-semibold font-rajdhani uppercase tracking-wide transition-all duration-300 text-sm ${
+            activeTab === 'member'
+              ? 'bg-gradient-to-r from-apex-orange to-apex-red text-white shadow-[0_4px_12px_rgba(139,0,0,0.3)]'
+              : 'text-gray-400 hover:bg-[rgba(139,0,0,0.2)] hover:text-white'
+          }`}
           onClick={() => setActiveTab('member')}
         >
           Member ({activeTab === 'member' ? getFilteredProjects().length : getMemberProjectsCount()})
         </button>
       </div>
       
-      <div className="scrollable-content">
-        {projectActivities.length > 0 ? (
-          projectActivities.map((activity) => (
-            <ProjectPreview key={activity.id} activity={activity} />
-          ))
-        ) : (
-          <div className="no-projects-message">
-            No {activeTab} projects yet
-          </div>
-        )}
+      {/* Projects List */}
+      <div className="flex-1 overflow-visible">
+        <div className="flex flex-col gap-4">
+          {projectActivities.length > 0 ? (
+            projectActivities.map((activity) => (
+              <ProjectPreview key={activity.id} activity={activity} />
+            ))
+          ) : (
+            <div className="text-center py-10 text-gray-400">
+              No {activeTab} projects yet
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </Container>
   );
 };
 
