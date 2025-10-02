@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from './Card';
 
-// Export mock data for use in other components
+
 export const defaultActivities = [
   { id: 1, user: { name: 'WraithRunner', avatar: '👻', isOnline: true }, action: 'checked in', project: { id: '1', name: 'Battle Royale Engine', description: 'Fixed hitbox detection', stars: 15, forks: 5, lastUpdated: '2 hours ago' }, message: 'Fixed hitbox detection', timestamp: '2 hours ago', projectImage: '🎮', likes: 15, type: 'checkin' },
   { id: 2, user: { name: 'OctaneSpeed', avatar: '⚡', isOnline: true }, action: 'created', project: { id: '2', name: 'Jump Pad Physics', description: 'New project for movement', stars: 8, forks: 3, lastUpdated: '4 hours ago' }, message: 'New project for movement', timestamp: '4 hours ago', projectImage: '🚀', likes: 8, type: 'create' },
@@ -15,7 +15,7 @@ export const defaultActivities = [
 const ProjectPreview = ({ activity }) => {
   const navigate = useNavigate();
 
-  // Use provided activity or first default activity
+  
   const currentActivity = activity || defaultActivities[0];
 
   const handleProjectClick = () => {
@@ -23,7 +23,7 @@ const ProjectPreview = ({ activity }) => {
   };
 
   const handleUserClick = (e) => {
-    e.stopPropagation(); // Prevent project navigation when clicking user
+    e.stopPropagation(); 
     const userId = currentActivity.user.id || currentActivity.user.name;
     if (userId) {
       navigate(`/profile/${userId}`);
@@ -31,7 +31,7 @@ const ProjectPreview = ({ activity }) => {
   };
 
   const formatTimeAgo = (timestamp) => {
-    return timestamp; // Already formatted in mock data
+    return timestamp; 
   };
 
   const getActionColor = (type) => {

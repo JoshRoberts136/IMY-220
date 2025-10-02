@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const { authenticateToken } = require('../middleware/auth');
 const router = express.Router();
 
-// Get all users (for search)
 router.get('/', authenticateToken, async (req, res) => {
   try {
     const users = await mongoose.connection.db.collection('Users')
@@ -30,7 +29,7 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
-// Get user by ID
+
 router.get('/:userId', authenticateToken, async (req, res) => {
   try {
     const userId = req.params.userId;
@@ -64,7 +63,6 @@ router.get('/:userId', authenticateToken, async (req, res) => {
   }
 });
 
-// Get user's profile
 router.get('/:userId/profile', authenticateToken, async (req, res) => {
   try {
     const userId = req.params.userId;

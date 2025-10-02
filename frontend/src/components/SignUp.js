@@ -40,7 +40,7 @@ function Signup() {
       });
 
       if (response.success) {
-        console.log('Signup successful with:', { legendName, legendId });
+        
         setIsAuthenticated(true);
         navigate('/home');
       } else {

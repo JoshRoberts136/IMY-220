@@ -225,7 +225,6 @@ class ApiService {
   }
 
   async getSentFriendRequests(filters = {}) {
-    // This endpoint doesn't exist in the backend yet, but we'll add it
     const queryString = new URLSearchParams(filters).toString();
     const endpoint = queryString ? `/friends/sent?${queryString}` : '/friends/sent';
     return this.request(endpoint);

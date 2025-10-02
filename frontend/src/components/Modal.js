@@ -1,10 +1,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 
-/**
- * Reusable Modal Component with Tailwind
- * Wraps content in a centered overlay with backdrop blur
- */
+
 const Modal = ({
   isOpen,
   onClose,
@@ -25,7 +22,7 @@ const Modal = ({
         style={{ maxWidth }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Header */}
+        {}
         {title && (
           <div className="flex justify-between items-center mb-6">
             <h2 className="font-orbitron text-2xl font-bold text-apex-orange m-0">
@@ -40,7 +37,7 @@ const Modal = ({
           </div>
         )}
 
-        {/* Modal Content */}
+        {}
         {children}
       </div>
     </div>

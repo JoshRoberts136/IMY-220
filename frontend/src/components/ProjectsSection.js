@@ -19,7 +19,7 @@ const ProjectsSection = ({ userId }) => {
       if (response.success) {
         setProjects(response.projects || []);
       } else {
-        // Fallback to dummy data
+        
         setProjects([
           {
             _id: '1',

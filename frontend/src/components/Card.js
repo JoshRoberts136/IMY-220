@@ -1,9 +1,6 @@
 import React from 'react';
 
-/**
- * Reusable Card Component with Tailwind
- * Variants: default, activity, project, member, feed
- */
+
 const Card = ({ 
   children, 
   variant = 'default',
@@ -69,7 +66,6 @@ const Card = ({
     `,
   };
 
-  // Top gradient line effect
   const gradientLine = variant === 'activity' || variant === 'project' ? (
     <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-apex-orange via-apex-red to-apex-blue opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
   ) : null;
@@ -92,9 +88,7 @@ const Card = ({
   );
 };
 
-/**
- * Container Component - Wrapper for sections
- */
+
 export const Container = ({ 
   children, 
   title,
@@ -117,7 +111,7 @@ export const Container = ({
       `}
       {...props}
     >
-      {/* Top gradient line */}
+      {}
       <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-apex-orange via-apex-red to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
       
       {title && (

@@ -1,9 +1,6 @@
 import React from 'react';
 
-/**
- * Reusable Tailwind Button Component
- * Variants: primary, secondary, warning, danger, disabled
- */
+
 const Button = ({ 
   children, 
   variant = 'primary', 

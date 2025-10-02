@@ -54,7 +54,7 @@ const CreateProject = ({ isOpen, onClose, onSave }) => {
         setError(response.message || 'Failed to create project');
       }
     } catch (err) {
-      console.error('Error creating project:', err);
+      
       setError(err.message || 'Failed to create project');
     } finally {
       setLoading(false);

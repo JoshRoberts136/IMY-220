@@ -1,8 +1,5 @@
 import React from 'react';
 
-/**
- * Reusable Form Input Component with Tailwind
- */
 const FormInput = ({ 
   label, 
   icon: Icon,

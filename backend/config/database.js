@@ -4,17 +4,15 @@ require('dotenv').config();
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGODB_URI, {
-      // These options help with MongoDB connection optimization
-      maxPoolSize: 10, // Maintain up to 10 socket connections
-      serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
-      socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-      bufferCommands: false // Disable mongoose buffering
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000, 
+      socketTimeoutMS: 45000, 
+      bufferCommands: false 
     });
 
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
     console.log(`📊 Database: ${conn.connection.name}`);
-    
-    // Handle connection events
+
     mongoose.connection.on('error', (err) => {
       console.error('❌ MongoDB connection error:', err);
     });
@@ -31,11 +29,9 @@ const connectDB = async () => {
     console.error('❌ MongoDB connection failed:', error.message);
     console.log('⚠️  Server will continue running without MongoDB connection');
     console.log('📝 API endpoints with hardcoded data will still work');
-    // Don't exit the process, let the server continue running
   }
 };
 
-// Graceful shutdown
 process.on('SIGINT', async () => {
   try {
     await mongoose.connection.close();

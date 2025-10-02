@@ -16,7 +16,7 @@ const ActivityFeed = ({ userId }) => {
       const targetUserId = userId || apiService.getUser()?.id;
       if (!targetUserId) return;
 
-      // Get user's commits
+      
       const commitsResponse = await apiService.request(`/projects/user-commits/${targetUserId}`);
       
       if (commitsResponse.success && commitsResponse.commits) {
@@ -41,12 +41,12 @@ const ActivityFeed = ({ userId }) => {
         }));
         setActivities(commitActivities);
       } else {
-        // Fallback to dummy data
+        
         setActivities(generateDummyActivities());
       }
     } catch (error) {
       console.error('Error fetching user activity:', error);
-      // Fallback to dummy data
+      
       setActivities(generateDummyActivities());
     } finally {
       setLoading(false);

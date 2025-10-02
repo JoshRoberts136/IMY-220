@@ -55,10 +55,8 @@ function Files({ projectId, project, onCommitCreated }) {
   };
 
   const handleCommitCreated = async (newCommit) => {
-    // Refresh commits list
     await fetchCommits();
     
-    // Notify parent component if callback provided
     if (onCommitCreated) {
       onCommitCreated(newCommit);
     }

@@ -56,13 +56,11 @@ const CreateCommit = ({ isOpen, onClose, projectId, onCommitCreated }) => {
       const response = await apiService.createCommit(commitData);
 
       if (response.success) {
-        // Reset form
         setFormData({
           message: '',
           filesChanged: 1
         });
-        
-        // Notify parent component
+
         if (onCommitCreated) {
           onCommitCreated(response.commit);
         }

@@ -30,35 +30,22 @@ const Search = ({ onSearchResults }) => {
       setIsSearching(true);
       
       try {
-        console.log('Searching for:', query);
         
-        // Search for users and projects
+
         const [usersResult, projectsResult] = await Promise.all([
           apiService.request('/users'),
           apiService.request('/projects')
         ]);
-
-        console.log('Users result:', usersResult);
-        console.log('Users success?', usersResult.success);
-        console.log('Has users array?', usersResult.users);
-        console.log('Users array length?', usersResult.users?.length);
-        console.log('Projects result:', projectsResult);
-
         const results = [];
-        
-        // Filter users - handle both array response and object response
         const usersList = Array.isArray(usersResult) ? usersResult : (usersResult.users || []);
         
         if (usersList.length > 0) {
-          console.log('Raw users:', usersList);
-          console.log('First user:', usersList[0]);
-          
           const matchingUsers = usersList
             .filter(user => {
-              console.log('Checking user:', user.username, user.id);
+              
               const matchUsername = user.username?.toLowerCase().includes(query.toLowerCase());
               const matchEmail = user.email?.toLowerCase().includes(query.toLowerCase());
-              console.log('Match results:', { matchUsername, matchEmail });
+              
               return matchUsername || matchEmail;
             })
             .slice(0, 3)
@@ -70,11 +57,10 @@ const Search = ({ onSearchResults }) => {
               avatar: user.profile?.avatar || '👤'
             }));
           
-          console.log('Matching users:', matchingUsers);
+          
           results.push(...matchingUsers);
         }
         
-        // Filter projects
         if (projectsResult.success && projectsResult.projects) {
           const matchingProjects = projectsResult.projects
             .filter(project => {
@@ -91,11 +77,11 @@ const Search = ({ onSearchResults }) => {
               language: project.language
             }));
           
-          console.log('Matching projects:', matchingProjects);
+          
           results.push(...matchingProjects);
         }
         
-        console.log('All results:', results);
+        
         setSuggestions(results);
         setShowSuggestions(results.length > 0);
         
@@ -115,8 +101,6 @@ const Search = ({ onSearchResults }) => {
   const handleSuggestionClick = (suggestion) => {
     setSearchQuery(suggestion.name);
     setShowSuggestions(false);
-    
-    // Navigate based on type
     if (suggestion.type === 'user') {
       navigate(`/profile/${suggestion.id}`);
     } else if (suggestion.type === 'project') {

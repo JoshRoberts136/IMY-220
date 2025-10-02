@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const { authenticateToken } = require('../middleware/auth');
 const router = express.Router();
 
-// Search users, projects, etc.
 router.get('/', authenticateToken, async (req, res) => {
   try {
     const { query, type, limit = 10, skip = 0 } = req.query;
@@ -16,13 +15,12 @@ router.get('/', authenticateToken, async (req, res) => {
       });
     }
     
-    const searchLimit = Math.min(parseInt(limit), 50); // Max 50 results
+    const searchLimit = Math.min(parseInt(limit), 50); 
     const searchSkip = parseInt(skip) || 0;
     
     let results = [];
     
     if (!type || type === 'user') {
-      // Search users
       const userResults = await mongoose.connection.db.collection('Users').find({
         $or: [
           { username: { $regex: query, $options: 'i' } },
@@ -63,7 +61,6 @@ router.get('/', authenticateToken, async (req, res) => {
     }
     
     if (!type || type === 'project') {
-      // Search projects
       const projectResults = await mongoose.connection.db.collection('Projects').find({
         $or: [
           { name: { $regex: query, $options: 'i' } },
@@ -76,7 +73,6 @@ router.get('/', authenticateToken, async (req, res) => {
       .limit(searchLimit)
       .toArray();
       
-      // Get owner info for projects
       const projects = await Promise.all(projectResults.map(async (project) => {
         const owner = await mongoose.connection.db.collection('Users').findOne({
           _id: new mongoose.Types.ObjectId(project.ownedBy)
@@ -101,9 +97,7 @@ router.get('/', authenticateToken, async (req, res) => {
       results = results.concat(projects);
     }
     
-    // Sort mixed results by relevance (simple score based on match type)
     results = results.sort((a, b) => {
-      // Prioritize exact username/name matches
       const aExactMatch = a.username?.toLowerCase() === query.toLowerCase() ||
                          a.name?.toLowerCase() === query.toLowerCase();
       const bExactMatch = b.username?.toLowerCase() === query.toLowerCase() ||
@@ -112,7 +106,6 @@ router.get('/', authenticateToken, async (req, res) => {
       if (aExactMatch && !bExactMatch) return -1;
       if (!aExactMatch && bExactMatch) return 1;
       
-      // Then prioritize users over projects
       if (a.type === 'user' && b.type === 'project') return -1;
       if (a.type === 'project' && b.type === 'user') return 1;
       
@@ -136,7 +129,6 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
-// Search suggestions (for autocomplete)
 router.get('/suggestions', authenticateToken, async (req, res) => {
   try {
     const { query, limit = 5 } = req.query;
@@ -150,7 +142,7 @@ router.get('/suggestions', authenticateToken, async (req, res) => {
     
     const searchLimit = Math.min(parseInt(limit), 10);
     
-    // Get user suggestions
+
     const userSuggestions = await mongoose.connection.db.collection('Users').find({
       username: { $regex: `^${query}`, $options: 'i' },
       isActive: true
@@ -158,7 +150,6 @@ router.get('/suggestions', authenticateToken, async (req, res) => {
     .limit(searchLimit)
     .toArray();
     
-    // Get project suggestions
     const projectSuggestions = await mongoose.connection.db.collection('Projects').find({
       name: { $regex: `^${query}`, $options: 'i' }
     })

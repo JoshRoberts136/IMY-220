@@ -1,4 +1,3 @@
-// Export all models from a single file for easier imports
 const User = require('./User');
 const Project = require('./Project');
 const CheckIn = require('./CheckIn');

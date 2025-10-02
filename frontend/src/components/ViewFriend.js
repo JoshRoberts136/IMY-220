@@ -14,37 +14,33 @@ const ViewFriend = ({ userId }) => {
 
   const fetchFriends = async () => {
     try {
-      console.log('Fetching friends for userId:', userId);
+      
       setLoading(true);
       
       const currentUser = apiService.getUser();
       const currentUserId = currentUser?.id;
       
-      // Check if viewing own profile or someone else's
       const isOwnProfile = !userId || userId === currentUserId;
       
       let friendIds = [];
       
       if (isOwnProfile) {
-        // Get current user's friends from getFriends endpoint
         const response = await apiService.getFriends();
-        console.log('Own profile - Friends API response:', response);
+        
         
         if (response.success) {
           setFriends(response.friends || []);
           return;
         }
       } else {
-        // Get other user's friends from their user data
         const response = await apiService.getUserById(userId);
-        console.log('Other profile - User API response:', response);
+        
         
         if (response.success) {
           friendIds = response.friends || [];
         }
       }
       
-      // If we have friendIds (viewing someone else's profile), fetch their details
       if (friendIds.length > 0) {
         const friendDetails = [];
         
@@ -58,17 +54,16 @@ const ViewFriend = ({ userId }) => {
                 avatar: friendResponse.profile?.avatar || '👤',
                 title: friendResponse.profile?.title || 'Developer',
                 status: friendResponse.isActive ? 'online' : 'offline',
-                mutualProjects: 0 // Can calculate this later if needed
+                mutualProjects: 0
               });
             }
           } catch (err) {
-            console.log(`Could not fetch friend ${friendId}`);
+            
           }
         }
         
         setFriends(friendDetails);
       } else if (!isOwnProfile) {
-        // Viewing someone else's profile and they have no friends
         setFriends([]);
       }
     } catch (error) {
@@ -156,7 +151,7 @@ const ViewFriend = ({ userId }) => {
                   className="message-button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    console.log(`Message ${friend.username}`);
+                    
                   }}
                 >
                   Message

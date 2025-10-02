@@ -3,17 +3,12 @@ const mongoose = require('mongoose');
 const { authenticateToken } = require('../middleware/auth');
 const router = express.Router();
 
-// Get local activity feed (user's own activities + friends' activities)
 router.get('/local', authenticateToken, async (req, res) => {
   try {
     const userId = req.user._id || req.user.id;
     const limit = parseInt(req.query.limit) || 20;
     const skip = parseInt(req.query.skip) || 0;
-    
-    // For demo purposes, if no activities exist, return empty array with success
     let activitiesWithUserInfo = [];
-    
-    // Try to get user's friends (gracefully handle if collections don't exist)
     let friendIds = [];
     try {
       const friendships = await mongoose.connection.db.collection('Friendships').find({
@@ -30,10 +25,7 @@ router.get('/local', authenticateToken, async (req, res) => {
       console.log('No friendships collection or error:', friendError.message);
     }
     
-    // Include user's own ID in the list
     const userIds = [userId.toString(), ...friendIds];
-    
-    // Try to get activities from user and friends
     let activitiesFromDb = [];
     try {
       activitiesFromDb = await mongoose.connection.db.collection('Activities').find({
@@ -46,8 +38,7 @@ router.get('/local', authenticateToken, async (req, res) => {
     } catch (activityError) {
       console.log('No activities collection or error:', activityError.message);
     }
-    
-    // Get user info for each activity
+
     if (activitiesFromDb.length > 0) {
       activitiesWithUserInfo = await Promise.all(activitiesFromDb.map(async (activity) => {
         let user = null;
@@ -83,20 +74,15 @@ router.get('/local', authenticateToken, async (req, res) => {
   }
 });
 
-// Get global activity feed (all public activities)
 router.get('/global', authenticateToken, async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 20;
     const skip = parseInt(req.query.skip) || 0;
-    
-    // For demo purposes, return empty array with success if no activities
     let activitiesWithUserInfo = [];
-    
-    // Try to get all public activities
     let activitiesFromDb = [];
     try {
       activitiesFromDb = await mongoose.connection.db.collection('Activities').find({
-        isPublic: { $ne: false } // Include activities that are public or don't have isPublic field
+        isPublic: { $ne: false } 
       })
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -105,8 +91,7 @@ router.get('/global', authenticateToken, async (req, res) => {
     } catch (activityError) {
       console.log('No activities collection or error:', activityError.message);
     }
-    
-    // Get user info for each activity
+
     if (activitiesFromDb.length > 0) {
       activitiesWithUserInfo = await Promise.all(activitiesFromDb.map(async (activity) => {
         let user = null;
@@ -142,7 +127,6 @@ router.get('/global', authenticateToken, async (req, res) => {
   }
 });
 
-// Create activity (helper function that can be called from other routes)
 const createActivity = async (userId, type, description, data = {}) => {
   try {
     const activity = {
@@ -163,7 +147,6 @@ const createActivity = async (userId, type, description, data = {}) => {
   }
 };
 
-// Add activity manually (for testing)
 router.post('/', authenticateToken, async (req, res) => {
   try {
     const { type, description, data, isPublic } = req.body;

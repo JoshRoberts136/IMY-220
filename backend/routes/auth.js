@@ -13,41 +13,41 @@ const generateToken = (userId) => {
 
 router.post('/login', async (req, res) => {
   try {
-    console.log('=== LOGIN REQUEST RECEIVED ===');
-    console.log('Request body:', req.body);
+    
+    
     const { email, password } = req.body;
-    console.log('Email:', email);
+    
 
     const user = await User.db.collection('Users').findOne({ 
       email: { $regex: new RegExp(`^${email}$`, 'i') } 
     });
-    console.log('User found:', user ? user.username : 'null');
+    
 
     if (!user) {
-      console.log('No user found with email:', email);
+      
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
       });
     }
 
-    console.log('Stored password hash:', user.password);
+    
 
     const isValidPassword = await bcrypt.compare(password, user.password);
-    console.log('Bcrypt comparison result:', isValidPassword);
+    
 
     if (!isValidPassword) {
-      console.log('Password validation failed');
+      
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
       });
     }
 
-    console.log('Password validation successful');
+    
 
     const token = generateToken(user.id);
-    console.log('Generated token:', token ? 'SUCCESS' : 'FAILED');
+    
 
     await User.db.collection('Users').updateOne(
       { id: user.id },
@@ -77,8 +77,8 @@ router.post('/login', async (req, res) => {
 
 router.post('/register', async (req, res) => {
   try {
-    console.log('=== REGISTER REQUEST RECEIVED ===');
-    console.log('Request body:', req.body);
+    
+    
     const { username, email, password, profile } = req.body;
 
     const existingUser = await User.db.collection('Users').findOne({
@@ -114,7 +114,7 @@ router.post('/register', async (req, res) => {
     };
 
     const result = await User.db.collection('Users').insertOne(newUser);
-    console.log('User created:', result.insertedId);
+    
 
     const token = generateToken(newUser.id);
 
@@ -179,10 +179,7 @@ router.put('/profile', async (req, res) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
     const { profile } = req.body;
-    
-    console.log('Updating profile for user:', decoded.userId);
-    console.log('Profile data:', profile);
-    
+
     const updateData = {
       $set: {
         'profile.title': profile?.title || '',
@@ -198,7 +195,7 @@ router.put('/profile', async (req, res) => {
       { returnDocument: 'after' }
     );
 
-    console.log('Update result:', result);
+    
     
     res.json({ success: true, message: 'Profile updated successfully' });
   } catch (error) {
@@ -217,61 +214,50 @@ router.delete('/profile', async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
     const userId = decoded.userId;
     
-    console.log('=== DELETE PROFILE REQUEST ===');
-    console.log('User ID:', userId);
-
-    // Get user to check owned projects
+  
     const user = await User.db.collection('Users').findOne({ id: userId });
     
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    // Delete all projects owned by the user
     if (user.ownedProjects && user.ownedProjects.length > 0) {
       await User.db.collection('Projects').deleteMany({
         id: { $in: user.ownedProjects }
       });
-      console.log('Deleted projects:', user.ownedProjects.length);
+      
     }
 
-    // Remove user from projects they are a member of
     if (user.memberProjects && user.memberProjects.length > 0) {
       await User.db.collection('Projects').updateMany(
         { id: { $in: user.memberProjects } },
         { $pull: { members: userId } }
       );
-      console.log('Removed from member projects:', user.memberProjects.length);
+      
     }
-
-    // Delete all commits by the user
     await User.db.collection('Commits').deleteMany({ userId: userId });
-    console.log('Deleted user commits');
+    
 
-    // Remove user from all friend lists
     await User.db.collection('Users').updateMany(
       { friends: userId },
       { $pull: { friends: userId } }
     );
-    console.log('Removed from friend lists');
 
-    // Delete all friend requests involving the user
     await User.db.collection('FriendRequests').deleteMany({
       $or: [
         { senderId: userId },
         { receiverId: userId }
       ]
     });
-    console.log('Deleted friend requests');
+    
 
-    // Finally, delete the user
     const deleteResult = await User.db.collection('Users').deleteOne({ id: userId });
     
     if (deleteResult.deletedCount === 0) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    console.log('User profile deleted successfully');
+    
 
     res.json({
       success: true,

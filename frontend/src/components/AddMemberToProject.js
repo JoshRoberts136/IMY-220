@@ -24,7 +24,6 @@ const AddMemberToProject = ({ isOpen, onClose, projectId, currentMembers, onMemb
       setFilteredUsers([]);
     } else {
       const filtered = allUsers.filter(user => {
-        // Don't show users who are already members
         if (currentMembers && currentMembers.includes(user.id)) {
           return false;
         }
@@ -43,10 +42,8 @@ const AddMemberToProject = ({ isOpen, onClose, projectId, currentMembers, onMemb
       setLoading(true);
       const response = await apiService.request('/users');
       
-      // Handle both array response and object response
       const usersList = Array.isArray(response) ? response : (response.users || []);
       
-      // Filter out current user
       const currentUser = apiService.getUser();
       const filteredList = usersList.filter(user => user.id !== currentUser.id);
       
