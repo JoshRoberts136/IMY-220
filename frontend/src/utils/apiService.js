@@ -326,6 +326,12 @@ class ApiService {
     return this.request(`/users/${userId}`);
   }
 
+  async deleteProfile() {
+    return this.request('/auth/profile', {
+      method: 'DELETE',
+    });
+  }
+
   async checkHealth() {
     try {
       const response = await this.request('/health');

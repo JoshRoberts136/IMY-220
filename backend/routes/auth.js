@@ -207,4 +207,80 @@ router.put('/profile', async (req, res) => {
   }
 });
 
+router.delete('/profile', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ success: false, message: 'No token provided' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    const userId = decoded.userId;
+    
+    console.log('=== DELETE PROFILE REQUEST ===');
+    console.log('User ID:', userId);
+
+    // Get user to check owned projects
+    const user = await User.db.collection('Users').findOne({ id: userId });
+    
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Delete all projects owned by the user
+    if (user.ownedProjects && user.ownedProjects.length > 0) {
+      await User.db.collection('Projects').deleteMany({
+        id: { $in: user.ownedProjects }
+      });
+      console.log('Deleted projects:', user.ownedProjects.length);
+    }
+
+    // Remove user from projects they are a member of
+    if (user.memberProjects && user.memberProjects.length > 0) {
+      await User.db.collection('Projects').updateMany(
+        { id: { $in: user.memberProjects } },
+        { $pull: { members: userId } }
+      );
+      console.log('Removed from member projects:', user.memberProjects.length);
+    }
+
+    // Delete all commits by the user
+    await User.db.collection('Commits').deleteMany({ userId: userId });
+    console.log('Deleted user commits');
+
+    // Remove user from all friend lists
+    await User.db.collection('Users').updateMany(
+      { friends: userId },
+      { $pull: { friends: userId } }
+    );
+    console.log('Removed from friend lists');
+
+    // Delete all friend requests involving the user
+    await User.db.collection('FriendRequests').deleteMany({
+      $or: [
+        { senderId: userId },
+        { receiverId: userId }
+      ]
+    });
+    console.log('Deleted friend requests');
+
+    // Finally, delete the user
+    const deleteResult = await User.db.collection('Users').deleteOne({ id: userId });
+    
+    if (deleteResult.deletedCount === 0) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    console.log('User profile deleted successfully');
+
+    res.json({
+      success: true,
+      message: 'Profile deleted successfully'
+    });
+  } catch (error) {
+    console.error('Profile deletion error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 module.exports = router;

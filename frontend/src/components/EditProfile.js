@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { User, Mail, MapPin, X, Briefcase, FileText } from 'lucide-react';
+import { User, Mail, X, Briefcase, FileText } from 'lucide-react';
 import FormInput from './FormInput';
 import Button from './Button';
+import DeleteProfile from './DeleteProfile';
 import apiService from '../utils/apiService';
 
 const EditProfile = ({ isOpen, onClose, user, onSave }) => {
@@ -11,7 +12,6 @@ const EditProfile = ({ isOpen, onClose, user, onSave }) => {
     title: '',
     bio: '',
     email: '',
-    location: '',
     joinDate: '',
   });
   const [loading, setLoading] = useState(false);
@@ -31,7 +31,6 @@ const EditProfile = ({ isOpen, onClose, user, onSave }) => {
         title: currentUser.profile?.title || '',
         bio: currentUser.profile?.bio || '',
         email: currentUser.email || '',
-        location: currentUser.profile?.location || '',
         joinDate: currentUser.createdAt || '',
       });
     }
@@ -57,7 +56,6 @@ const EditProfile = ({ isOpen, onClose, user, onSave }) => {
           ...currentUser.profile,
           title: formData.title,
           bio: formData.bio,
-          location: formData.location
         }
       };
       
@@ -68,6 +66,10 @@ const EditProfile = ({ isOpen, onClose, user, onSave }) => {
       }
     }
     
+    onClose();
+  };
+
+  const handleProfileDeleted = () => {
     onClose();
   };
 
@@ -151,16 +153,6 @@ const EditProfile = ({ isOpen, onClose, user, onSave }) => {
             placeholder="your@email.com"
           />
           
-          <FormInput
-            label="Location"
-            icon={MapPin}
-            type="text"
-            name="location"
-            value={formData.location}
-            onChange={handleChange}
-            placeholder="Your location"
-          />
-          
           <div className="flex gap-4 mt-8">
             <Button 
               type="submit" 
@@ -179,6 +171,9 @@ const EditProfile = ({ isOpen, onClose, user, onSave }) => {
             </Button>
           </div>
         </form>
+
+        {/* Delete Profile Section */}
+        <DeleteProfile onDelete={handleProfileDeleted} />
       </div>
     </div>,
     document.body
