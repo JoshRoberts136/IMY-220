@@ -36,11 +36,18 @@ module.exports = (env, argv) => {
     },
     devServer: {
       historyApiFallback: true,
-      port: 3000,
+      port: 8080,
       host: '0.0.0.0',
       static: {
         directory: path.join(__dirname, 'public'),
       },
+      proxy: [
+        {
+          context: ['/api'],
+          target: 'http://localhost:3000',
+          changeOrigin: true
+        }
+      ]
     },
     watch: !isProduction,
     performance: {
