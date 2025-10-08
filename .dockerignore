@@ -1,14 +1,9 @@
 node_modules
 npm-debug.log
+.env
 .git
 .gitignore
-.env.local
+README.md
 .DS_Store
-*.md
-!README.md
-.vscode
-.idea
 dist
-coverage
-.cache
-Github link
+*.md
