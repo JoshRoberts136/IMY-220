@@ -16,8 +16,8 @@ COPY . .
 # Build the frontend
 RUN npm run build
 
-# Expose ports for frontend (3000) and backend 
-EXPOSE 3000 3000
+# Expose port
+EXPOSE 3000
 
-# Run the development script
-CMD ["npm", "run", "dev"]
+# Run production server
+CMD ["npm", "start"]
