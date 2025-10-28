@@ -1,25 +1,3 @@
-/* Scrollbar Styles */
-
 ::-webkit-scrollbar {
   display: none;
 }
-
-/* Alternative scrollbar styling (commented out, using hidden instead) */
-/*
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(20, 20, 20, 0.5);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--apex-orange);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--apex-red);
-}
-*/

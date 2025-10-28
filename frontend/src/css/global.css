@@ -1,6 +1,3 @@
-/* Global Reset and Body Styles */
-
-/* Global Reset */
 * {
   margin: 0;
   padding: 0;
@@ -9,7 +6,6 @@
   scrollbar-width: none;
 }
 
-/* Body Styles */
 body {
   font-family: 'Rajdhani', sans-serif;
   background: linear-gradient(135deg, black 0%, #111 50%, #1a1a1a 100%);
@@ -17,7 +13,6 @@ body {
   overflow-x: hidden;
   min-height: 100vh;
   position: relative;
-  /* Force GPU acceleration */
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
   will-change: scroll-position;

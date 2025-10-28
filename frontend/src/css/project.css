@@ -1,5 +1,3 @@
-/* Project Page Styles */
-
 .project-header-section {
   background: linear-gradient(135deg, rgba(139, 0, 0, 0.1), rgba(20, 20, 20, 0.9));
   border: 2px solid var(--apex-orange);
@@ -288,7 +286,6 @@
   border: 1px solid var(--apex-red);
 }
 
-/* Members */
 .member-avatar {
   position: relative;
   width: 45px;
@@ -330,7 +327,6 @@
   margin-left: 5px;
 }
 
-/* Analytics */
 .analytics-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

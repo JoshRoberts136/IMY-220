@@ -1,5 +1,3 @@
-/* Utility Classes */
-
 .file-item {
   display: flex;
   justify-content: space-between;
@@ -40,7 +38,6 @@
   margin-left: auto;
 }
 
-/* Inline styling utilities that may conflict with Tailwind - keeping for backwards compatibility */
 div[style*="background: var(--apex-red)"],
 div[style*="background: var(--apex-orange)"],
 div[style*="background: #4a5568"] {

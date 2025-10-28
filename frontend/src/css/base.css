@@ -1,5 +1,3 @@
-/* Base Variables and Reset Styles */
-
 @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;600;700&family=Orbitron:wght@400;700;900&display=swap');
 
 :root {
@@ -45,7 +43,6 @@ body {
   display: none;
 }
 
-/* Custom scrollbar for specific elements */
 .friends-container::-webkit-scrollbar,
 .commits-list::-webkit-scrollbar,
 .user-select-list::-webkit-scrollbar {
