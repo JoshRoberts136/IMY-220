@@ -152,18 +152,23 @@ const ProjectsSection = ({ userId }) => {
 
   if (loading) {
     return (
-      <Container title="Projects">
+      <div className="content-section view-friend-section">
+        <div className="section-title">Projects</div>
         <div className="text-center py-5 text-gray-400">Loading projects...</div>
-      </Container>
+      </div>
     );
   }
 
   return (
-    <Container title="Projects" className="flex flex-col h-full">
+    <div className="content-section view-friend-section projects-section-container">
+      <div className="section-title">
+        Projects ({activeTab === 'owned' ? getFilteredProjects().length : getMemberProjectsCount()})
+      </div>
+      
       {/* Tabs */}
       <div className="flex gap-1 mb-5 bg-[rgba(20,20,20,0.5)] rounded-lg p-1">
         <button
-          className={`flex-1 px-4 py-3 bg-transparent rounded-lg cursor-pointer font-semibold font-rajdhani uppercase tracking-wide transition-all duration-300 text-sm ${
+          className={`flex-1 px-4 py-3 bg-transparent rounded-lg cursor-pointer font-semibold font-rajdhani uppercase tracking-wide transition-all duration-300 text-sm tab-cursor ${
             activeTab === 'owned'
               ? 'bg-gradient-to-r from-apex-orange to-apex-red text-white shadow-[0_4px_12px_rgba(139,0,0,0.3)]'
               : 'text-gray-400 hover:bg-[rgba(139,0,0,0.2)] hover:text-white'
@@ -178,7 +183,7 @@ const ProjectsSection = ({ userId }) => {
           }).length})
         </button>
         <button
-          className={`flex-1 px-4 py-3 bg-transparent rounded-lg cursor-pointer font-semibold font-rajdhani uppercase tracking-wide transition-all duration-300 text-sm ${
+          className={`flex-1 px-4 py-3 bg-transparent rounded-lg cursor-pointer font-semibold font-rajdhani uppercase tracking-wide transition-all duration-300 text-sm tab-cursor ${
             activeTab === 'member'
               ? 'bg-gradient-to-r from-apex-orange to-apex-red text-white shadow-[0_4px_12px_rgba(139,0,0,0.3)]'
               : 'text-gray-400 hover:bg-[rgba(139,0,0,0.2)] hover:text-white'
@@ -189,21 +194,19 @@ const ProjectsSection = ({ userId }) => {
         </button>
       </div>
       
-      {/* Projects List */}
-      <div className="flex-1 overflow-visible">
-        <div className="flex flex-col gap-4">
-          {projectActivities.length > 0 ? (
-            projectActivities.map((activity) => (
-              <ProjectPreview key={activity.id} activity={activity} />
-            ))
-          ) : (
-            <div className="text-center py-10 text-gray-400">
-              No {activeTab} projects yet
-            </div>
-          )}
-        </div>
+      {/* Scrollable Projects List */}
+      <div className="friends-container">
+        {projectActivities.length > 0 ? (
+          projectActivities.map((activity) => (
+            <ProjectPreview key={activity.id} activity={activity} />
+          ))
+        ) : (
+          <div className="no-friends-message">
+            No {activeTab} projects yet
+          </div>
+        )}
       </div>
-    </Container>
+    </div>
   );
 };
 

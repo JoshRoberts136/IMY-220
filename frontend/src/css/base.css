@@ -1,0 +1,72 @@
+/* Base Variables and Reset Styles */
+
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;600;700&family=Orbitron:wght@400;700;900&display=swap');
+
+:root {
+  --apex-orange: #8b0000;
+  --apex-red: #ff3333;
+  --apex-dark: #111111;
+  --apex-darker: #000000;
+  --apex-blue: #8b0000;
+  --apex-gray-highlight: #1f1f1f;
+  --apex-gray: #2d3748;
+  --apex-light-gray: #2a2a2a;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -ms-overflow-style: none;  
+  scrollbar-width: none;  
+}
+
+html, body {
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  font-family: 'Rajdhani', sans-serif;
+  background: linear-gradient(135deg, black 0%, #111 50%, #1a1a1a 100%);
+  color: white;
+  overflow-x: hidden;
+  min-height: 100vh;
+  position: relative;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Custom scrollbar for specific elements */
+.friends-container::-webkit-scrollbar,
+.commits-list::-webkit-scrollbar,
+.user-select-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.friends-container::-webkit-scrollbar-track,
+.commits-list::-webkit-scrollbar-track,
+.user-select-list::-webkit-scrollbar-track {
+  background: rgba(20, 20, 20, 0.5);
+}
+
+.friends-container::-webkit-scrollbar-thumb,
+.commits-list::-webkit-scrollbar-thumb,
+.user-select-list::-webkit-scrollbar-thumb {
+  background: var(--apex-orange);
+  border-radius: 4px;
+}
+
+.friends-container::-webkit-scrollbar-thumb:hover,
+.commits-list::-webkit-scrollbar-thumb:hover,
+.user-select-list::-webkit-scrollbar-thumb:hover {
+  background: var(--apex-red);
+}

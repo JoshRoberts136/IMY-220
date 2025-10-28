@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Files from './Files';
+import FileManager from './FileManager';
 import Messages from './Messages';
 import EditProject from './EditProject';
 import DeleteProject from './DeleteProject';
@@ -114,6 +115,7 @@ const ProjectCard = () => {
               name: userResponse.username || 'Unknown User',
               avatar: userResponse.profile?.avatar || '👤',
               role: isOwner ? 'Project Owner' : 'Team Member',
+              isOwner: isOwner,
               isOnline: Math.random() > 0.5
             });
           }
@@ -211,6 +213,25 @@ const ProjectCard = () => {
     }
   };
 
+  // Check if avatar is a file path or emoji
+  const isImagePath = (avatar) => {
+    return avatar && (avatar.startsWith('/') || avatar.startsWith('http'));
+  };
+
+  const renderMemberAvatar = (avatar) => {
+    if (isImagePath(avatar)) {
+      return (
+        <img 
+          src={avatar} 
+          alt="Member avatar"
+          className="w-full h-full object-cover rounded-full"
+        />
+      );
+    } else {
+      return <span className="avatar-emoji">{avatar || '👤'}</span>;
+    }
+  };
+
   if (loading && projectId) {
     return (
       <PageContainer>
@@ -295,13 +316,14 @@ const ProjectCard = () => {
                   onClick={() => navigate(`/profile/${member.id}`)}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
-                    <div className="member-avatar">
-                      <span className="avatar-emoji">{member.avatar}</span>
+                    <div className="member-avatar" style={{ overflow: 'hidden' }}>
+                      {renderMemberAvatar(member.avatar)}
                       {member.isOnline && <div className="online-indicator"></div>}
-                      {member.role === 'Project Owner' && <span className="crown-indicator">👑</span>}
                     </div>
                     <div className="member-info">
-                      <div className="member-name">{member.name}</div>
+                      <div className="member-name">
+                        {member.name} {member.isOwner && <span className="crown-indicator">👑</span>}
+                      </div>
                       <div className="member-role">{member.role}</div>
                     </div>
                     <div className="member-status">
@@ -337,36 +359,16 @@ const ProjectCard = () => {
         </div>
       </div>
 
-      {/* Two Column Grid - Original Layout */}
+      {/* Two Column Grid - Files Left, Commits Right */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', minHeight: '400px' }}>
-        {/* Left Column */}
+        {/* Left Column - Project Files */}
         <div>
-          <Files projectId={project.id} project={project} onCommitCreated={fetchProjectData} />
+          <FileManager projectId={project.id} />
         </div>
         
-        {/* Right Column */}
+        {/* Right Column - Commits */}
         <div>
-          
-          <Messages />
-          
-          <div className="project-stats-bar">
-            <div className="stat-group">
-              <span className="stat-value">{project.stats.stars}</span>
-              <span className="stat-label">Stars</span>
-            </div>
-            <div className="stat-group">
-              <span className="stat-value">{project.stats.forks}</span>
-              <span className="stat-label">Forks</span>
-            </div>
-            <div className="stat-group">
-              <span className="stat-value">{project.stats.commits}</span>
-              <span className="stat-label">Commits</span>
-            </div>
-            <div className="stat-group">
-              <span className="stat-value">{project.stats.issues}</span>
-              <span className="stat-label">Issues</span>
-            </div>
-          </div>
+          <Files projectId={project.id} project={project} onCommitCreated={fetchProjectData} />
         </div>
       </div>
 

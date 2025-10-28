@@ -67,7 +67,9 @@ router.post('/', authenticateToken, async (req, res) => {
       commit: {
         ...newCommit,
         userAvatar: user ? (user.profile?.avatar || '👤') : '👤',
-        username: user ? user.username : author
+        username: user ? user.username : author,
+        projectImage: project.image || '💻',
+        projectName: project.name
       }
     });
   } catch (error) {
@@ -129,9 +131,17 @@ router.get('/user/:userId', authenticateToken, async (req, res) => {
         const project = await mongoose.connection.db.collection('Projects').findOne({
           id: commit.projectId
         });
+        
+        const user = await mongoose.connection.db.collection('Users').findOne({
+          id: commit.userId
+        });
+        
         return {
           ...commit,
-          projectName: project ? project.name : 'Unknown Project'
+          projectName: project ? project.name : 'Unknown Project',
+          projectImage: project ? project.image : '💻',
+          userAvatar: user ? (user.profile?.avatar || '👤') : '👤',
+          username: user ? user.username : commit.author
         };
       })
     );

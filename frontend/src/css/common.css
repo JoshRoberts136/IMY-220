@@ -1,0 +1,207 @@
+/* Common Component Styles */
+
+.sidebar {
+  background: rgba(45, 55, 72, 0.4);
+  padding: 25px;
+  border-radius: 12px;
+  border: 1px solid rgba(139, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  transition: border-color 0.3s ease;
+}
+
+.sidebar:hover {
+  border-color: var(--apex-orange);
+  background: rgba(45, 55, 72, 0.5);
+}
+
+.content-section {
+  background: rgba(45, 55, 72, 0.3);
+  padding: 25px;
+  border-radius: 12px;
+  border: 1px solid rgba(139, 0, 0, 0.25);
+  backdrop-filter: blur(5px);
+  transition: border-color 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.content-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--apex-orange), var(--apex-red));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.content-section:hover {
+  border-color: var(--apex-orange);
+  background: rgba(45, 55, 72, 0.4);
+}
+
+.content-section:hover::before {
+  opacity: 1;
+}
+
+.content-section > div[style*="display: flex"] {
+  background: rgba(139, 0, 0, 0.06) !important;
+  border: 1px solid rgba(139, 0, 0, 0.2) !important;
+  border-radius: 10px !important;
+  padding: 16px !important;
+  margin-bottom: 12px !important;
+  transition: all 0.3s ease;
+}
+
+.content-section > div[style*="display: flex"]:hover {
+  border-color: var(--apex-orange) !important;
+  background: rgba(139, 0, 0, 0.12) !important;
+}
+
+.section-title {
+  color: var(--apex-orange);
+  font-weight: 700;
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-family: 'Orbitron', monospace;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  padding-bottom: 8px;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  height: 2px;
+  background: var(--apex-orange);
+  border-radius: 1px;
+}
+
+.tabs-placeholder {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 20px;
+  background: rgba(20, 20, 20, 0.5);
+  border-radius: 10px;
+  padding: 4px;
+}
+
+.tab-placeholder {
+  padding: 12px 18px;
+  background: transparent;
+  color: #888;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-family: 'Rajdhani', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  font-size: 13px;
+}
+
+.tab-placeholder.active {
+  background: linear-gradient(45deg, var(--apex-orange), var(--apex-red));
+  color: white;
+  box-shadow: 0 4px 12px rgba(139, 0, 0, 0.3);
+}
+
+.tab-placeholder:hover:not(.active) {
+  background: rgba(139, 0, 0, 0.2);
+  color: white;
+}
+
+.tab-cursor {
+  cursor: pointer;
+}
+
+.tab-cursor-pointer {
+  cursor: pointer;
+}
+
+.online-indicator {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 14px;
+  height: 14px;
+  background: #00ff88;
+  border-radius: 50%;
+  border: 3px solid #1a1a1a;
+  box-shadow: 0 0 10px #00ff88;
+  animation: pulse-glow 2s infinite;
+}
+
+.online-badge {
+  background: rgba(0, 255, 136, 0.2);
+  color: #00ff88;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.user-avatar {
+  position: relative;
+  width: 45px;
+  height: 45px;
+  background: rgba(139, 0, 0, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--apex-orange);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-name {
+  color: white;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.avatar-emoji {
+  font-size: 20px;
+}
+
+.user-greeting-inline {
+  margin-right: 10px;
+  color: #666;
+}
+
+.success-message {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(45deg, #00ff88, #00cc6a);
+  color: white;
+  padding: 15px 25px;
+  border-radius: 8px;
+  z-index: 2000;
+  box-shadow: 0 8px 25px rgba(0, 255, 136, 0.3);
+  font-family: 'Rajdhani, sans-serif';
+  font-weight: 700;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: slideInRight 0.3s ease-out;
+}
+
+.icon-sm {
+  width: 16px;
+  height: 16px;
+}

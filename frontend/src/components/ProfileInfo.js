@@ -5,10 +5,12 @@ import EditProfile from './EditProfile';
 import CreateProject from './CreateProject';
 import AddFriend from './AddFriend';
 import RemoveFriend from './RemoveFriend';
+import ProfileImageUpload from './ProfileImageUpload';
+import { DefaultAvatar } from '../utils/avatarUtils';
 import apiService from '../utils/apiService';
 import '../styles.css';
 
-const ProfileInfo = ({ profileData, isOwnProfile, targetUserId, onProjectCreated }) => {
+const ProfileInfo = ({ profileData, isOwnProfile, isFriend, targetUserId, onProjectCreated, onFriendshipChange }) => {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isCreatingProject, setIsCreatingProject] = useState(false);
   const [friendshipStatus, setFriendshipStatus] = useState('none');
@@ -18,8 +20,10 @@ const ProfileInfo = ({ profileData, isOwnProfile, targetUserId, onProjectCreated
     bio: 'Conquering bugs and building digital empires. 5+ years of battle-tested experience in the coding arena.',
     isOnline: true,
   });
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    setIsLoading(true);
     if (profileData) {
       setUser({
         username: profileData.username || 'Unknown User',
@@ -27,10 +31,12 @@ const ProfileInfo = ({ profileData, isOwnProfile, targetUserId, onProjectCreated
         bio: profileData.profile?.bio || 'No bio available',
         email: profileData.email,
         location: profileData.profile?.location,
+        avatar: profileData.profile?.avatar,
         joinDate: profileData.createdAt ? new Date(profileData.createdAt).toLocaleDateString() : 'Unknown',
         isOnline: profileData.isActive || false,
         ...profileData
       });
+      setIsLoading(false);
     } else if (isOwnProfile) {
       const currentUser = apiService.getUser();
       if (currentUser) {
@@ -40,10 +46,12 @@ const ProfileInfo = ({ profileData, isOwnProfile, targetUserId, onProjectCreated
           bio: currentUser.profile?.bio || 'No bio available',
           email: currentUser.email,
           location: currentUser.profile?.location,
+          avatar: currentUser.profile?.avatar,
           joinDate: currentUser.createdAt ? new Date(currentUser.createdAt).toLocaleDateString() : 'Unknown',
           isOnline: currentUser.isActive || false,
           ...currentUser
         });
+        setIsLoading(false);
       }
     }
     
@@ -60,6 +68,31 @@ const ProfileInfo = ({ profileData, isOwnProfile, targetUserId, onProjectCreated
       }
     } catch (error) {
       console.error('Error checking friendship status:', error);
+    }
+  };
+
+  const handleAvatarUploadSuccess = async (newAvatarPath) => {
+    // Update local state
+    setUser(prev => ({
+      ...prev,
+      profile: {
+        ...prev.profile,
+        avatar: newAvatarPath
+      },
+      avatar: newAvatarPath
+    }));
+
+    // Update localStorage
+    const currentUser = apiService.getUser();
+    if (currentUser) {
+      const updatedUser = {
+        ...currentUser,
+        profile: {
+          ...currentUser.profile,
+          avatar: newAvatarPath
+        }
+      };
+      apiService.setUser(updatedUser);
     }
   };
 
@@ -111,10 +144,23 @@ const ProfileInfo = ({ profileData, isOwnProfile, targetUserId, onProjectCreated
     }
   };
 
-  const handleFriendshipChange = (newStatus) => {
-    console.log('Friendship status changed:', newStatus);
+  const handleLocalFriendshipChange = (newStatus) => {
+    console.log('Friendship status changed locally:', newStatus);
     setFriendshipStatus(newStatus);
+    
+    // Notify parent component to update the view
+    if (onFriendshipChange) {
+      onFriendshipChange(newStatus);
+    }
   };
+
+  // Get the correct userId
+  const getUserId = () => {
+    return user.id || user._id;
+  };
+
+  // Show limited profile info if not friends
+  const showLimitedInfo = !isOwnProfile && !isFriend;
 
   return (
     <div className="content-section profile-info-section">
@@ -123,21 +169,50 @@ const ProfileInfo = ({ profileData, isOwnProfile, targetUserId, onProjectCreated
       </div>
       
       <div className="profile-container">
-        <div className="user-avatar user-avatar-large">
-          <User className="avatar-icon-large" />
-        </div>
+        {isOwnProfile && !isLoading && getUserId() ? (
+          <ProfileImageUpload
+            currentAvatar={user.profile?.avatar || user.avatar}
+            userId={getUserId()}
+            username={user.username}
+            onUploadSuccess={handleAvatarUploadSuccess}
+            isOwnProfile={true}
+          />
+        ) : (
+          <div className="user-avatar user-avatar-large">
+            {user.profile?.avatar || user.avatar ? (
+              <img 
+                src={user.profile?.avatar || user.avatar} 
+                alt={user.username}
+                className="profile-avatar-image"
+              />
+            ) : (
+              <DefaultAvatar username={user.username} size={150} />
+            )}
+          </div>
+        )}
         
         <div className="profile-info">
           <div className="profile-header-row">
             <h1 className="profile-username-title">{user.username}</h1>
-            <div className="online-badge">
-              <Trophy className="badge-icon" />
-              <span>Legend</span>
-            </div>
+            {(isOwnProfile || isFriend) && (
+              <div className="online-badge">
+                <Trophy className="badge-icon" />
+                <span>Legend</span>
+              </div>
+            )}
           </div>
           
-          <p className="profile-title-text">{user.title}</p>
-          <p className="profile-bio-text">{user.bio}</p>
+          {/* Show full info for own profile or friends */}
+          {!showLimitedInfo ? (
+            <>
+              <p className="profile-title-text">{user.title}</p>
+              <p className="profile-bio-text">{user.bio}</p>
+            </>
+          ) : (
+            <div className="text-gray-400 text-sm mt-2">
+              <p>🔒 Add {user.username} as a friend to view their full profile</p>
+            </div>
+          )}
           
           <div className="buttons-container-profile">
             {isOwnProfile ? (
@@ -161,12 +236,12 @@ const ProfileInfo = ({ profileData, isOwnProfile, targetUserId, onProjectCreated
               friendshipStatus === 'friends' ? (
                 <RemoveFriend
                   targetUserId={targetUserId}
-                  onFriendshipChange={handleFriendshipChange}
+                  onFriendshipChange={handleLocalFriendshipChange}
                 />
               ) : (
                 <AddFriend
                   targetUserId={targetUserId}
-                  onFriendshipChange={handleFriendshipChange}
+                  onFriendshipChange={handleLocalFriendshipChange}
                 />
               )
             )}
@@ -185,7 +260,7 @@ const ProfileInfo = ({ profileData, isOwnProfile, targetUserId, onProjectCreated
 
           <CreateProject
             isOpen={isCreatingProject}
-            onClose={() => setIsCreatingProject(false)}
+            onClose={() => setIsCreatingProfile(false)}
             onSave={handleCreateProject}
           />
         </>

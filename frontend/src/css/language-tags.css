@@ -1,0 +1,51 @@
+/* Language Tags Styles */
+
+.language-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 10px;
+}
+
+.language-tags-section {
+  margin-bottom: 20px;
+}
+
+.language-tag {
+  border-radius: 20px;
+  color: white;
+  font-weight: 600;
+}
+
+.language-tag-expert {
+  background: var(--apex-red);
+  padding: 10px 14px;
+  font-size: 16px;
+  border-radius: 20px;
+  color: white;
+  font-weight: 600;
+}
+
+.language-tag-advanced {
+  background: var(--apex-orange);
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 20px;
+  color: white;
+  font-weight: 600;
+}
+
+.language-tag-intermediate {
+  background: #4a5568;
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 20px;
+  color: white;
+  font-weight: 600;
+}
+
+.language-tag-beginner {
+  background: #4a5568;
+  padding: 6px 10px;
+  font-size: 12px;
+}

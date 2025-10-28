@@ -18,7 +18,7 @@ function Header() {
       <div className="absolute bottom-[-3px] left-0 w-full h-px bg-gradient-to-r from-transparent via-apex-blue to-transparent"></div>
       
       {/* Logo */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 cursor-pointer" onClick={() => navigate('/home')}>
         {/* Logo Icon with rotating border */}
         <div className="relative w-[60px] h-[60px] bg-apex-red shadow-[0_0_25px_rgba(139,0,0,0.8)]" 
              style={{ clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)' }}>

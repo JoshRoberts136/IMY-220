@@ -11,6 +11,7 @@ import '../styles.css';
 const Profile = ({ userId }) => {
   const [profileData, setProfileData] = useState(null);
   const [isOwnProfile, setIsOwnProfile] = useState(false);
+  const [isFriend, setIsFriend] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -25,6 +26,7 @@ const Profile = ({ userId }) => {
         
         if (!userId) {
           setIsOwnProfile(true);
+          setIsFriend(false);
           setProfileData(currentUser);
         } else {
           const isOwn = currentUser && (
@@ -37,12 +39,21 @@ const Profile = ({ userId }) => {
           setIsOwnProfile(isOwn);
           
           if (isOwn) {
+            setIsFriend(false);
             setProfileData(currentUser);
           } else {
             try {
               const response = await apiService.request(`/users/${userId}`);
               if (response.success) {
                 setProfileData(response);
+                
+                // Check if they are friends
+                const friendshipResponse = await apiService.checkFriendshipStatus(userId);
+                if (friendshipResponse.success && friendshipResponse.status === 'friends') {
+                  setIsFriend(true);
+                } else {
+                  setIsFriend(false);
+                }
               } else {
                 setProfileData({
                   username: 'Unknown User',
@@ -50,6 +61,7 @@ const Profile = ({ userId }) => {
                   email: 'unknown@example.com',
                   isActive: false
                 });
+                setIsFriend(false);
               }
             } catch (apiError) {
               console.warn('API call failed, using fallback data:', apiError);
@@ -59,6 +71,7 @@ const Profile = ({ userId }) => {
                 email: 'unknown@example.com',
                 isActive: false
               });
+              setIsFriend(false);
             }
           }
         }
@@ -77,6 +90,18 @@ const Profile = ({ userId }) => {
     setRefreshTrigger(prev => prev + 1);
   };
 
+  // Handle friendship status changes dynamically without page reload
+  const handleFriendshipChange = (newStatus) => {
+    console.log('Friendship status changed to:', newStatus);
+    
+    // Update isFriend state immediately
+    if (newStatus === 'friends') {
+      setIsFriend(true);
+    } else if (newStatus === 'none' || newStatus === 'removed') {
+      setIsFriend(false);
+    }
+  };
+
   if (loading) {
     return (
       <PageContainer>
@@ -93,32 +118,59 @@ const Profile = ({ userId }) => {
     );
   }
 
+  // If not own profile AND not friends, show limited view
+  const showLimitedView = !isOwnProfile && !isFriend;
+
   return (
     <PageContainer>
-      {/* Two Column Grid Layout - Original Structure */}
+      {/* Two Column Grid Layout - 20px gap between columns */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', minHeight: '78vh' }}>
-        {/* Left Column */}
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        {/* Left Column - 10px gap between rows */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <ProfileInfo
             profileData={profileData}
             isOwnProfile={isOwnProfile}
+            isFriend={isFriend}
             targetUserId={userId}
             onProjectCreated={handleProjectCreated}
+            onFriendshipChange={handleFriendshipChange}
           />
-          <div style={{ flex: 1, overflow: 'visible' }}>
-            <ActivityFeed userId={userId} key={refreshTrigger} />
-          </div>
+          {!showLimitedView && <LanguageTags userId={userId} />}
+          {!showLimitedView && (
+            <div style={{ flex: 1, overflow: 'visible', maxHeight: '500px' }}>
+              <ActivityFeed userId={userId} key={refreshTrigger} />
+            </div>
+          )}
+          {showLimitedView && (
+            <div className="content-section">
+              <div className="text-center py-10 text-gray-400">
+                <p className="mb-4">🔒 This profile is private</p>
+                <p className="text-sm">Add {profileData?.username} as a friend to view their activity and projects</p>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Right Column */}
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <div style={{ flexShrink: 0 }}>
-            <ViewFriend userId={userId} />
-            <LanguageTags userId={userId} />
-          </div>
-          <div style={{ flex: 1, overflow: 'visible' }}>
-            <ProjectsSection userId={userId} key={refreshTrigger} />
-          </div>
+        {/* Right Column - 10px gap between rows */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {!showLimitedView && (
+            <>
+              <div style={{ flexShrink: 0 }}>
+                <ViewFriend userId={userId} />
+              </div>
+              <div style={{ flex: 1, overflow: 'visible', maxHeight: '500px' }}>
+                <ProjectsSection userId={userId} key={refreshTrigger} />
+              </div>
+            </>
+          )}
+          {showLimitedView && (
+            <div className="content-section">
+              <div className="text-center py-10 text-gray-400">
+                <p className="mb-4">🚫 Friends Only Content</p>
+                <p className="text-sm">You must be friends with {profileData?.username} to view their friends and projects</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </PageContainer>

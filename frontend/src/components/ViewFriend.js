@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { DefaultAvatar } from '../utils/avatarUtils';
 import apiService from '../utils/apiService';
 import '../styles.css';
 
@@ -14,7 +15,6 @@ const ViewFriend = ({ userId }) => {
 
   const fetchFriends = async () => {
     try {
-      
       setLoading(true);
       
       const currentUser = apiService.getUser();
@@ -27,14 +27,12 @@ const ViewFriend = ({ userId }) => {
       if (isOwnProfile) {
         const response = await apiService.getFriends();
         
-        
         if (response.success) {
           setFriends(response.friends || []);
           return;
         }
       } else {
         const response = await apiService.getUserById(userId);
-        
         
         if (response.success) {
           friendIds = response.friends || [];
@@ -51,14 +49,14 @@ const ViewFriend = ({ userId }) => {
               friendDetails.push({
                 id: friendResponse.id,
                 username: friendResponse.username,
-                avatar: friendResponse.profile?.avatar || '👤',
+                avatar: friendResponse.profile?.avatar,
                 title: friendResponse.profile?.title || 'Developer',
                 status: friendResponse.isActive ? 'online' : 'offline',
                 mutualProjects: 0
               });
             }
           } catch (err) {
-            
+            console.error('Error fetching friend:', err);
           }
         }
         
@@ -79,13 +77,10 @@ const ViewFriend = ({ userId }) => {
     navigate(`/profile/${friendId}`);
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'online': return '#00ff88';
-      case 'away': return '#ffa500';
-      case 'offline': return '#666666';
-      default: return '#666666';
-    }
+  // Check if avatar is a real uploaded image (not emoji)
+  const hasRealAvatar = (avatar) => {
+    if (!avatar) return false;
+    return avatar.startsWith('/') || avatar.startsWith('http');
   };
 
   const getStatusText = (status) => {
@@ -122,7 +117,15 @@ const ViewFriend = ({ userId }) => {
               onClick={() => handleFriendClick(friend)}
             >
               <div className="friend-avatar">
-                {friend.avatar || friend.profile?.avatar || '👤'}
+                {hasRealAvatar(friend.avatar) ? (
+                  <img 
+                    src={friend.avatar} 
+                    alt={friend.username}
+                    className="friend-avatar-image"
+                  />
+                ) : (
+                  <DefaultAvatar username={friend.username} size={40} />
+                )}
                 <div 
                   className={`friend-status-indicator friend-status-dot ${friend.status === 'online' ? 'status-online' : friend.status === 'away' ? 'status-away' : 'status-offline'}`}
                 ></div>
@@ -151,7 +154,6 @@ const ViewFriend = ({ userId }) => {
                   className="message-button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    
                   }}
                 >
                   Message

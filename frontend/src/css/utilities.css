@@ -1,0 +1,55 @@
+/* Utility Classes */
+
+.file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  background: #2a2a2a;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.label-with-icon {
+  display: flex;
+  align-items: center;
+}
+
+.label-icon {
+  margin-right: 8px;
+}
+
+.textarea-resizable {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.button-group {
+  display: flex;
+  gap: 8px;
+}
+
+.button-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.quick-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* Inline styling utilities that may conflict with Tailwind - keeping for backwards compatibility */
+div[style*="background: var(--apex-red)"],
+div[style*="background: var(--apex-orange)"],
+div[style*="background: #4a5568"] {
+  transition: all 0.3s ease !important;
+  cursor: pointer;
+}
+
+div[style*="background: var(--apex-red)"]:hover,
+div[style*="background: var(--apex-orange)"]:hover,
+div[style*="background: #4a5568"]:hover {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}

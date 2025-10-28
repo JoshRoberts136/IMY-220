@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Button from './Button';
 import CreateCommit from './CreateCommit';
+import { DefaultAvatar } from '../utils/avatarUtils';
 import apiService from '../utils/apiService';
 import '../styles.css';
 
@@ -81,6 +82,42 @@ function Files({ projectId, project, onCommitCreated }) {
     }
   };
 
+  // Check if avatar is a file path or emoji
+  const isImagePath = (avatar) => {
+    return avatar && (avatar.startsWith('/') || avatar.startsWith('http'));
+  };
+
+  const renderCommitAvatar = (commit) => {
+    const avatar = commit.userAvatar;
+    const username = commit.username || commit.author;
+    
+    if (isImagePath(avatar)) {
+      return (
+        <img 
+          src={avatar} 
+          alt={username}
+          style={{
+            width: '20px',
+            height: '20px',
+            borderRadius: '50%',
+            objectFit: 'cover',
+            marginRight: '8px'
+          }}
+        />
+      );
+    } else if (avatar && avatar.length <= 2) {
+      // It's an emoji
+      return <span className="commit-avatar">{avatar}</span>;
+    } else {
+      // Use default avatar
+      return (
+        <div style={{ display: 'inline-block', marginRight: '8px', verticalAlign: 'middle' }}>
+          <DefaultAvatar username={username} size={20} />
+        </div>
+      );
+    }
+  };
+
   if (loading) {
     return (
       <div className="content-section">
@@ -118,8 +155,9 @@ function Files({ projectId, project, onCommitCreated }) {
                 <div 
                   className="commit-author clickable-author"
                   onClick={() => handleUserClick(commit.userId)}
+                  style={{ display: 'flex', alignItems: 'center' }}
                 >
-                  <span className="commit-avatar">{commit.userAvatar}</span>
+                  {renderCommitAvatar(commit)}
                   <span className="commit-username">{commit.username || commit.author}</span>
                 </div>
                 <div className="commit-time">{formatTimeAgo(commit.timestamp)}</div>

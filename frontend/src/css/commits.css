@@ -1,0 +1,99 @@
+/* Commits Styles */
+
+.commits-container {
+  background: rgba(45, 55, 72, 0.3);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(139, 0, 0, 0.25);
+  margin-bottom: 20px;
+}
+
+.commits-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.commits-list {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.commit-item {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(139, 0, 0, 0.2);
+}
+
+.commit-item:last-child {
+  border-bottom: none;
+}
+
+.commit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.commit-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.3s ease;
+}
+
+.commit-author:hover {
+  color: var(--apex-orange);
+}
+
+.commit-avatar {
+  font-size: 16px;
+}
+
+.commit-username {
+  font-weight: 600;
+  color: white;
+}
+
+.commit-time {
+  color: #888;
+  font-size: 12px;
+}
+
+.commit-message {
+  color: #cbd5e0;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.commit-footer {
+  display: flex;
+  gap: 15px;
+  font-size: 12px;
+  color: #888;
+}
+
+.commit-hash {
+  font-family: 'Courier New', monospace;
+  background: rgba(139, 0, 0, 0.2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--apex-orange);
+}
+
+.commit-files {
+  color: #888;
+}
+
+.no-commits {
+  text-align: center;
+  padding: 20px;
+  color: #888;
+}
+
+.clickable-author {
+  cursor: pointer;
+}

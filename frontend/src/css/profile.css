@@ -1,0 +1,138 @@
+/* Profile Page Styles */
+
+.profile-container {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-header-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.profile-username-title {
+  font-size: 1.875rem;
+  font-weight: bold;
+  color: white;
+  margin: 0;
+}
+
+.profile-title-text {
+  color: #d1d5db;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.profile-bio-text {
+  color: #9ca3af;
+  font-size: 14px;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.profile-detail {
+  color: #d1d5db;
+  margin-bottom: 8px;
+}
+
+.profile-info-section {
+  margin-bottom: 20px;
+}
+
+.profile-stats-container {
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid var(--apex-orange);
+}
+
+.user-avatar-large {
+  width: 120px;
+  height: 120px;
+  font-size: 64px;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.avatar-icon-large {
+  width: 64px;
+  height: 64px;
+  color: #9ca3af;
+}
+
+.badge-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.buttons-container-profile {
+  display: flex;
+  gap: 10px;
+}
+
+.edit-profile-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--apex-orange);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.create-project-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--apex-orange);
+  border: 2px solid var(--apex-orange);
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.create-project-button:hover {
+  background: var(--apex-orange);
+  color: white;
+}
+
+.edit-project-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--apex-orange);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.loading-projects-message {
+  text-align: center;
+  padding: 20px;
+  color: #888;
+}
+
+.no-projects-message {
+  text-align: center;
+  padding: 40px;
+  color: #888;
+}
+
+.projects-section-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}

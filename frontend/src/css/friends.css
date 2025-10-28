@@ -1,0 +1,216 @@
+/* Friends List Styles */
+
+.friends-container {
+  max-height: 240px;
+  overflow-y: auto;
+  padding-right: 8px;
+  margin-bottom: 20px;
+}
+
+.friends-container > * {
+  margin-bottom: 12px;
+}
+
+.friends-container > *:last-child {
+  margin-bottom: 0;
+}
+
+/* Larger containers for Activity and Projects only */
+.activity-feed-container .friends-container,
+.projects-section-container .friends-container {
+  max-height: 450px;
+}
+
+.friend-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(45, 55, 72, 0.3);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(139, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.friend-item:hover {
+  background: rgba(45, 55, 72, 0.5);
+  border-color: var(--apex-orange);
+}
+
+.friend-avatar {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  background: rgba(139, 0, 0, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--apex-orange);
+  font-size: 18px;
+  flex-shrink: 0;
+  overflow: visible;
+  z-index: 1;
+}
+
+.friend-avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 50%;
+}
+
+.friend-status-indicator {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #1a1a1a;
+  z-index: 10;
+}
+
+.friend-status-indicator-online {
+  background: #00ff88;
+  box-shadow: 0 0 8px #00ff88;
+}
+
+.friend-status-indicator-away {
+  background: #ffa500;
+  box-shadow: none;
+}
+
+.friend-status-indicator-offline {
+  background: #666666;
+  box-shadow: none;
+}
+
+.friend-status-dot {
+  background-color: #666666;
+}
+
+.status-online {
+  background-color: #00ff88;
+  box-shadow: 0 0 8px #00ff88;
+}
+
+.status-away {
+  background-color: #ffa500;
+  box-shadow: none;
+}
+
+.status-offline {
+  background-color: #666666;
+  box-shadow: none;
+}
+
+.friend-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.friend-username {
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 2px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.friend-title {
+  color: #888;
+  font-size: 12px;
+  margin-bottom: 1px;
+}
+
+.friend-status-projects {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.friend-status-text-online {
+  color: #00ff88;
+}
+
+.friend-status-text-away {
+  color: #ffa500;
+}
+
+.friend-status-text-offline {
+  color: #666666;
+}
+
+.status-text {
+  color: #888;
+}
+
+.text-online {
+  color: #00ff88;
+}
+
+.text-away {
+  color: #ffa500;
+}
+
+.text-offline {
+  color: #666666;
+}
+
+.friend-separator {
+  color: #666;
+}
+
+.friend-projects-count {
+  color: #888;
+}
+
+.friend-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+}
+
+.message-button {
+  background: rgba(139, 0, 0, 0.1);
+  border: 1px solid var(--apex-orange);
+  color: var(--apex-orange);
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.message-button:hover {
+  background: var(--apex-orange);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.view-friend-section {
+  margin-bottom: 20px;
+}
+
+.loading-friends-message {
+  text-align: center;
+  padding: 20px;
+  color: #888;
+}
+
+.no-friends-message {
+  text-align: center;
+  padding: 20px;
+  color: #888;
+}

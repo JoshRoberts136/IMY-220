@@ -28,6 +28,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 app.use(express.static(path.join(__dirname, '../public')));
 
+// Serve uploaded files (profile images)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 app.use('/api/auth', authRoutes);
 app.use('/api', apiRoutes);
 app.use('/api/projects', projectRoutes);
@@ -74,6 +77,23 @@ app.use((err, req, res, next) => {
       success: false,
       error: 'Token expired',
       message: 'Please login again'
+    });
+  }
+  
+  // Multer errors
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(400).json({
+      success: false,
+      error: 'File too large',
+      message: 'Image must be less than 5MB'
+    });
+  }
+  
+  if (err.message === 'Only image files are allowed!') {
+    return res.status(400).json({
+      success: false,
+      error: 'Invalid file type',
+      message: err.message
     });
   }
   

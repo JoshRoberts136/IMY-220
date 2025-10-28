@@ -23,7 +23,8 @@ const ActivityFeed = ({ userId }) => {
         const commitActivities = commitsResponse.commits.map(commit => ({
           id: commit._id,
           user: { 
-            name: commit.author, 
+            id: commit.userId,
+            name: commit.username || commit.author, 
             avatar: commit.userAvatar || '👤', 
             isOnline: true 
           },
@@ -35,7 +36,7 @@ const ActivityFeed = ({ userId }) => {
           },
           message: commit.message,
           timestamp: new Date(commit.timestamp).toLocaleDateString(),
-          projectImage: '💻',
+          projectImage: commit.projectImage || '💻',
           likes: 0,
           type: 'checkin'
         }));
@@ -58,7 +59,12 @@ const ActivityFeed = ({ userId }) => {
     return [
       {
         id: '1',
-        user: { name: currentUser?.username || 'CodeLegend42', avatar: '👤', isOnline: true },
+        user: { 
+          id: currentUser?.id || 'user_001',
+          name: currentUser?.username || 'CodeLegend42', 
+          avatar: '👤', 
+          isOnline: true 
+        },
         action: 'checked in',
         project: {
           id: 'e-commerce-beast',
@@ -76,7 +82,12 @@ const ActivityFeed = ({ userId }) => {
       },
       {
         id: '2',
-        user: { name: currentUser?.username || 'CodeLegend42', avatar: '👤', isOnline: true },
+        user: { 
+          id: currentUser?.id || 'user_001',
+          name: currentUser?.username || 'CodeLegend42', 
+          avatar: '👤', 
+          isOnline: true 
+        },
         action: 'updated',
         project: {
           id: 'code-arena-platform',
@@ -94,7 +105,12 @@ const ActivityFeed = ({ userId }) => {
       },
       {
         id: '3',
-        user: { name: currentUser?.username || 'CodeLegend42', avatar: '👤', isOnline: true },
+        user: { 
+          id: currentUser?.id || 'user_001',
+          name: currentUser?.username || 'CodeLegend42', 
+          avatar: '👤', 
+          isOnline: true 
+        },
         action: 'created',
         project: {
           id: 'ai-chat-companion',
@@ -112,7 +128,12 @@ const ActivityFeed = ({ userId }) => {
       },
       {
         id: '4',
-        user: { name: currentUser?.username || 'CodeLegend42', avatar: '👤', isOnline: true },
+        user: { 
+          id: currentUser?.id || 'user_001',
+          name: currentUser?.username || 'CodeLegend42', 
+          avatar: '👤', 
+          isOnline: true 
+        },
         action: 'checked in',
         project: {
           id: 'data-visualization-suite',
@@ -133,26 +154,28 @@ const ActivityFeed = ({ userId }) => {
 
   if (loading) {
     return (
-      <Container title="Recent Activity">
+      <div className="content-section view-friend-section">
+        <div className="section-title">Recent Activity</div>
         <div className="text-center py-5 text-gray-400">Loading activity...</div>
-      </Container>
+      </div>
     );
   }
 
   return (
-    <Container title="Recent Activity">
-      <div className="flex flex-col gap-4">
+    <div className="content-section view-friend-section activity-feed-container">
+      <div className="section-title">Recent Activity ({activities.length})</div>
+      <div className="friends-container">
         {activities.length > 0 ? (
-          activities.slice(0, 5).map((activity) => (
+          activities.map((activity) => (
             <ProjectPreview key={activity.id} activity={activity} />
           ))
         ) : (
-          <div className="text-center py-10 text-gray-400">
+          <div className="no-friends-message">
             No recent activity yet. Start coding!
           </div>
         )}
       </div>
-    </Container>
+    </div>
   );
 };
 

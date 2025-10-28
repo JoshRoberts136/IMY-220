@@ -214,50 +214,87 @@ router.delete('/profile', async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
     const userId = decoded.userId;
     
-  
+    console.log('=== DELETING USER PROFILE ===');
+    console.log('User ID:', userId);
+    
     const user = await User.db.collection('Users').findOne({ id: userId });
     
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
+    // Handle owned projects - transfer to random member or delete if no members
     if (user.ownedProjects && user.ownedProjects.length > 0) {
-      await User.db.collection('Projects').deleteMany({
-        id: { $in: user.ownedProjects }
-      });
+      console.log(`Processing ${user.ownedProjects.length} owned projects...`);
       
+      for (const projectId of user.ownedProjects) {
+        const project = await User.db.collection('Projects').findOne({ id: projectId });
+        
+        if (project) {
+          // Get members excluding the current owner
+          const otherMembers = (project.members || []).filter(memberId => memberId !== userId);
+          
+          if (otherMembers.length > 0) {
+            // Transfer ownership to random member
+            const randomMember = otherMembers[Math.floor(Math.random() * otherMembers.length)];
+            
+            await User.db.collection('Projects').updateOne(
+              { id: projectId },
+              { 
+                $set: { 
+                  ownedBy: randomMember,
+                  updatedAt: new Date().toISOString()
+                }
+              }
+            );
+            
+            console.log(`✅ Transferred project "${project.name}" to member ${randomMember}`);
+          } else {
+            // No other members, delete the project
+            await User.db.collection('Projects').deleteOne({ id: projectId });
+            console.log(`🗑️  Deleted project "${project.name}" (no other members)`);
+          }
+        }
+      }
     }
 
+    // Remove user from projects they're a member of
     if (user.memberProjects && user.memberProjects.length > 0) {
       await User.db.collection('Projects').updateMany(
         { id: { $in: user.memberProjects } },
         { $pull: { members: userId } }
       );
-      
+      console.log(`✅ Removed user from ${user.memberProjects.length} projects as member`);
     }
-    await User.db.collection('Commits').deleteMany({ userId: userId });
     
+    // Delete user's commits
+    await User.db.collection('Commits').deleteMany({ userId: userId });
+    console.log('✅ Deleted user commits');
 
+    // Remove user from friends lists
     await User.db.collection('Users').updateMany(
       { friends: userId },
       { $pull: { friends: userId } }
     );
+    console.log('✅ Removed user from friends lists');
 
+    // Delete friend requests
     await User.db.collection('FriendRequests').deleteMany({
       $or: [
         { senderId: userId },
         { receiverId: userId }
       ]
     });
-    
+    console.log('✅ Deleted friend requests');
 
+    // Finally, delete the user
     const deleteResult = await User.db.collection('Users').deleteOne({ id: userId });
     
     if (deleteResult.deletedCount === 0) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    
+    console.log('✅ User profile deleted successfully');
 
     res.json({
       success: true,

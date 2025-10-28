@@ -1,0 +1,134 @@
+/* Search Component Styles */
+
+.search-container {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: rgba(20, 20, 20, 0.9);
+  border: 2px solid #4a5568;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.search-input-wrapper:focus-within {
+  border-color: var(--apex-orange);
+  box-shadow: 0 0 20px rgba(139, 0, 0, 0.2);
+  background: rgba(45, 55, 72, 1);
+}
+
+.search-icon {
+  padding: 0 15px;
+  color: var(--apex-orange);
+  display: flex;
+  align-items: center;
+}
+
+.search-loading {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #4a5568;
+  border-top: 2px solid var(--apex-orange);
+  border-radius: 50%;
+  animation: spin 10s linear infinite;
+}
+
+.search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 15px 0;
+  color: white;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 16px;
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: #888;
+}
+
+.search-shortcut {
+  padding: 0 15px;
+  color: #666;
+  font-size: 12px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+}
+
+.search-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(10, 10, 10, 0.95);
+  border: 2px solid var(--apex-orange);
+  border-radius: 8px;
+  margin-top: 5px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  backdrop-filter: blur(15px);
+}
+
+.search-suggestion {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  border-bottom: 1px solid #333;
+}
+
+.search-suggestion:last-child {
+  border-bottom: none;
+}
+
+.search-suggestion:hover {
+  background: rgba(139, 0, 0, 0.1);
+}
+
+.suggestion-icon {
+  width: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  margin-right: 12px;
+}
+
+.suggestion-content {
+  flex: 1;
+}
+
+.suggestion-name {
+  color: white;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.suggestion-subtitle {
+  color: #888;
+  font-size: 14px;
+}
+
+.suggestion-icon-user {
+  color: #8b0000;
+}
+
+.suggestion-icon-project {
+  color: #ff3333;
+}
+
+.suggestion-icon-hashtag {
+  color: #666;
+}
+
+.suggestion-icon-default {
+  color: #8b0000;
+}

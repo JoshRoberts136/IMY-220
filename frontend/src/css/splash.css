@@ -1,0 +1,47 @@
+/* Splash Page Specific Styles */
+
+.splash-logo-triangle {
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+}
+
+.splash-logo-inner-triangle {
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+}
+
+.splash-logo-border {
+  animation-duration: 10s;
+}
+
+.splash-title-glow {
+  text-shadow: 0 0 30px var(--apex-orange);
+}
+
+.splash-nav-button {
+  clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+}
+
+.splash-champion-badge {
+  clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 100%, 15px 100%);
+}
+
+.splash-hero-title {
+  text-shadow: 0 0 50px rgba(139, 0, 0, 0.3);
+}
+
+.splash-feature-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 0.5rem;
+  padding: 2px;
+  background: linear-gradient(to right, var(--apex-orange), var(--apex-blue), var(--apex-red));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.splash-feature-card:hover .splash-feature-border::before {
+  opacity: 1;
+}
