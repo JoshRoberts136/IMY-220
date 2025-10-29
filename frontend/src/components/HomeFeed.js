@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { ArrowUpDown } from 'lucide-react';
 import Search from '../components/Search';
 import ProjectPreview from './ProjectPreview';
@@ -7,17 +8,30 @@ import apiService from '../utils/apiService';
 import '../styles.css';
 
 const HomeFeed = () => {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState('local');
   const [sortBy, setSortBy] = useState('date');
   const [sortOrder, setSortOrder] = useState('desc');
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [friends, setFriends] = useState([]);
+  const [hashtagFilter, setHashtagFilter] = useState('');
 
   useEffect(() => {
     fetchProjects();
     fetchFriends();
   }, []);
+
+  useEffect(() => {
+    if (location.state?.searchQuery) {
+      setHashtagFilter(location.state.searchQuery);
+      setActiveTab('global');
+    }
+    
+    if (location.state?.refresh) {
+      fetchProjects();
+    }
+  }, [location.state]);
 
   const fetchProjects = async () => {
     try {
@@ -43,19 +57,28 @@ const HomeFeed = () => {
     }
   };
 
-  // Memoize filtered and sorted projects
   const sortedProjects = useMemo(() => {
-    // Filter projects
     let filtered = projects;
+    
     if (activeTab === 'local') {
+      const currentUser = apiService.getUser();
+      const currentUserId = currentUser?.id;
       const friendIds = friends.map(friend => friend.id || friend._id?.toString());
+      
       filtered = projects.filter(project => {
         const projectOwnerId = project.ownedBy || project.id;
-        return friendIds.includes(projectOwnerId);
+        return friendIds.includes(projectOwnerId) || projectOwnerId === currentUserId;
       });
     }
     
-    // Sort projects
+    if (hashtagFilter) {
+      filtered = filtered.filter(project => {
+        return project.hashtags?.some(tag => 
+          tag.toLowerCase().includes(hashtagFilter.toLowerCase())
+        );
+      });
+    }
+    
     const sorted = [...filtered];
     
     switch (sortBy) {
@@ -92,7 +115,7 @@ const HomeFeed = () => {
     }
     
     return sorted;
-  }, [projects, friends, activeTab, sortBy, sortOrder]);
+  }, [projects, friends, activeTab, sortBy, sortOrder, hashtagFilter]);
 
   const toggleSortOrder = () => {
     setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
@@ -109,7 +132,7 @@ const HomeFeed = () => {
           <button className={`feed-tab ${activeTab === 'local' ? 'active' : ''}`} onClick={() => setActiveTab('local')}>Squad Feed</button>
           <button className={`feed-tab ${activeTab === 'global' ? 'active' : ''}`} onClick={() => setActiveTab('global')}>Arena Feed</button>
         </div>
-        <Search />
+        <Search initialQuery={hashtagFilter} onSearchChange={setHashtagFilter} />
         <div className="sort-controls">
           <label htmlFor="sort-select">Sort by:</label>
           <select id="sort-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="sort-select">
@@ -151,12 +174,44 @@ const HomeFeed = () => {
         </div>
       </div>
       
+      {hashtagFilter && (
+        <div style={{
+          padding: '12px 20px',
+          background: 'rgba(139, 0, 0, 0.1)',
+          border: '1px solid var(--apex-orange)',
+          borderRadius: '8px',
+          marginBottom: '20px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <span style={{ color: 'var(--apex-orange)', fontWeight: '600' }}>
+            Filtering by: #{hashtagFilter}
+          </span>
+          <button
+            onClick={() => setHashtagFilter('')}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--apex-orange)',
+              cursor: 'pointer',
+              fontSize: '18px',
+              padding: '0 8px'
+            }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+      
       <div className="flex flex-col gap-4 mt-5">
         {sortedProjects.length === 0 ? (
           <div className="text-center py-10 text-gray-400">
-            {activeTab === 'local' ? 
-              'No projects from your squad yet. Add some friends or switch to Arena Feed!' : 
-              'No projects available yet.'}
+            {hashtagFilter ? 
+              `No projects found with hashtag #${hashtagFilter}` :
+              activeTab === 'local' ? 
+                'No projects from your squad yet. Add some friends or switch to Arena Feed!' : 
+                'No projects available yet.'}
           </div>
         ) : (
           sortedProjects.map((project) => {

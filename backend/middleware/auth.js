@@ -28,6 +28,15 @@ const authenticateToken = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
     console.log('Decoded token userId:', decoded.userId);
     
+    if (!mongoose.connection.db) {
+      console.log('AUTH ERROR: Database not connected');
+      return res.status(503).json({
+        success: false,
+        error: 'Service unavailable',
+        message: 'Database connection not available'
+      });
+    }
+
     let user;
     if (mongoose.Types.ObjectId.isValid(decoded.userId)) {
       user = await mongoose.connection.db.collection('Users').findOne({
@@ -99,6 +108,10 @@ const optionalAuth = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
     
+    if (!mongoose.connection.db) {
+      return next();
+    }
+
     let user;
     if (mongoose.Types.ObjectId.isValid(decoded.userId)) {
       user = await mongoose.connection.db.collection('Users').findOne({

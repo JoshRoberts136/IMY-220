@@ -20,16 +20,14 @@ const { router: activityRoutes } = require('./routes/activity');
 const app = express();
 const port = process.env.PORT || 3000;
 
-connectDB();
-
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Serve uploaded files (profile images)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads/project-files', express.static(path.join(__dirname, 'uploads/project-files')));
 
 app.use('/api/auth', authRoutes);
 app.use('/api', apiRoutes);
@@ -49,8 +47,12 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public', 'index.html'));
+app.use('/api/*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    error: 'API endpoint not found',
+    message: `Route ${req.method} ${req.path} does not exist`
+  });
 });
 
 app.use((err, req, res, next) => {
@@ -80,7 +82,6 @@ app.use((err, req, res, next) => {
     });
   }
   
-  // Multer errors
   if (err.code === 'LIMIT_FILE_SIZE') {
     return res.status(400).json({
       success: false,
@@ -106,20 +107,22 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.use('/api/*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    error: 'API endpoint not found',
-    message: `Route ${req.method} ${req.path} does not exist`
-  });
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public', 'index.html'));
 });
 
-app.listen(port, '0.0.0.0', () => {
+const startServer = async () => {
+  await connectDB();
   
-  
-  
-  
-});
+  app.listen(port, '0.0.0.0', () => {
+    console.log(`🚀 Server running on port ${port}`);
+    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`📡 API: http://localhost:${port}/api`);
+    console.log(`🏠 Frontend: http://localhost:${port}`);
+  });
+};
+
+startServer();
 
 process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception:', error);

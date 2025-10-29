@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import Files from './Files';
 import FileManager from './FileManager';
-import Messages from './Messages';
+import Files from './Files';
 import EditProject from './EditProject';
-import DeleteProject from './DeleteProject';
 import AddMemberToProject from './AddMemberToProject';
-import LanguageTags from './LanguageTags';
+import TransferOwnership from './TransferOwnership';
+import CheckoutManager from './CheckoutManager';
+import ProjectChatroom from './ProjectChatroom';
 import PageContainer from './PageContainer';
 import apiService from '../utils/apiService';
 import '../styles.css';
-import { Edit3 } from 'lucide-react';
+import { Edit3, Crown } from 'lucide-react';
 import Button from './Button';
 
 const ProjectCard = () => {
@@ -18,6 +18,7 @@ const ProjectCard = () => {
   const { projectId } = useParams();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
+  const [isTransferOwnershipOpen, setIsTransferOwnershipOpen] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -50,9 +51,9 @@ const ProjectCard = () => {
       if (response.success) {
         const currentUser = apiService.getUser();
         const isProjectOwner = response.ownedBy === currentUser?.id;
-        const isMember = response.members?.includes(currentUser?.id);
+        const isProjectMember = response.members?.includes(currentUser?.id);
         setIsOwner(isProjectOwner);
-        setIsMember(isMember);
+        setIsMember(isProjectMember);
         
         const projectData = {
           id: response.id,
@@ -79,7 +80,10 @@ const ProjectCard = () => {
           lastUpdated: formatDate(response.lastUpdated),
           members: response.members || [],
           commits: response.commits || [],
-          messages: response.messages || []
+          messages: response.messages || [],
+          checkedOutBy: response.checkedOutBy || null,
+          checkedOutAt: response.checkedOutAt || null,
+          version: response.version || '1.0.0'
         };
         
         setProject(projectData);
@@ -130,7 +134,6 @@ const ProjectCard = () => {
         return 0;
       });
       
-      console.log('Fetched member details:', memberDetails);
       setProjectMembers(memberDetails);
       setProject(prev => ({ ...prev, members: memberDetails }));
     } catch (error) {
@@ -213,7 +216,18 @@ const ProjectCard = () => {
     }
   };
 
-  // Check if avatar is a file path or emoji
+  const handleOwnershipTransferred = () => {
+    fetchProjectData();
+    setShowSuccessMessage(true);
+    setTimeout(() => {
+      setShowSuccessMessage(false);
+    }, 3000);
+  };
+
+  const handleHashtagClick = (tag) => {
+    navigate('/home', { state: { searchQuery: tag } });
+  };
+
   const isImagePath = (avatar) => {
     return avatar && (avatar.startsWith('/') || avatar.startsWith('http'));
   };
@@ -266,9 +280,10 @@ const ProjectCard = () => {
     );
   }
 
+  const canEdit = isOwner && !project.checkedOutBy;
+
   return (
     <PageContainer>
-      {/* Project Hero - Full Width */}
       <div className="project-hero">
         <div className="project-info" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
           <div style={{ width: '100%' }}>
@@ -277,10 +292,18 @@ const ProjectCard = () => {
             <div className="project-meta">
               <span>Created: {project.created}</span>
               <span>Last Updated: {project.lastUpdated}</span>
+              <span>Version: {project.version}</span>
             </div>
             <div className="project-tags">
               {project.tags.map((tag, index) => (
-                <span key={index} className="tag">{tag}</span>
+                <span 
+                  key={index} 
+                  className="tag"
+                  onClick={() => handleHashtagClick(tag)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  {tag}
+                </span>
               ))}
             </div>
             
@@ -290,86 +313,89 @@ const ProjectCard = () => {
                   variant="warning"
                   icon={Edit3}
                   onClick={handleEditProject}
+                  disabled={!!project.checkedOutBy}
+                  title={project.checkedOutBy ? 'Cannot edit while project is checked out' : 'Edit project'}
                 >
                   Edit Project
                 </Button>
-                <DeleteProject
-                  projectId={project.id}
-                  projectName={project.name}
-                  onDeleted={() => navigate('/home')}
-                />
+                <Button
+                  variant="secondary"
+                  icon={Crown}
+                  onClick={() => setIsTransferOwnershipOpen(true)}
+                >
+                  Transfer Ownership
+                </Button>
               </div>
             )}
-            
-            <LanguageTags />
           </div>
         </div>
-                  {/* Squad Members Sidebar */}
+        
         <div className="sidebar" style={{ marginBottom: '20px' }}>
-            <h3 className="section-title">Squad Members</h3>
-            {projectMembers.length > 0 ? (
-              projectMembers.map((member, index) => (
-                <div
-                  key={index}
-                  className="member-card"
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px', marginBottom: '10px', background: 'rgba(45, 55, 72, 0.3)', borderRadius: '8px', border: '1px solid #333', cursor: 'pointer' }}
-                  onClick={() => navigate(`/profile/${member.id}`)}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
-                    <div className="member-avatar" style={{ overflow: 'hidden' }}>
-                      {renderMemberAvatar(member.avatar)}
-                      {member.isOnline && <div className="online-indicator"></div>}
-                    </div>
-                    <div className="member-info">
-                      <div className="member-name">
-                        {member.name} {member.isOwner && <span className="crown-indicator">👑</span>}
-                      </div>
-                      <div className="member-role">{member.role}</div>
-                    </div>
-                    <div className="member-status">
-                      {member.isOnline ? '🟢' : '⚫'}
-                    </div>
-                  </div>
-                  {isOwner && member.role !== 'Project Owner' && (
-                    <button
-                      className="btn-remove-member"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRemoveMember(member.id);
-                      }}
-                      title="Remove member"
-                    >
-                      ✕
-                    </button>
-                  )}
-                </div>
-              ))
-            ) : (
-              <div className="text-gray-400">No members yet</div>
-            )}
-            {isOwner && (
-              <Button 
-                variant="secondary"
-                onClick={() => setIsAddMemberModalOpen(true)}
-                className="w-full mt-3"
+          <h3 className="section-title">Squad Members</h3>
+          {projectMembers.length > 0 ? (
+            projectMembers.map((member, index) => (
+              <div
+                key={index}
+                className="member-card"
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px', marginBottom: '10px', background: 'rgba(45, 55, 72, 0.3)', borderRadius: '8px', border: '1px solid #333', cursor: 'pointer' }}
+                onClick={() => navigate(`/profile/${member.id}`)}
               >
-                ➕ Add Member
-              </Button>
-            )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+                  <div className="member-avatar" style={{ overflow: 'hidden' }}>
+                    {renderMemberAvatar(member.avatar)}
+                    {member.isOnline && <div className="online-indicator"></div>}
+                  </div>
+                  <div className="member-info">
+                    <div className="member-name">
+                      {member.name} {member.isOwner && <span className="crown-indicator">👑</span>}
+                    </div>
+                    <div className="member-role">{member.role}</div>
+                  </div>
+                  <div className="member-status">
+                    {member.isOnline ? '🟢' : '⚫'}
+                  </div>
+                </div>
+                {isOwner && member.role !== 'Project Owner' && (
+                  <button
+                    className="btn-remove-member"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveMember(member.id);
+                    }}
+                    title="Remove member"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            ))
+          ) : (
+            <div className="text-gray-400">No members yet</div>
+          )}
+          {isMember && (
+            <Button 
+              variant="secondary"
+              onClick={() => setIsAddMemberModalOpen(true)}
+              className="w-full mt-3"
+            >
+              ➕ Add Friend
+            </Button>
+          )}
         </div>
       </div>
 
-      {/* Two Column Grid - Files Left, Commits Right */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+        <CheckoutManager 
+          project={project} 
+          isMember={isMember}
+          onStatusChange={fetchProjectData}
+        />
+        <Files projectId={project.id} project={project} onCommitCreated={fetchProjectData} />
+      </div>
+
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', minHeight: '400px' }}>
-        {/* Left Column - Project Files */}
-        <div>
-          <FileManager projectId={project.id} />
-        </div>
-        
-        {/* Right Column - Commits */}
-        <div>
-          <Files projectId={project.id} project={project} onCommitCreated={fetchProjectData} />
-        </div>
+        <FileManager projectId={project.id} canEdit={isMember && project.checkedOutBy === apiService.getUser()?.id} />
+        <ProjectChatroom projectId={project.id} isMember={isMember} />
       </div>
 
       {showSuccessMessage && (
@@ -389,8 +415,17 @@ const ProjectCard = () => {
         isOpen={isAddMemberModalOpen}
         onClose={() => setIsAddMemberModalOpen(false)}
         projectId={project?.id}
-        currentMembers={project?.members}
+        currentMembers={projectMembers}
         onMemberAdded={handleMemberAdded}
+      />
+
+      <TransferOwnership
+        isOpen={isTransferOwnershipOpen}
+        onClose={() => setIsTransferOwnershipOpen(false)}
+        projectId={project?.id}
+        projectName={project?.name}
+        members={projectMembers}
+        onTransferred={handleOwnershipTransferred}
       />
     </PageContainer>
   );

@@ -52,7 +52,7 @@ function Login() {
       )}
       
       <FormInput
-        label="Legend ID"
+        label="Legend Email"
         icon={Mail}
         type="email"
         id="loginEmail"

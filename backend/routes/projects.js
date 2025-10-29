@@ -1,6 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { authenticateToken } = require('../middleware/auth');
+const uploadProjectFiles = require('../config/projectFilesMulter');
+const path = require('path');
+const fs = require('fs');
 const router = express.Router();
 
 router.get('/user-commits/:userId', authenticateToken, async (req, res) => {
@@ -147,6 +150,8 @@ router.get('/:id', authenticateToken, async (req, res) => {
       forks: project.forks || 0,
       commits: project.commits || [],
       messages: project.messages || [],
+      checkedOutBy: project.checkedOutBy || null,
+      checkedOutAt: project.checkedOutAt || null,
       lastUpdated: project.lastUpdated,
       createdAt: project.createdAt,
       ownerName: owner ? owner.username : 'Unknown',
@@ -304,10 +309,11 @@ router.post('/:id/members', authenticateToken, async (req, res) => {
       });
     }
     
-    if (project.ownedBy !== userId) {
+    const members = project.members || [];
+    if (!members.includes(userId) && project.ownedBy !== userId) {
       return res.status(403).json({
         success: false,
-        message: 'Only the project owner can add members'
+        message: 'Only project members can add other members'
       });
     }
     
@@ -319,7 +325,20 @@ router.post('/:id/members', authenticateToken, async (req, res) => {
       });
     }
     
-    const members = project.members || [];
+    const friendsResponse = await mongoose.connection.db.collection('Friends').findOne({
+      $or: [
+        { userId: userId, friendId: newMemberId, status: 'accepted' },
+        { userId: newMemberId, friendId: userId, status: 'accepted' }
+      ]
+    });
+    
+    if (!friendsResponse) {
+      return res.status(403).json({
+        success: false,
+        message: 'You can only add friends to projects'
+      });
+    }
+    
     if (members.includes(newMemberId)) {
       return res.status(400).json({
         success: false,
@@ -400,6 +419,384 @@ router.delete('/:id/members/:memberId', authenticateToken, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error removing member'
+    });
+  }
+});
+
+router.post('/:id/transfer-ownership', authenticateToken, async (req, res) => {
+  try {
+    const projectId = req.params.id;
+    const { newOwnerId } = req.body;
+    const user = req.user;
+    const userId = user.id || user._id;
+    
+    console.log('Transferring ownership:', { projectId, newOwnerId, currentOwnerId: userId });
+    
+    const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        message: 'Project not found'
+      });
+    }
+    
+    if (project.ownedBy !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only the project owner can transfer ownership'
+      });
+    }
+    
+    const members = project.members || [];
+    if (!members.includes(newOwnerId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'New owner must be a member of the project'
+      });
+    }
+    
+    await mongoose.connection.db.collection('Projects').updateOne(
+      { id: projectId },
+      { 
+        $set: { 
+          ownedBy: newOwnerId,
+          lastUpdated: new Date().toISOString()
+        }
+      }
+    );
+    
+    res.json({
+      success: true,
+      message: 'Ownership transferred successfully'
+    });
+  } catch (error) {
+    console.error('Error transferring ownership:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error transferring ownership'
+    });
+  }
+});
+
+router.post('/:id/checkout', authenticateToken, async (req, res) => {
+  try {
+    const projectId = req.params.id;
+    const user = req.user;
+    const userId = user.id || user._id;
+    
+    const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        message: 'Project not found'
+      });
+    }
+    
+    const members = project.members || [];
+    if (!members.includes(userId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only project members can checkout'
+      });
+    }
+    
+    if (project.checkedOutBy) {
+      return res.status(400).json({
+        success: false,
+        message: 'Project is already checked out by another user'
+      });
+    }
+    
+    await mongoose.connection.db.collection('Projects').updateOne(
+      { id: projectId },
+      { 
+        $set: { 
+          checkedOutBy: userId,
+          checkedOutAt: new Date().toISOString(),
+          lastUpdated: new Date().toISOString()
+        }
+      }
+    );
+    
+    res.json({
+      success: true,
+      message: 'Project checked out successfully',
+      checkedOutBy: userId
+    });
+  } catch (error) {
+    console.error('Error checking out project:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error checking out project'
+    });
+  }
+});
+
+router.post('/:id/checkin', authenticateToken, async (req, res) => {
+  try {
+    const projectId = req.params.id;
+    const { message, version } = req.body;
+    const user = req.user;
+    const userId = user.id || user._id;
+    
+    const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        message: 'Project not found'
+      });
+    }
+    
+    if (project.checkedOutBy !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: 'You can only check in projects you have checked out'
+      });
+    }
+    
+    await mongoose.connection.db.collection('Projects').updateOne(
+      { id: projectId },
+      { 
+        $unset: { 
+          checkedOutBy: '',
+          checkedOutAt: ''
+        },
+        $set: {
+          version: version || project.version || '1.0.0',
+          lastUpdated: new Date().toISOString()
+        }
+      }
+    );
+    
+    const commit = {
+      id: `commit_${Date.now()}`,
+      projectId: projectId,
+      userId: userId,
+      author: user.username,
+      message: message || 'No message provided',
+      timestamp: new Date().toISOString()
+    };
+    
+    await mongoose.connection.db.collection('Commits').insertOne(commit);
+    
+    res.json({
+      success: true,
+      message: 'Project checked in successfully',
+      commit
+    });
+  } catch (error) {
+    console.error('Error checking in project:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error checking in project'
+    });
+  }
+});
+
+router.post('/:id/messages', authenticateToken, async (req, res) => {
+  try {
+    const projectId = req.params.id;
+    const { message } = req.body;
+    const user = req.user;
+    const userId = user.id || user._id;
+    
+    const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        message: 'Project not found'
+      });
+    }
+    
+    const members = project.members || [];
+    if (!members.includes(userId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only project members can post messages'
+      });
+    }
+    
+    const newMessage = {
+      id: `msg_${Date.now()}`,
+      userId: userId,
+      username: user.username,
+      avatar: user.profile?.avatar || '👤',
+      message: message,
+      timestamp: new Date().toISOString()
+    };
+    
+    await mongoose.connection.db.collection('Projects').updateOne(
+      { id: projectId },
+      { 
+        $push: { messages: newMessage },
+        $set: { lastUpdated: new Date().toISOString() }
+      }
+    );
+    
+    res.json({
+      success: true,
+      message: 'Message posted successfully',
+      messageData: newMessage
+    });
+  } catch (error) {
+    console.error('Error posting message:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error posting message'
+    });
+  }
+});
+
+router.get('/:id/messages', authenticateToken, async (req, res) => {
+  try {
+    const projectId = req.params.id;
+    
+    const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        message: 'Project not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      messages: project.messages || []
+    });
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching messages'
+    });
+  }
+});
+
+router.post('/:id/files', authenticateToken, uploadProjectFiles.array('files', 10), async (req, res) => {
+  try {
+    const projectId = req.params.id;
+    const user = req.user;
+    const userId = user.id || user._id;
+    
+    const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        message: 'Project not found'
+      });
+    }
+    
+    const members = project.members || [];
+    if (!members.includes(userId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only project members can upload files'
+      });
+    }
+    
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No files uploaded'
+      });
+    }
+    
+    const uploadedFiles = req.files.map(file => ({
+      id: `file_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      originalName: file.originalname,
+      filename: file.filename,
+      path: `/uploads/project-files/${projectId}/${file.filename}`,
+      size: file.size,
+      mimetype: file.mimetype,
+      uploadedBy: userId,
+      uploadedAt: new Date().toISOString()
+    }));
+    
+    await mongoose.connection.db.collection('Projects').updateOne(
+      { id: projectId },
+      { 
+        $push: { files: { $each: uploadedFiles } },
+        $set: { lastUpdated: new Date().toISOString() }
+      }
+    );
+    
+    res.json({
+      success: true,
+      message: 'Files uploaded successfully',
+      files: uploadedFiles
+    });
+  } catch (error) {
+    console.error('Error uploading files:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error uploading files'
+    });
+  }
+});
+
+router.get('/:id/files', authenticateToken, async (req, res) => {
+  try {
+    const projectId = req.params.id;
+    
+    const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        message: 'Project not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      files: project.files || []
+    });
+  } catch (error) {
+    console.error('Error fetching files:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching files'
+    });
+  }
+});
+
+router.get('/:id/files/:fileId/download', authenticateToken, async (req, res) => {
+  try {
+    const projectId = req.params.id;
+    const fileId = req.params.fileId;
+    
+    const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        message: 'Project not found'
+      });
+    }
+    
+    const files = project.files || [];
+    const file = files.find(f => f.id === fileId);
+    
+    if (!file) {
+      return res.status(404).json({
+        success: false,
+        message: 'File not found'
+      });
+    }
+    
+    const filePath = path.join(__dirname, '../uploads/project-files', projectId, file.filename);
+    
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({
+        success: false,
+        message: 'File not found on server'
+      });
+    }
+    
+    res.download(filePath, file.originalName);
+  } catch (error) {
+    console.error('Error downloading file:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error downloading file'
     });
   }
 });

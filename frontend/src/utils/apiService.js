@@ -190,6 +190,17 @@ class ApiService {
     });
   }
 
+  async postProjectMessage(projectId, message) {
+    return this.request(`/projects/${projectId}/messages`, {
+      method: 'POST',
+      body: JSON.stringify({ message }),
+    });
+  }
+
+  async getProjectMessages(projectId) {
+    return this.request(`/projects/${projectId}/messages`);
+  }
+
   async createCommit(commitData) {
     return this.request('/commits', {
       method: 'POST',

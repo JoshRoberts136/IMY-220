@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import apiService from '../utils/apiService';
 import '../styles.css';
 
-// Fuzzy search function - checks if characters match in order
 const fuzzyMatch = (str, pattern) => {
   if (!str || !pattern) return false;
   
@@ -23,23 +22,18 @@ const fuzzyMatch = (str, pattern) => {
   return patternIdx === pattern.length;
 };
 
-// Calculate fuzzy match score (lower is better)
 const fuzzyScore = (str, pattern) => {
   if (!str || !pattern) return Infinity;
   
   str = str.toLowerCase();
   pattern = pattern.toLowerCase();
   
-  // Exact match gets best score
   if (str === pattern) return 0;
   
-  // Starts with pattern gets good score
   if (str.startsWith(pattern)) return 1;
   
-  // Contains pattern gets ok score
   if (str.includes(pattern)) return 2;
   
-  // Fuzzy match gets higher score
   if (fuzzyMatch(str, pattern)) {
     const distance = str.length - pattern.length;
     return 3 + distance;
@@ -48,8 +42,8 @@ const fuzzyScore = (str, pattern) => {
   return Infinity;
 };
 
-const Search = ({ onSearchResults }) => {
-  const [searchQuery, setSearchQuery] = useState('');
+const Search = ({ onSearchResults, initialQuery = '', onSearchChange }) => {
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [isSearching, setIsSearching] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -57,6 +51,13 @@ const Search = ({ onSearchResults }) => {
   const searchRef = useRef(null);
   const inputRef = useRef(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (initialQuery) {
+      setSearchQuery(initialQuery);
+      handleSearch(initialQuery);
+    }
+  }, [initialQuery]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -70,7 +71,6 @@ const Search = ({ onSearchResults }) => {
     };
   }, []);
 
-  // Handle Tab or Right Arrow to accept autocomplete
   const handleKeyDown = (e) => {
     if (e.key === 'Tab' && autocompleteSuggestion) {
       e.preventDefault();
@@ -90,6 +90,10 @@ const Search = ({ onSearchResults }) => {
   const handleSearch = async (query) => {
     setSearchQuery(query);
     
+    if (onSearchChange) {
+      onSearchChange(query);
+    }
+    
     if (query.length > 1) {
       setIsSearching(true);
       
@@ -102,7 +106,6 @@ const Search = ({ onSearchResults }) => {
         const results = [];
         const allItems = [];
         
-        // Process users
         const usersList = Array.isArray(usersResult) ? usersResult : (usersResult.users || []);
         
         if (usersList.length > 0) {
@@ -124,7 +127,6 @@ const Search = ({ onSearchResults }) => {
           });
         }
         
-        // Process projects
         if (projectsResult.success && projectsResult.projects) {
           projectsResult.projects.forEach(project => {
             const nameScore = fuzzyScore(project.name || '', query);
@@ -143,7 +145,6 @@ const Search = ({ onSearchResults }) => {
             }
           });
           
-          // Process hashtags from projects
           const hashtags = new Set();
           projectsResult.projects.forEach(project => {
             if (project.hashtags && Array.isArray(project.hashtags)) {
@@ -169,16 +170,13 @@ const Search = ({ onSearchResults }) => {
           });
         }
         
-        // Sort by score (best matches first)
         allItems.sort((a, b) => a.score - b.score);
         
-        // Take top 8 results
         const topResults = allItems.slice(0, 8);
         
         setSuggestions(topResults);
         setShowSuggestions(topResults.length > 0);
         
-        // Set autocomplete suggestion (best match)
         if (topResults.length > 0 && topResults[0].name.toLowerCase().startsWith(query.toLowerCase())) {
           const completion = topResults[0].name;
           setAutocompleteSuggestion(completion);
@@ -211,8 +209,10 @@ const Search = ({ onSearchResults }) => {
     } else if (suggestion.type === 'project') {
       navigate(`/projects/${suggestion.id}`);
     } else if (suggestion.type === 'hashtag') {
-      // TODO: Navigate to hashtag search results
-      console.log('Search by hashtag:', suggestion.name);
+      const tagName = suggestion.name.replace('#', '');
+      if (onSearchChange) {
+        onSearchChange(tagName);
+      }
     }
     
     if (onSearchResults) {
@@ -242,7 +242,6 @@ const Search = ({ onSearchResults }) => {
           )}
         </div>
         <div style={{ position: 'relative', flex: 1 }}>
-          {/* Autocomplete suggestion (grayed out) */}
           {autocompleteSuggestion && searchQuery && (
             <div style={{
               position: 'absolute',

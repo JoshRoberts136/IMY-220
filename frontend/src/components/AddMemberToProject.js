@@ -7,50 +7,49 @@ import apiService from '../utils/apiService';
 
 const AddMemberToProject = ({ isOpen, onClose, projectId, currentMembers, onMemberAdded }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [allUsers, setAllUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [allFriends, setAllFriends] = useState([]);
+  const [filteredFriends, setFilteredFriends] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (isOpen) {
-      fetchUsers();
+      fetchFriends();
     }
   }, [isOpen]);
 
   useEffect(() => {
     if (searchQuery.trim() === '') {
-      setFilteredUsers([]);
+      setFilteredFriends([]);
     } else {
-      const filtered = allUsers.filter(user => {
-        if (currentMembers && currentMembers.includes(user.id)) {
+      const filtered = allFriends.filter(friend => {
+        if (currentMembers && currentMembers.some(m => m.id === friend.id)) {
           return false;
         }
         
-        const matchUsername = user.username?.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchEmail = user.email?.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchUsername = friend.username?.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchEmail = friend.email?.toLowerCase().includes(searchQuery.toLowerCase());
         return matchUsername || matchEmail;
       }).slice(0, 5);
       
-      setFilteredUsers(filtered);
+      setFilteredFriends(filtered);
     }
-  }, [searchQuery, allUsers, currentMembers]);
+  }, [searchQuery, allFriends, currentMembers]);
 
-  const fetchUsers = async () => {
+  const fetchFriends = async () => {
     try {
       setLoading(true);
-      const response = await apiService.request('/users');
+      const response = await apiService.getFriends();
       
-      const usersList = Array.isArray(response) ? response : (response.users || []);
-      
-      const currentUser = apiService.getUser();
-      const filteredList = usersList.filter(user => user.id !== currentUser.id);
-      
-      setAllUsers(filteredList);
+      if (response.success) {
+        setAllFriends(response.friends || []);
+      } else {
+        setError('Failed to load friends');
+      }
     } catch (err) {
-      console.error('Error fetching users:', err);
-      setError('Failed to load users');
+      console.error('Error fetching friends:', err);
+      setError('Failed to load friends');
     } finally {
       setLoading(false);
     }
@@ -58,7 +57,7 @@ const AddMemberToProject = ({ isOpen, onClose, projectId, currentMembers, onMemb
 
   const handleAddMember = async () => {
     if (!selectedUser) {
-      setError('Please select a user to add');
+      setError('Please select a friend to add');
       return;
     }
 
@@ -87,9 +86,27 @@ const AddMemberToProject = ({ isOpen, onClose, projectId, currentMembers, onMemb
   const handleClose = () => {
     setSearchQuery('');
     setSelectedUser(null);
-    setFilteredUsers([]);
+    setFilteredFriends([]);
     setError('');
     onClose();
+  };
+
+  const isImagePath = (avatar) => {
+    return avatar && (avatar.startsWith('/') || avatar.startsWith('http'));
+  };
+
+  const renderAvatar = (avatar) => {
+    if (isImagePath(avatar)) {
+      return (
+        <img 
+          src={avatar} 
+          alt="Avatar"
+          className="w-full h-full object-cover"
+          style={{ borderRadius: '50%' }}
+        />
+      );
+    }
+    return <span style={{ fontSize: '20px' }}>{avatar || '👤'}</span>;
   };
 
   if (!isOpen) return null;
@@ -103,10 +120,9 @@ const AddMemberToProject = ({ isOpen, onClose, projectId, currentMembers, onMemb
         className="bg-[rgba(10,10,10,0.95)] border-2 border-apex-orange rounded-xl p-8 w-[90%] max-w-[500px] max-h-[80vh] overflow-y-auto shadow-[0_0_50px_rgba(139,0,0,0.3)] relative"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Header */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="font-orbitron text-2xl font-bold text-apex-orange m-0">
-            Add Member to Project
+            Add Friend to Project
           </h2>
           <button
             onClick={handleClose}
@@ -123,72 +139,80 @@ const AddMemberToProject = ({ isOpen, onClose, projectId, currentMembers, onMemb
           </div>
         )}
 
-        <form onSubmit={(e) => { e.preventDefault(); handleAddMember(); }}>
-          <FormInput
-            label="Search Users"
-            icon={Search}
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by username or email..."
-            disabled={loading}
-          />
-
-          {searchQuery && filteredUsers.length > 0 && (
-            <div className="mb-6">
-              <label className="flex items-center mb-2 text-gray-300 font-semibold uppercase tracking-wide text-xs">
-                <UserPlus size={16} className="mr-2" />
-                Select User
-              </label>
-              <div className="user-select-list">
-                {filteredUsers.map((user) => (
-                  <div
-                    key={user.id}
-                    className={`user-select-item ${selectedUser?.id === user.id ? 'selected' : ''}`}
-                    onClick={() => setSelectedUser(user)}
-                  >
-                    <div className="user-select-avatar">
-                      {user.profile?.avatar || '👤'}
-                    </div>
-                    <div className="user-select-info">
-                      <div className="user-select-name">{user.username}</div>
-                      <div className="user-select-email">{user.email}</div>
-                    </div>
-                    {selectedUser?.id === user.id && (
-                      <div className="selected-check">✓</div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {searchQuery && filteredUsers.length === 0 && !loading && (
-            <div className="no-results-message">
-              No users found matching your search
-            </div>
-          )}
-
-          <div className="flex gap-4 mt-8">
-            <Button
-              type="submit"
-              variant="primary"
-              disabled={loading || !selectedUser}
-              className="flex-1"
-            >
-              {loading ? 'Adding Member...' : 'Add Member'}
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={handleClose}
-              disabled={loading}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
+        {allFriends.length === 0 && !loading && (
+          <div className="text-center py-6 text-gray-400">
+            You need to add friends before you can add them to projects.
           </div>
-        </form>
+        )}
+
+        {allFriends.length > 0 && (
+          <form onSubmit={(e) => { e.preventDefault(); handleAddMember(); }}>
+            <FormInput
+              label="Search Friends"
+              icon={Search}
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by username or email..."
+              disabled={loading}
+            />
+
+            {searchQuery && filteredFriends.length > 0 && (
+              <div className="mb-6">
+                <label className="flex items-center mb-2 text-gray-300 font-semibold uppercase tracking-wide text-xs">
+                  <UserPlus size={16} className="mr-2" />
+                  Select Friend
+                </label>
+                <div className="user-select-list">
+                  {filteredFriends.map((friend) => (
+                    <div
+                      key={friend.id}
+                      className={`user-select-item ${selectedUser?.id === friend.id ? 'selected' : ''}`}
+                      onClick={() => setSelectedUser(friend)}
+                    >
+                      <div className="user-select-avatar">
+                        {renderAvatar(friend.profile?.avatar || friend.avatar)}
+                      </div>
+                      <div className="user-select-info">
+                        <div className="user-select-name">{friend.username}</div>
+                        <div className="user-select-email">{friend.email}</div>
+                      </div>
+                      {selectedUser?.id === friend.id && (
+                        <div className="selected-check">✓</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {searchQuery && filteredFriends.length === 0 && !loading && (
+              <div className="no-results-message">
+                No friends found matching your search
+              </div>
+            )}
+
+            <div className="flex gap-4 mt-8">
+              <Button
+                type="submit"
+                variant="primary"
+                disabled={loading || !selectedUser}
+                className="flex-1"
+              >
+                {loading ? 'Adding Member...' : 'Add Member'}
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={handleClose}
+                disabled={loading}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        )}
       </div>
     </div>,
     document.body

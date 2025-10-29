@@ -74,7 +74,7 @@ function Signup() {
       />
       
       <FormInput
-        label="Legend ID"
+        label="Legend Email"
         icon={Mail}
         type="email"
         id="regEmail"

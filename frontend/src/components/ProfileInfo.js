@@ -72,7 +72,6 @@ const ProfileInfo = ({ profileData, isOwnProfile, isFriend, targetUserId, onProj
   };
 
   const handleAvatarUploadSuccess = async (newAvatarPath) => {
-    // Update local state
     setUser(prev => ({
       ...prev,
       profile: {
@@ -82,7 +81,6 @@ const ProfileInfo = ({ profileData, isOwnProfile, isFriend, targetUserId, onProj
       avatar: newAvatarPath
     }));
 
-    // Update localStorage
     const currentUser = apiService.getUser();
     if (currentUser) {
       const updatedUser = {
@@ -148,18 +146,15 @@ const ProfileInfo = ({ profileData, isOwnProfile, isFriend, targetUserId, onProj
     console.log('Friendship status changed locally:', newStatus);
     setFriendshipStatus(newStatus);
     
-    // Notify parent component to update the view
     if (onFriendshipChange) {
       onFriendshipChange(newStatus);
     }
   };
 
-  // Get the correct userId
   const getUserId = () => {
     return user.id || user._id;
   };
 
-  // Show limited profile info if not friends
   const showLimitedInfo = !isOwnProfile && !isFriend;
 
   return (
@@ -202,7 +197,6 @@ const ProfileInfo = ({ profileData, isOwnProfile, isFriend, targetUserId, onProj
             )}
           </div>
           
-          {/* Show full info for own profile or friends */}
           {!showLimitedInfo ? (
             <>
               <p className="profile-title-text">{user.title}</p>
@@ -260,7 +254,7 @@ const ProfileInfo = ({ profileData, isOwnProfile, isFriend, targetUserId, onProj
 
           <CreateProject
             isOpen={isCreatingProject}
-            onClose={() => setIsCreatingProfile(false)}
+            onClose={() => setIsCreatingProject(false)}
             onSave={handleCreateProject}
           />
         </>
