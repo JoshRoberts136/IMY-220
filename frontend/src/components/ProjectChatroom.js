@@ -101,7 +101,7 @@ const ProjectChatroom = ({ projectId, isMember }) => {
   };
 
   const isImagePath = (avatar) => {
-    return avatar && (avatar.startsWith('/') || avatar.startsWith('http'));
+    return avatar && typeof avatar === 'string' && (avatar.startsWith('/') || avatar.startsWith('http'));
   };
 
   const renderAvatar = (avatar) => {
@@ -115,6 +115,10 @@ const ProjectChatroom = ({ projectId, isMember }) => {
             height: '36px',
             borderRadius: '50%',
             objectFit: 'cover'
+          }}
+          onError={(e) => {
+            e.target.style.display = 'none';
+            e.target.parentElement.innerHTML = '<span style="font-size: 24px">👤</span>';
           }}
         />
       );

@@ -646,11 +646,13 @@ router.post('/:id/messages', authenticateToken, async (req, res) => {
       });
     }
     
+    const fullUser = await db.collection('Users').findOne({ id: userId });
+    
     const newMessage = {
       id: `msg_${Date.now()}`,
       userId: userId,
-      username: user.username,
-      avatar: user.profile?.avatar || '👤',
+      username: fullUser ? fullUser.username : user.username,
+      avatar: fullUser && fullUser.profile && fullUser.profile.avatar ? fullUser.profile.avatar : '👤',
       message: message,
       timestamp: new Date().toISOString()
     };
@@ -689,9 +691,22 @@ router.get('/:id/messages', authenticateToken, async (req, res) => {
       });
     }
     
+    const messages = project.messages || [];
+    
+    const messagesWithCurrentUserData = await Promise.all(
+      messages.map(async (msg) => {
+        const user = await db.collection('Users').findOne({ id: msg.userId });
+        return {
+          ...msg,
+          username: user ? user.username : msg.username,
+          avatar: user && user.profile && user.profile.avatar ? user.profile.avatar : (msg.avatar || '👤')
+        };
+      })
+    );
+    
     res.json({
       success: true,
-      messages: project.messages || []
+      messages: messagesWithCurrentUserData
     });
   } catch (error) {
     res.status(500).json({
