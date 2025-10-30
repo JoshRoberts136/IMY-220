@@ -8,6 +8,7 @@ const CheckoutManager = ({ project, isMember, onStatusChange }) => {
   const [loading, setLoading] = useState(false);
   const [checkinMessage, setCheckinMessage] = useState('');
   const [showCheckinForm, setShowCheckinForm] = useState(false);
+  const [message, setMessage] = useState({ text: '', type: '' });
   const currentUser = apiService.getUser();
   
   const isCheckedOut = !!project.checkedOutBy;
@@ -15,28 +16,28 @@ const CheckoutManager = ({ project, isMember, onStatusChange }) => {
   const canCheckout = isMember && !isCheckedOut;
   const canCheckin = isMember && isCheckedOutByMe;
 
+  const showMessage = (text, type) => {
+    setMessage({ text, type });
+    setTimeout(() => setMessage({ text: '', type: '' }), 3000);
+  };
+
   const handleCheckout = async () => {
     if (!canCheckout) return;
-
-    if (!window.confirm('Check out this project? This will lock it from other members until you check it back in.')) {
-      return;
-    }
 
     try {
       setLoading(true);
       const response = await apiService.checkoutProject(project.id);
       
       if (response.success) {
-        alert('Project checked out successfully! You can now make changes.');
+        showMessage('Project checked out successfully!', 'success');
         if (onStatusChange) {
           onStatusChange();
         }
       } else {
-        alert(response.message || 'Failed to checkout project');
+        showMessage(response.message || 'Failed to checkout project', 'error');
       }
     } catch (error) {
-      console.error('Error checking out:', error);
-      alert(error.message || 'Failed to checkout project');
+      showMessage(error.message || 'Failed to checkout project', 'error');
     } finally {
       setLoading(false);
     }
@@ -46,7 +47,7 @@ const CheckoutManager = ({ project, isMember, onStatusChange }) => {
     e.preventDefault();
 
     if (!checkinMessage.trim()) {
-      alert('Please provide a check-in message describing your changes');
+      showMessage('Please provide a check-in message', 'error');
       return;
     }
 
@@ -63,20 +64,41 @@ const CheckoutManager = ({ project, isMember, onStatusChange }) => {
         if (onStatusChange) {
           await onStatusChange();
         }
-        alert('Project checked in successfully!');
+        showMessage('Project checked in successfully!', 'success');
       } else {
-        alert(response.message || 'Failed to checkin project');
+        showMessage(response.message || 'Failed to checkin project', 'error');
       }
     } catch (error) {
-      console.error('Error checking in:', error);
-      alert(error.message || 'Failed to checkin project');
+      showMessage(error.message || 'Failed to checkin project', 'error');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDownload = () => {
-    alert('Download functionality would be implemented here');
+  const handleDownload = async () => {
+    try {
+      setLoading(true);
+      const response = await apiService.request(`/projects/${project.id}/files`);
+      
+      if (response.success && response.files && response.files.length > 0) {
+        for (const file of response.files) {
+          const a = document.createElement('a');
+          a.href = file.path;
+          a.download = file.originalName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        showMessage(`Downloaded ${response.files.length} file(s)`, 'success');
+      } else {
+        showMessage('No files to download', 'error');
+      }
+    } catch (error) {
+      showMessage('Failed to download files', 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -85,6 +107,21 @@ const CheckoutManager = ({ project, isMember, onStatusChange }) => {
         {isCheckedOut ? <Lock size={20} color="var(--apex-orange)" /> : <Unlock size={20} color="#4ade80" />}
         Project Status
       </div>
+
+      {message.text && (
+        <div style={{
+          padding: '12px 16px',
+          marginBottom: '16px',
+          borderRadius: '8px',
+          background: message.type === 'success' ? 'rgba(74, 222, 128, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+          border: `2px solid ${message.type === 'success' ? '#4ade80' : '#ef4444'}`,
+          color: message.type === 'success' ? '#4ade80' : '#ef4444',
+          fontSize: '14px',
+          fontWeight: '600'
+        }}>
+          {message.text}
+        </div>
+      )}
 
       <div style={{
         padding: '16px',
