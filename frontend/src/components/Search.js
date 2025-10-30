@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { DefaultAvatar } from '../utils/avatarUtils';
 import apiService from '../utils/apiService';
 import '../styles.css';
 
@@ -120,7 +121,7 @@ const Search = ({ onSearchResults, initialQuery = '', onSearchChange }) => {
                 id: user.id,
                 name: user.username,
                 subtitle: user.profile?.title || user.email,
-                avatar: user.profile?.avatar || '👤',
+                avatar: user.profile?.avatar,
                 score: bestScore
               });
             }
@@ -284,7 +285,19 @@ const Search = ({ onSearchResults, initialQuery = '', onSearchChange }) => {
               onClick={() => handleSuggestionClick(suggestion)}
             >
               <div className={`suggestion-icon suggestion-icon-${suggestion.type}`}>
-                {suggestion.avatar || getTypeIcon(suggestion.type)}
+                {suggestion.type === 'user' ? (
+                  suggestion.avatar ? (
+                    <img 
+                      src={suggestion.avatar} 
+                      alt={suggestion.name}
+                      style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover' }}
+                    />
+                  ) : (
+                    <DefaultAvatar username={suggestion.name} size={30} />
+                  )
+                ) : (
+                  getTypeIcon(suggestion.type)
+                )}
               </div>
               <div className="suggestion-content">
                 <div className="suggestion-name">{suggestion.name}</div>

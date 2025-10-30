@@ -176,7 +176,9 @@ const ProfileInfo = ({ profileData, isOwnProfile, isFriend, targetUserId, onProj
           />
         ) : (
           <div className="user-avatar user-avatar-large">
-            {user.profile?.avatar || user.avatar ? (
+            {(user.profile?.avatar || user.avatar) && 
+             ((user.profile?.avatar || user.avatar).startsWith('/') || 
+              (user.profile?.avatar || user.avatar).startsWith('http')) ? (
               <img 
                 src={user.profile?.avatar || user.avatar} 
                 alt={user.username}
