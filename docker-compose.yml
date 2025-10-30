@@ -13,4 +13,7 @@ services:
       - NODE_ENV=production
       - MONGODB_URI=${MONGODB_URI}
       - JWT_SECRET=${JWT_SECRET}
+      - PORT=3000
+    volumes:
+      - ./backend/uploads:/app/backend/uploads
     restart: unless-stopped
