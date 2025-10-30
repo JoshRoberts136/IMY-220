@@ -1,108 +1,77 @@
+# ApexCoding
+
 https://github.com/JoshRoberts136/IMY-220
-# IMY-220 Project - ApexCoding
 
-Version control website for collaborative coding.
+Collaborative version control platform for developers.
 
-## Prerequisites
-- Docker Desktop installed
-- MongoDB Atlas account (or local MongoDB)
+## Setup
 
-## Environment Variables
-Create a `.env` file in the root directory with:
+You need Docker and a MongoDB database (Atlas works fine).
+
+Make a `.env` file:
 ```
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_secret_key
+MONGODB_URI=your_connection_string
+JWT_SECRET=whatever_you_want
 PORT=3000
 NODE_ENV=production
 ```
 
-## Docker Commands
+## Running with Docker
 
-### Build and Run
 ```bash
 docker-compose up --build
 ```
 
-### Run (after building)
-```bash
-docker-compose up
-```
+Go to `http://localhost:3000`
 
-### Stop
+Stop it with `Ctrl+C` then:
 ```bash
 docker-compose down
 ```
 
-Or press `Ctrl+C` and then run:
-```bash
-docker-compose down
-```
+## Running locally
 
-### Access the Application
-Once running, open your browser to:
-```
-http://localhost:3000
-```
-
-## Development (Without Docker)
-
-### Install Dependencies
 ```bash
 npm install
-```
-
-### Run Development Server
-```bash
 npm run dev
 ```
 
-This runs both the frontend (webpack-dev-server) and backend (Express) concurrently.
-
-### Build for Production
+For production:
 ```bash
 npm run build
 npm start
 ```
 
-## Project Structure
+## What's in here
+
 ```
-IMY_220_Project/
-├── backend/           # Express API and server
-│   ├── config/       # Database configuration
-│   ├── middleware/   # Auth middleware
-│   ├── models/       # MongoDB models
-│   ├── routes/       # API routes
-│   └── server.js     # Main server file
-├── frontend/         # React frontend
-│   └── src/
-│       ├── components/  # React components
-│       ├── pages/       # Page components
-│       ├── utils/       # Utilities (API service)
-│       └── styles.css   # Global styles
-├── public/           # Built frontend files
-├── Dockerfile        # Docker configuration
-├── docker-compose.yml # Docker Compose configuration
-└── webpack.config.js # Webpack configuration
+backend/
+  config/      - database stuff
+  middleware/  - auth
+  routes/      - API endpoints
+  server.js    - main server
+  uploads/     - user files
+
+frontend/src/
+  components/  - React components
+  pages/       - page components
+  utils/       - API service
+  styles.css   - global styles
+
+public/        - built files
 ```
 
 ## Features
-- User authentication (login/signup)
-- Project creation and management
-- File check-in/check-out system
-- Friend connections
-- Activity feeds (local and global)
-- Project collaboration
-- Search functionality
 
-## Technologies
-- **Frontend:** React, CSS
-- **Backend:** Node.js, Express
-- **Database:** MongoDB (Atlas)
-- **Authentication:** JWT
-- **Bundler:** Webpack
-- **Containerization:** Docker
+- Login/signup
+- Create and manage projects
+- Check-in/check-out system
+- Add friends
+- Activity feeds
+- Project chat
+- File uploads
+- Search
 
-## Notes
-- Make sure MongoDB URI is correctly set in `.env`
-- The application runs on port 3000 by default
-- Docker builds the frontend automatically during image creation
+## Stack
+
+React + Express + MongoDB + JWT + Docker
