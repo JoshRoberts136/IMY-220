@@ -9,6 +9,20 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('authToken');
     const user = localStorage.getItem('currentUser');
     setIsAuthenticated(!!(token && user));
+    
+    if (user) {
+      try {
+        const userData = JSON.parse(user);
+        const theme = userData.theme || 'dark';
+        if (theme === 'light') {
+          document.documentElement.setAttribute('data-theme', 'light');
+        } else {
+          document.documentElement.removeAttribute('data-theme');
+        }
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+      }
+    }
   }, []);
 
   useEffect(() => {

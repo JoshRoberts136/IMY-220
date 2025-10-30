@@ -14,22 +14,18 @@ const DeleteProject = ({ projectId, projectName, onDeleted, disabled }) => {
   const handleDeleteClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('Delete button clicked, opening modal');
     setShowConfirm(true);
     setConfirmText('');
     setError('');
   };
 
   const handleCancel = () => {
-    console.log('Cancel clicked');
     setShowConfirm(false);
     setConfirmText('');
     setError('');
   };
 
   const handleConfirmDelete = async () => {
-    console.log('Confirm delete called, confirmText:', confirmText);
-    
     if (confirmText.toLowerCase() !== 'delete') {
       setError('Please type "DELETE" to confirm');
       return;
@@ -39,11 +35,9 @@ const DeleteProject = ({ projectId, projectName, onDeleted, disabled }) => {
       setLoading(true);
       setError('');
       
-      console.log('Deleting project:', projectId);
       const response = await apiService.deleteProject(projectId);
       
       if (response.success) {
-        console.log('Project deleted successfully');
         setShowConfirm(false);
         if (onDeleted) {
           onDeleted();
@@ -59,8 +53,6 @@ const DeleteProject = ({ projectId, projectName, onDeleted, disabled }) => {
       setLoading(false);
     }
   };
-
-  console.log('DeleteProject render - showConfirm:', showConfirm);
 
   if (!showConfirm) {
     return (

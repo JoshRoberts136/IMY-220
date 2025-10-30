@@ -134,10 +134,7 @@ function Files({ projectId, project, onCommitCreated }) {
           <Button
             variant="primary"
             icon={Plus}
-            onClick={() => {
-              console.log('New Commit button clicked');
-              setIsCreateCommitOpen(true);
-            }}
+            onClick={() => setIsCreateCommitOpen(true)}
           >
             New Commit
           </Button>

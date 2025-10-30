@@ -235,11 +235,20 @@ router.delete('/:userId/profile/avatar', authenticateToken, async (req, res) => 
   }
 });
 
-router.put('/:userId', authenticateToken, requireAdmin, async (req, res) => {
+router.put('/:userId', authenticateToken, async (req, res) => {
   try {
     const userId = req.params.userId;
     const updateData = req.body;
+    const currentUserId = req.user.id || (req.user._id ? req.user._id.toString() : null);
+    const isAdmin = req.user.isAdmin || false;
     const db = getDB();
+    
+    if (currentUserId !== userId && !isAdmin) {
+      return res.status(403).json({
+        success: false,
+        message: 'You can only update your own profile'
+      });
+    }
     
     delete updateData._id;
     delete updateData.id;

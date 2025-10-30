@@ -134,3 +134,28 @@
   flex-direction: column;
   height: 100%;
 }
+
+:root[data-theme="light"] .profile-username-title {
+  color: #212529;
+}
+
+:root[data-theme="light"] .profile-title-text {
+  color: #495057;
+}
+
+:root[data-theme="light"] .profile-bio-text {
+  color: #6c757d;
+}
+
+:root[data-theme="light"] .profile-detail {
+  color: #495057;
+}
+
+:root[data-theme="light"] .avatar-icon-large {
+  color: #6c757d;
+}
+
+:root[data-theme="light"] .loading-projects-message,
+:root[data-theme="light"] .no-projects-message {
+  color: #6c757d;
+}

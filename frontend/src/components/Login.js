@@ -26,18 +26,14 @@ function Login() {
         password: passcode
       });
 
-      console.log('API Response:', response);
       if (response.success) {
-        console.log('Login successful, navigating to /home');
         setIsAuthenticated(true);
         navigate('/home');
       } else {
         setError(response.message || 'Login failed');
-        console.log('Login failed:', response.message);
       }
     } catch (error) {
       setError(error.message || 'Login failed');
-      console.log('Login failed:', error.message);
     } finally {
       setLoading(false);
     }

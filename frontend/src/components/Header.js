@@ -13,7 +13,7 @@ function Header() {
   };
 
   return (
-    <header className="flex justify-between items-center px-10 py-4 bg-[rgba(10,10,10,0.95)] backdrop-blur-[10px] border-b-[3px] border-apex-orange relative mb-5">
+    <header className="flex justify-between items-center px-10 py-4 backdrop-blur-[10px] border-b-[3px] border-apex-orange relative mb-5" style={{ backgroundColor: 'var(--apex-darker)' }}>
       {/* Animated gradient line */}
       <div className="absolute bottom-[-3px] left-0 w-full h-px bg-gradient-to-r from-transparent via-apex-blue to-transparent"></div>
       
@@ -41,12 +41,12 @@ function Header() {
       <div className="flex gap-5">
         <Link 
           to="/home" 
-          className={`px-6 py-3 bg-transparent border-2 text-white font-rajdhani font-semibold text-sm cursor-pointer transition-all duration-300 uppercase tracking-wider relative overflow-hidden ${
+          className={`px-6 py-3 bg-transparent border-2 font-rajdhani font-semibold text-sm cursor-pointer transition-all duration-300 uppercase tracking-wider relative overflow-hidden ${
             location.pathname === '/home' 
               ? 'border-apex-red bg-apex-orange' 
               : 'border-apex-orange'
-          } hover:text-white hover:shadow-[0_0_20px_rgba(139,0,0,0.5)] group`}
-          style={{ clipPath: 'polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%)' }}>
+          } hover:shadow-[0_0_20px_rgba(139,0,0,0.5)] group`}
+          style={{ clipPath: 'polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%)', color: 'var(--text-color)' }}>
           <span className="relative z-10">Feed</span>
           <div className={`absolute top-0 left-0 right-0 bottom-0 ${
             location.pathname === '/home' ? 'bg-apex-red' : 'bg-apex-orange'
@@ -55,12 +55,12 @@ function Header() {
 
         <Link 
           to="/profile" 
-          className={`px-6 py-3 bg-transparent border-2 text-white font-rajdhani font-semibold text-sm cursor-pointer transition-all duration-300 uppercase tracking-wider relative overflow-hidden ${
+          className={`px-6 py-3 bg-transparent border-2 font-rajdhani font-semibold text-sm cursor-pointer transition-all duration-300 uppercase tracking-wider relative overflow-hidden ${
             location.pathname === '/profile' 
               ? 'border-apex-red bg-apex-orange' 
               : 'border-apex-orange'
-          } hover:text-white hover:shadow-[0_0_20px_rgba(139,0,0,0.5)] group`}
-          style={{ clipPath: 'polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%)' }}>
+          } hover:shadow-[0_0_20px_rgba(139,0,0,0.5)] group`}
+          style={{ clipPath: 'polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%)', color: 'var(--text-color)' }}>
           <span className="relative z-10">Profile</span>
           <div className={`absolute top-0 left-0 right-0 bottom-0 ${
             location.pathname === '/profile' ? 'bg-apex-red' : 'bg-apex-orange'
@@ -69,8 +69,8 @@ function Header() {
 
         <button 
           onClick={handleSignOut} 
-          className="px-6 py-3 bg-transparent border-2 border-apex-orange text-white font-rajdhani font-semibold text-sm cursor-pointer transition-all duration-300 uppercase tracking-wider relative overflow-hidden hover:text-white hover:shadow-[0_0_20px_rgba(139,0,0,0.5)] group"
-          style={{ clipPath: 'polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%)' }}>
+          className="px-6 py-3 bg-transparent border-2 border-apex-orange font-rajdhani font-semibold text-sm cursor-pointer transition-all duration-300 uppercase tracking-wider relative overflow-hidden hover:shadow-[0_0_20px_rgba(139,0,0,0.5)] group"
+          style={{ clipPath: 'polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%)', color: 'var(--text-color)' }}>
           <span className="relative z-10">Sign out</span>
           <div className="absolute top-0 left-0 right-0 bottom-0 bg-apex-orange -z-10 transition-transform duration-300 origin-right scale-x-0 group-hover:scale-x-100 group-hover:origin-left"></div>
         </button>

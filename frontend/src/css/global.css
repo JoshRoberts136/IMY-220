@@ -13,6 +13,12 @@ body {
   overflow-x: hidden;
   min-height: 100vh;
   position: relative;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+:root[data-theme="light"] body {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 50%, #e9ecef 100%);
+  color: #212529;
 }
 
 html, body {

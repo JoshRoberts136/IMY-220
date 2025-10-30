@@ -125,7 +125,7 @@ const ProjectCard = () => {
             });
           }
         } catch (err) {
-          console.log(`Could not fetch member ${memberId}:`, err.message);
+
         }
       }
       

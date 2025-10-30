@@ -92,9 +92,6 @@ const Profile = ({ userId }) => {
 
   
   const handleFriendshipChange = (newStatus) => {
-    console.log('Friendship status changed to:', newStatus);
-    
-    
     if (newStatus === 'friends') {
       setIsFriend(true);
     } else if (newStatus === 'none' || newStatus === 'removed') {

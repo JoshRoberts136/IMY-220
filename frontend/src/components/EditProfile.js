@@ -81,7 +81,7 @@ const EditProfile = ({ isOpen, onClose, user, onSave }) => {
 
   if (isOpen === undefined) {
     return (
-      <Button variant="warning" icon={User} onClick={() => console.log('Edit profile clicked')}>
+      <Button variant="warning" icon={User}>
         Edit Profile
       </Button>
     );

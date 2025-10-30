@@ -85,11 +85,6 @@ IMY_220_Project/
 └── webpack.config.js # Webpack configuration
 ```
 
-## Test User Credentials
-For testing purposes:
-- Email: `test@test.com`
-- Password: `test1234`
-
 ## Features
 - User authentication (login/signup)
 - Project creation and management

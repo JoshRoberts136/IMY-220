@@ -7,4 +7,17 @@
   --apex-gray-highlight: #1f1f1f;
   --apex-gray: #2d3748;
   --apex-light-gray: #2a2a2a;
+  --text-color: #ffffff;
+}
+
+:root[data-theme="light"] {
+  --apex-orange: #d94444;
+  --apex-red: #e63946;
+  --apex-dark: #f8f9fa;
+  --apex-darker: #f5f5f5;
+  --apex-blue: #d94444;
+  --apex-gray-highlight: #e9ecef;
+  --apex-gray: #dee2e6;
+  --apex-light-gray: #f1f3f5;
+  --text-color: #000000;
 }

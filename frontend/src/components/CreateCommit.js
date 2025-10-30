@@ -41,8 +41,6 @@ const CreateCommit = ({ isOpen, onClose, projectId, onCommitCreated }) => {
     try {
       const user = apiService.getUser();
       
-      console.log('Creating commit with projectId:', projectId);
-      
       const commitData = {
         message: formData.message.trim(),
         filesChanged: formData.filesChanged,
@@ -50,8 +48,6 @@ const CreateCommit = ({ isOpen, onClose, projectId, onCommitCreated }) => {
         author: user.username,
         userId: user.id
       };
-      
-      console.log('Commit data:', commitData);
       
       const response = await apiService.createCommit(commitData);
 

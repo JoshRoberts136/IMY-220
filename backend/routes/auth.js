@@ -53,7 +53,8 @@ router.post('/login', async (req, res) => {
         username: user.username,
         email: user.email,
         profile: user.profile,
-        isAdmin: user.isAdmin || false
+        isAdmin: user.isAdmin || false,
+        theme: user.theme || 'dark'
       }
     });
   } catch (error) {
@@ -116,7 +117,8 @@ router.post('/register', async (req, res) => {
         username: newUser.username,
         email: newUser.email,
         profile: newUser.profile,
-        isAdmin: false
+        isAdmin: false,
+        theme: 'dark'
       }
     });
   } catch (error) {
@@ -151,7 +153,8 @@ router.get('/verify', async (req, res) => {
         username: user.username,
         email: user.email,
         profile: user.profile,
-        isAdmin: user.isAdmin || false
+        isAdmin: user.isAdmin || false,
+        theme: user.theme || 'dark'
       }
     });
   } catch (error) {

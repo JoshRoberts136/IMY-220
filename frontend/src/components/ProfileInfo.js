@@ -114,9 +114,7 @@ const ProfileInfo = ({ profileData, isOwnProfile, isFriend, targetUserId, onProj
           body: JSON.stringify(updatePayload)
         });
         
-        console.log('Profile updated in MongoDB');
       } catch (error) {
-        console.error('Failed to update MongoDB:', error);
       }
       
       setUser({ ...user, ...updatedData });
@@ -136,14 +134,12 @@ const ProfileInfo = ({ profileData, isOwnProfile, isFriend, targetUserId, onProj
   };
 
   const handleCreateProject = async (projectData) => {
-    console.log('New project created:', projectData);
     if (onProjectCreated) {
       onProjectCreated();
     }
   };
 
   const handleLocalFriendshipChange = (newStatus) => {
-    console.log('Friendship status changed locally:', newStatus);
     setFriendshipStatus(newStatus);
     
     if (onFriendshipChange) {

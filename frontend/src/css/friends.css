@@ -211,3 +211,46 @@
   padding: 20px;
   color: #888;
 }
+
+:root[data-theme="light"] .friend-item {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(217, 68, 68, 0.2);
+}
+
+:root[data-theme="light"] .friend-item:hover {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: var(--apex-orange);
+}
+
+:root[data-theme="light"] .friend-username {
+  color: #212529;
+}
+
+:root[data-theme="light"] .friend-title {
+  color: #6c757d;
+}
+
+:root[data-theme="light"] .status-text {
+  color: #6c757d;
+}
+
+:root[data-theme="light"] .friend-separator {
+  color: #adb5bd;
+}
+
+:root[data-theme="light"] .friend-projects-count {
+  color: #6c757d;
+}
+
+:root[data-theme="light"] .friend-status-indicator {
+  border-color: #ffffff;
+}
+
+:root[data-theme="light"] .loading-friends-message,
+:root[data-theme="light"] .no-friends-message {
+  color: #6c757d;
+}
+
+:root[data-theme="light"] .message-button {
+  background: rgba(217, 68, 68, 0.1);
+}

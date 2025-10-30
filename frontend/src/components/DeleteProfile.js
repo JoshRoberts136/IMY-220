@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Trash2, AlertTriangle } from 'lucide-react';
 import Button from './Button';
+import ThemeToggle from './ThemeToggle';
 import apiService from '../utils/apiService';
 import { useNavigate } from 'react-router-dom';
 
@@ -56,6 +57,8 @@ const DeleteProfile = ({ onDelete }) => {
   if (!showConfirmation) {
     return (
       <div className="mt-8 pt-6 border-t-2 border-red-900/30">
+        <ThemeToggle />
+        
         <div className="bg-red-900/10 border border-red-500/30 rounded-lg p-4 mb-4">
           <div className="flex items-start gap-3">
             <AlertTriangle className="text-red-500 flex-shrink-0 mt-1" size={20} />
@@ -81,6 +84,8 @@ const DeleteProfile = ({ onDelete }) => {
 
   return (
     <div className="mt-8 pt-6 border-t-2 border-red-900/30">
+      <ThemeToggle />
+      
       <div className="bg-red-900/20 border-2 border-red-500 rounded-lg p-6">
         <div className="flex items-center gap-3 mb-4">
           <AlertTriangle className="text-red-500" size={24} />

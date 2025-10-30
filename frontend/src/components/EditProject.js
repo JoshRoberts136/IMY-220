@@ -139,7 +139,7 @@ function EditProject({ isOpen, onClose, project, onSave }) {
 
   if (isOpen === undefined) {
     return (
-      <Button variant="warning" icon={FileText} onClick={() => console.log('Edit project clicked')}>
+      <Button variant="warning" icon={FileText}>
         Edit Project
       </Button>
     );

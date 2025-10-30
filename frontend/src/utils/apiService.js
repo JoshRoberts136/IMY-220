@@ -44,6 +44,13 @@ class ApiService {
     if (response.success && response.token) {
       this.setToken(response.token);
       this.setUser(response.user);
+      
+      const theme = response.user.theme || 'dark';
+      if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
     }
 
     return response;

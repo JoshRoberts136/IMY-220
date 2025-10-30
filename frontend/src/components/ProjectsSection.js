@@ -15,7 +15,6 @@ const ProjectsSection = ({ userId }) => {
   const fetchProjects = async () => {
     try {
       const response = await apiService.getProjects();
-      console.log('Projects in ProjectsSection:', response);
       if (response.success) {
         setProjects(response.projects || []);
       } else {
