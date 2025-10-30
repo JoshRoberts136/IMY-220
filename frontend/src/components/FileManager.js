@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Upload, File, X } from 'lucide-react';
+import { Upload, File, X, Download } from 'lucide-react';
 import Button from './Button';
 import apiService from '../utils/apiService';
 import '../styles.css';
 
 const FileManager = ({ projectId }) => {
-  const [activeTab, setActiveTab] = useState('owned');
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -16,14 +15,17 @@ const FileManager = ({ projectId }) => {
     if (projectId) {
       fetchFiles();
     }
-  }, [projectId, activeTab]);
+  }, [projectId]);
 
   const fetchFiles = async () => {
     try {
       setLoading(true);
-      // TODO: Replace with actual API call
-      // const response = await apiService.request(`/projects/${projectId}/files?type=${activeTab}`);
-      setFiles([]);
+      const response = await apiService.request(`/projects/${projectId}/files`);
+      if (response.success) {
+        setFiles(response.files || []);
+      } else {
+        setFiles([]);
+      }
     } catch (error) {
       console.error('Error fetching files:', error);
       setFiles([]);
@@ -72,20 +74,23 @@ const FileManager = ({ projectId }) => {
         formData.append('files', file);
       });
 
-      // TODO: Replace with actual API call
-      // const response = await apiService.request(`/projects/${projectId}/files`, {
-      //   method: 'POST',
-      //   body: formData,
-      //   headers: {} // Let browser set Content-Type with boundary
-      // });
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(`/api/projects/${projectId}/files`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
 
-      console.log('Uploading files:', filesArray.map(f => f.name));
+      const data = await response.json();
       
-      // Simulate upload
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      alert('Files uploaded successfully!');
-      fetchFiles();
+      if (data.success) {
+        alert('Files uploaded successfully!');
+        fetchFiles();
+      } else {
+        alert(data.message || 'Failed to upload files');
+      }
     } catch (error) {
       console.error('Error uploading files:', error);
       alert('Failed to upload files');
@@ -102,14 +107,16 @@ const FileManager = ({ projectId }) => {
     if (!window.confirm('Are you sure you want to delete this file?')) return;
 
     try {
-      // TODO: Replace with actual API call
-      // await apiService.request(`/projects/${projectId}/files/${fileId}`, {
-      //   method: 'DELETE'
-      // });
+      const response = await apiService.request(`/projects/${projectId}/files/${fileId}`, {
+        method: 'DELETE'
+      });
       
-      console.log('Deleting file:', fileId);
-      alert('File deleted!');
-      fetchFiles();
+      if (response.success) {
+        alert('File deleted!');
+        fetchFiles();
+      } else {
+        alert(response.message || 'Failed to delete file');
+      }
     } catch (error) {
       console.error('Error deleting file:', error);
       alert('Failed to delete file');
@@ -120,21 +127,7 @@ const FileManager = ({ projectId }) => {
     <div className="content-section">
       <div className="section-title">Project Files</div>
 
-      {/* Tabs */}
-      <div className="tabs-placeholder">
-        <button
-          className={`tab-placeholder ${activeTab === 'owned' ? 'active' : ''}`}
-          onClick={() => setActiveTab('owned')}
-        >
-          My Files
-        </button>
-        <button
-          className={`tab-placeholder ${activeTab === 'members' ? 'active' : ''}`}
-          onClick={() => setActiveTab('members')}
-        >
-          Team Files
-        </button>
-      </div>
+
 
       {/* Drag and Drop Zone */}
       <div
@@ -207,34 +200,54 @@ const FileManager = ({ projectId }) => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <File size={20} color="var(--apex-orange)" />
                 <div>
-                  <div style={{ color: 'white', fontWeight: '600' }}>{file.name}</div>
+                  <div style={{ color: 'white', fontWeight: '600' }}>{file.originalName || file.name}</div>
                   <div style={{ color: '#888', fontSize: '12px' }}>
-                    {file.size} • Uploaded {file.uploadedAt}
+                    {(file.size / 1024).toFixed(2)} KB • {new Date(file.uploadedAt).toLocaleDateString()}
                   </div>
                 </div>
               </div>
-              <button
-                onClick={() => handleDeleteFile(file.id)}
-                style={{
-                  background: 'transparent',
-                  border: '1px solid #ff4444',
-                  color: '#ff4444',
-                  borderRadius: '4px',
-                  padding: '6px 10px',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.background = '#ff4444';
-                  e.target.style.color = 'white';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.background = 'transparent';
-                  e.target.style.color = '#ff4444';
-                }}
-              >
-                <X size={16} />
-              </button>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <a
+                  href={file.path}
+                  download={file.originalName}
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid var(--apex-orange)',
+                    color: 'var(--apex-orange)',
+                    borderRadius: '4px',
+                    padding: '6px 10px',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  <Download size={16} />
+                </a>
+                <button
+                  onClick={() => handleDeleteFile(file.id)}
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid #ff4444',
+                    color: '#ff4444',
+                    borderRadius: '4px',
+                    padding: '6px 10px',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.background = '#ff4444';
+                    e.target.style.color = 'white';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.background = 'transparent';
+                    e.target.style.color = '#ff4444';
+                  }}
+                >
+                  <X size={16} />
+                </button>
+              </div>
             </div>
           ))
         ) : (
@@ -243,7 +256,7 @@ const FileManager = ({ projectId }) => {
             padding: '40px',
             color: '#888'
           }}>
-            {activeTab === 'owned' ? 'No files uploaded yet' : 'No team files yet'}
+            No files uploaded yet. Upload files to get started!
           </div>
         )}
       </div>

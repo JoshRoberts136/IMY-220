@@ -9,19 +9,22 @@ if (!fs.existsSync(projectFilesUploadDir)) {
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const projectId = req.params.id || req.body.projectId;
+    const projectId = req.params.id || req.body.projectId || 'temp';
     const projectDir = path.join(projectFilesUploadDir, projectId);
     
-    if (!fs.existsSync(projectDir)) {
-      fs.mkdirSync(projectDir, { recursive: true });
+    try {
+      if (!fs.existsSync(projectDir)) {
+        fs.mkdirSync(projectDir, { recursive: true });
+      }
+      cb(null, projectDir);
+    } catch (error) {
+      cb(error);
     }
-    
-    cb(null, projectDir);
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now();
-    const originalName = file.originalname;
-    cb(null, `${uniqueSuffix}_${originalName}`);
+    const sanitizedName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+    cb(null, `${uniqueSuffix}_${sanitizedName}`);
   }
 });
 

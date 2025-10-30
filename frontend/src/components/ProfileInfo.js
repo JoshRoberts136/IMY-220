@@ -155,7 +155,9 @@ const ProfileInfo = ({ profileData, isOwnProfile, isFriend, targetUserId, onProj
     return user.id || user._id;
   };
 
-  const showLimitedInfo = !isOwnProfile && !isFriend;
+  const currentUser = apiService.getUser();
+  const isAdmin = currentUser?.isAdmin || false;
+  const showLimitedInfo = !isOwnProfile && !isFriend && !isAdmin;
 
   return (
     <div className="content-section profile-info-section">
@@ -226,6 +228,14 @@ const ProfileInfo = ({ profileData, isOwnProfile, isFriend, targetUserId, onProj
                   Create Project
                 </Button>
               </>
+            ) : isAdmin ? (
+              <Button
+                variant="warning"
+                icon={Edit3}
+                onClick={() => setIsEditingProfile(true)}
+              >
+                Edit User (Admin)
+              </Button>
             ) : (
               friendshipStatus === 'friends' ? (
                 <RemoveFriend
@@ -243,7 +253,7 @@ const ProfileInfo = ({ profileData, isOwnProfile, isFriend, targetUserId, onProj
         </div>
       </div>
 
-      {isOwnProfile && (
+      {(isOwnProfile || isAdmin) && (
         <>
           <EditProfile
             isOpen={isEditingProfile}
@@ -252,11 +262,13 @@ const ProfileInfo = ({ profileData, isOwnProfile, isFriend, targetUserId, onProj
             onSave={handleSaveProfile}
           />
 
-          <CreateProject
-            isOpen={isCreatingProject}
-            onClose={() => setIsCreatingProject(false)}
-            onSave={handleCreateProject}
-          />
+          {isOwnProfile && (
+            <CreateProject
+              isOpen={isCreatingProject}
+              onClose={() => setIsCreatingProject(false)}
+              onSave={handleCreateProject}
+            />
+          )}
         </>
       )}
     </div>

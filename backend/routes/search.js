@@ -1,4 +1,3 @@
-
 const express = require('express');
 const mongoose = require('mongoose');
 const { authenticateToken } = require('../middleware/auth');
@@ -121,7 +120,6 @@ router.get('/', authenticateToken, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Error searching:', error);
     res.status(500).json({
       success: false,
       message: 'Error performing search'
@@ -141,7 +139,6 @@ router.get('/suggestions', authenticateToken, async (req, res) => {
     }
     
     const searchLimit = Math.min(parseInt(limit), 10);
-    
 
     const userSuggestions = await mongoose.connection.db.collection('Users').find({
       username: { $regex: `^${query}`, $options: 'i' },
@@ -177,7 +174,6 @@ router.get('/suggestions', authenticateToken, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Error getting search suggestions:', error);
     res.status(500).json({
       success: false,
       message: 'Error getting search suggestions'

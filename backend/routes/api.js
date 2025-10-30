@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { authenticateToken } = require('../middleware/auth');
+const adminRoutes = require('./admin');
 const router = express.Router();
 
 
@@ -130,5 +131,8 @@ router.put('/users/:id', authenticateToken, async (req, res) => {
     });
   }
 });
+
+// Admin routes
+router.use('/admin', adminRoutes);
 
 module.exports = router;

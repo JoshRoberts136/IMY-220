@@ -149,17 +149,9 @@ function EditProject({ isOpen, onClose, project, onSave }) {
 
   return createPortal(
     <div 
-      className="fixed top-0 left-0 right-0 bottom-0 bg-black/80 flex items-center justify-center backdrop-blur-sm z-[9999]"
+      style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, overflow: 'hidden' }}
+      className="bg-black/80 backdrop-blur-sm"
       onClick={onClose}
-      style={{ 
-        position: 'fixed',
-        inset: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999,
-        overflow: 'hidden'
-      }}
     >
       <div
         className="bg-[rgba(10,10,10,0.95)] border-2 border-apex-orange rounded-xl w-[90%] max-w-[500px] shadow-[0_0_50px_rgba(139,0,0,0.3)] relative"

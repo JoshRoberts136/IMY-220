@@ -14,7 +14,8 @@ const Modal = ({
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 bottom-0 bg-black/80 flex items-center justify-center backdrop-blur-sm z-[9999]"
+      style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}
+      className="bg-black/80 backdrop-blur-sm"
       onClick={onClose}
     >
       <div

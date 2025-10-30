@@ -73,7 +73,6 @@ router.post('/', authenticateToken, async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error creating commit:', error);
     res.status(500).json({
       success: false,
       message: 'Error creating commit'
@@ -109,7 +108,6 @@ router.get('/project/:projectId', authenticateToken, async (req, res) => {
       commits: commitsWithUsers
     });
   } catch (error) {
-    console.error('Error fetching commits:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching commits'
@@ -151,7 +149,6 @@ router.get('/user/:userId', authenticateToken, async (req, res) => {
       commits: commitsWithProjects
     });
   } catch (error) {
-    console.error('Error fetching user commits:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching user commits'

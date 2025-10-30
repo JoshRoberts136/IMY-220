@@ -154,10 +154,24 @@ class ApiService {
   }
 
   async checkinProject(id, checkinData) {
-    return this.request(`/projects/${id}/checkin`, {
+    const formData = new FormData();
+    formData.append('message', checkinData.message || '');
+    formData.append('version', checkinData.version || '1.0.0');
+    
+    const token = this.getToken();
+    const response = await fetch(`${this.baseURL}/projects/${id}/checkin`, {
       method: 'POST',
-      body: JSON.stringify(checkinData),
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
     });
+    
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to check in project');
+    }
+    return data;
   }
 
   async getProjectActivity(id, filters = {}) {

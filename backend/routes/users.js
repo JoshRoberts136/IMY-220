@@ -1,47 +1,18 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { authenticateToken } = require('../middleware/auth');
-const path = require('path');
-const fs = require('fs');
-const multer = require('multer');
+const { uploadProfileImage } = require('../middleware/upload');
 const router = express.Router();
 
-// Configure multer inline for this specific route
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const uploadDir = path.join(__dirname, '../uploads/profile-images');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now();
-    const ext = path.extname(file.originalname);
-    // Use the userId from params instead of req.user
-    cb(null, `${req.params.userId}_${uniqueSuffix}${ext}`);
+const requireAdmin = (req, res, next) => {
+  if (!req.user.isAdmin) {
+    return res.status(403).json({
+      success: false,
+      message: 'Admin access required'
+    });
   }
-});
-
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|gif|webp/;
-  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = allowedTypes.test(file.mimetype);
-
-  if (mimetype && extname) {
-    return cb(null, true);
-  } else {
-    cb(new Error('Only image files are allowed!'));
-  }
+  next();
 };
-
-const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB
-  },
-  fileFilter: fileFilter
-});
 
 router.get('/', authenticateToken, async (req, res) => {
   try {
@@ -52,7 +23,8 @@ router.get('/', authenticateToken, async (req, res) => {
         username: 1,
         email: 1,
         profile: 1,
-        isActive: 1
+        isActive: 1,
+        isAdmin: 1
       })
       .toArray();
     
@@ -61,7 +33,6 @@ router.get('/', authenticateToken, async (req, res) => {
       users: users
     });
   } catch (error) {
-    console.error('Error fetching users:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching users'
@@ -89,12 +60,12 @@ router.get('/:userId', authenticateToken, async (req, res) => {
       email: user.email,
       profile: user.profile,
       isActive: user.isActive,
+      isAdmin: user.isAdmin || false,
       friends: user.friends || [],
       ownedProjects: user.ownedProjects || [],
       memberProjects: user.memberProjects || []
     });
   } catch (error) {
-    console.error('Error fetching user:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching user'
@@ -122,11 +93,11 @@ router.get('/:userId/profile', authenticateToken, async (req, res) => {
         username: user.username,
         email: user.email,
         profile: user.profile,
-        isActive: user.isActive
+        isActive: user.isActive,
+        isAdmin: user.isAdmin || false
       }
     });
   } catch (error) {
-    console.error('Error fetching user profile:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching user profile'
@@ -134,65 +105,48 @@ router.get('/:userId/profile', authenticateToken, async (req, res) => {
   }
 });
 
-// Upload profile image - AUTH FIRST, THEN MULTER
-router.post('/:userId/profile/avatar', authenticateToken, (req, res, next) => {
-  console.log('=== AVATAR UPLOAD START ===');
-  console.log('URL userId:', req.params.userId);
-  console.log('req.user.id:', req.user?.id);
-  
-  // Check authorization BEFORE multer processes the file
+router.post('/:userId/profile/avatar', authenticateToken, uploadProfileImage.single('avatar'), async (req, res) => {
   const userId = req.params.userId;
   const currentUserId = req.user.id || (req.user._id ? req.user._id.toString() : null);
+  const isAdmin = req.user.isAdmin || false;
   
-  if (currentUserId !== userId) {
-    console.log('AUTHORIZATION FAILED:', currentUserId, 'vs', userId);
+  if (currentUserId !== userId && !isAdmin) {
     return res.status(403).json({
       success: false,
       message: 'You can only update your own profile picture'
     });
   }
-  
-  console.log('Authorization passed, processing upload...');
-  next();
-}, upload.single('avatar'), async (req, res) => {
   try {
     const userId = req.params.userId;
+    const fs = require('fs');
+    const path = require('path');
     
     if (!req.file) {
-      console.log('ERROR: No file uploaded');
       return res.status(400).json({
         success: false,
         message: 'No file uploaded'
       });
     }
     
-    console.log('File uploaded:', req.file.filename);
-    
-    // Get the user's current avatar to delete old file
     const user = await mongoose.connection.db.collection('Users').findOne({ id: userId });
     
     if (!user) {
       fs.unlinkSync(req.file.path);
-      console.log('ERROR: User not found');
       return res.status(404).json({
         success: false,
         message: 'User not found'
       });
     }
     
-    // Delete old avatar file if it exists
     if (user.profile && user.profile.avatar) {
       const oldAvatarPath = path.join(__dirname, '../uploads/profile-images', path.basename(user.profile.avatar));
       if (fs.existsSync(oldAvatarPath)) {
         fs.unlinkSync(oldAvatarPath);
-        console.log('Deleted old avatar');
       }
     }
     
-    // Create the avatar path
     const avatarPath = `/uploads/profile-images/${req.file.filename}`;
     
-    // Update database
     await mongoose.connection.db.collection('Users').updateOne(
       { id: userId },
       { 
@@ -203,8 +157,6 @@ router.post('/:userId/profile/avatar', authenticateToken, (req, res, next) => {
       }
     );
     
-    console.log('SUCCESS: Avatar updated to', avatarPath);
-    
     res.json({
       success: true,
       message: 'Profile picture updated successfully',
@@ -212,9 +164,8 @@ router.post('/:userId/profile/avatar', authenticateToken, (req, res, next) => {
     });
     
   } catch (error) {
-    console.error('Error uploading profile picture:', error);
-    
     if (req.file) {
+      const fs = require('fs');
       fs.unlinkSync(req.file.path);
     }
     
@@ -225,13 +176,13 @@ router.post('/:userId/profile/avatar', authenticateToken, (req, res, next) => {
   }
 });
 
-// Delete profile image
 router.delete('/:userId/profile/avatar', authenticateToken, async (req, res) => {
   try {
     const userId = req.params.userId;
     const currentUserId = req.user.id || (req.user._id ? req.user._id.toString() : null);
+    const isAdmin = req.user.isAdmin || false;
     
-    if (currentUserId !== userId) {
+    if (currentUserId !== userId && !isAdmin) {
       return res.status(403).json({
         success: false,
         message: 'You can only delete your own profile picture'
@@ -247,15 +198,15 @@ router.delete('/:userId/profile/avatar', authenticateToken, async (req, res) => 
       });
     }
     
-    // Delete avatar file if it exists
     if (user.profile && user.profile.avatar) {
+      const path = require('path');
+      const fs = require('fs');
       const avatarPath = path.join(__dirname, '../uploads/profile-images', path.basename(user.profile.avatar));
       if (fs.existsSync(avatarPath)) {
         fs.unlinkSync(avatarPath);
       }
     }
     
-    // Remove from database
     await mongoose.connection.db.collection('Users').updateOne(
       { id: userId },
       { 
@@ -272,10 +223,114 @@ router.delete('/:userId/profile/avatar', authenticateToken, async (req, res) => 
     });
     
   } catch (error) {
-    console.error('Error deleting profile picture:', error);
     res.status(500).json({
       success: false,
       message: 'Error deleting profile picture'
+    });
+  }
+});
+
+router.put('/:userId', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const updateData = req.body;
+    
+    delete updateData._id;
+    delete updateData.id;
+    delete updateData.password;
+    
+    await mongoose.connection.db.collection('Users').updateOne(
+      { id: userId },
+      { 
+        $set: {
+          ...updateData,
+          updatedAt: new Date()
+        }
+      }
+    );
+    
+    res.json({
+      success: true,
+      message: 'User updated successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error updating user'
+    });
+  }
+});
+
+router.delete('/:userId', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    
+    const user = await mongoose.connection.db.collection('Users').findOne({ id: userId });
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    if (user.ownedProjects && user.ownedProjects.length > 0) {
+      for (const projectId of user.ownedProjects) {
+        const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+        
+        if (project) {
+          const otherMembers = (project.members || []).filter(memberId => memberId !== userId);
+          
+          if (otherMembers.length > 0) {
+            const randomMember = otherMembers[Math.floor(Math.random() * otherMembers.length)];
+            
+            await mongoose.connection.db.collection('Projects').updateOne(
+              { id: projectId },
+              { 
+                $set: { 
+                  ownedBy: randomMember,
+                  updatedAt: new Date().toISOString()
+                }
+              }
+            );
+          } else {
+            await mongoose.connection.db.collection('Projects').deleteOne({ id: projectId });
+          }
+        }
+      }
+    }
+
+    if (user.memberProjects && user.memberProjects.length > 0) {
+      await mongoose.connection.db.collection('Projects').updateMany(
+        { id: { $in: user.memberProjects } },
+        { $pull: { members: userId } }
+      );
+    }
+    
+    await mongoose.connection.db.collection('Commits').deleteMany({ userId: userId });
+
+    await mongoose.connection.db.collection('Users').updateMany(
+      { friends: userId },
+      { $pull: { friends: userId } }
+    );
+
+    await mongoose.connection.db.collection('FriendRequests').deleteMany({
+      $or: [
+        { senderId: userId },
+        { receiverId: userId }
+      ]
+    });
+
+    await mongoose.connection.db.collection('Users').deleteOne({ id: userId });
+    
+    res.json({
+      success: true,
+      message: 'User deleted successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting user'
     });
   }
 });

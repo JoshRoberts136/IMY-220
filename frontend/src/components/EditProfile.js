@@ -20,7 +20,13 @@ const EditProfile = ({ isOpen, onClose, user, onSave }) => {
   useEffect(() => {
     if (isOpen) {
       fetchUserProfile();
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
     }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
   }, [isOpen]);
 
   const fetchUserProfile = () => {
@@ -85,7 +91,8 @@ const EditProfile = ({ isOpen, onClose, user, onSave }) => {
 
   return createPortal(
     <div 
-      className="fixed top-0 left-0 right-0 bottom-0 bg-black/80 flex items-center justify-center backdrop-blur-sm z-[9999]"
+      style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}
+      className="bg-black/80 backdrop-blur-sm"
       onClick={onClose}
     >
       <div

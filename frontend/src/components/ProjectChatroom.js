@@ -9,8 +9,41 @@ const ProjectChatroom = ({ projectId, isMember }) => {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
-  const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
   const currentUser = apiService.getUser();
+
+  const deleteMessage = async (messageId) => {
+    if (!currentUser?.isAdmin) return;
+    if (!confirm('Delete this message?')) return;
+    
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(`/api/projects/${projectId}/messages/${messageId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setMessages(prev => prev.filter(msg => (msg.id || msg._id) !== messageId));
+      } else {
+        alert(data.message || 'Failed to delete message');
+      }
+    } catch (error) {
+      console.error('Error deleting message:', error);
+      alert('Failed to delete message');
+    }
+  };
+
+  const scrollToBottom = () => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
+  };
 
   useEffect(() => {
     if (projectId) {
@@ -20,6 +53,10 @@ const ProjectChatroom = ({ projectId, isMember }) => {
     }
   }, [projectId]);
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   const fetchMessages = async () => {
     try {
       const response = await apiService.getProjectMessages(projectId);
@@ -27,7 +64,6 @@ const ProjectChatroom = ({ projectId, isMember }) => {
         setMessages(response.messages || []);
       }
     } catch (error) {
-      console.error('Error fetching messages:', error);
     } finally {
       setLoading(false);
     }
@@ -47,7 +83,6 @@ const ProjectChatroom = ({ projectId, isMember }) => {
         fetchMessages();
       }
     } catch (error) {
-      console.error('Error sending message:', error);
       alert('Failed to send message');
     } finally {
       setSending(false);
@@ -95,6 +130,7 @@ const ProjectChatroom = ({ projectId, isMember }) => {
       </div>
 
       <div 
+        ref={messagesContainerRef}
         className="chatroom-messages" 
         style={{
           height: '400px',
@@ -108,8 +144,10 @@ const ProjectChatroom = ({ projectId, isMember }) => {
           marginBottom: '16px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '12px'
+          gap: '12px',
+          scrollBehavior: 'smooth'
         }}
+        onScroll={(e) => e.stopPropagation()}
       >
         {loading ? (
           <div style={{ textAlign: 'center', color: '#888', padding: '20px' }}>
@@ -120,73 +158,95 @@ const ProjectChatroom = ({ projectId, isMember }) => {
             No messages yet. Start the conversation!
           </div>
         ) : (
-          <>
-            {messages.map((msg, index) => {
-              const isOwnMessage = msg.userId === currentUser?.id;
-              return (
-                <div
-                  key={msg.id || index}
-                  style={{
-                    display: 'flex',
-                    gap: '12px',
-                    alignItems: 'flex-start',
-                    flexDirection: isOwnMessage ? 'row-reverse' : 'row',
-                    flexShrink: 0
-                  }}
-                >
+          messages.map((msg, index) => {
+            const isOwnMessage = msg.userId === currentUser?.id;
+            return (
+              <div
+                key={msg.id || index}
+                style={{
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  flexDirection: isOwnMessage ? 'row-reverse' : 'row',
+                  flexShrink: 0
+                }}
+              >
+                <div style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  overflow: 'hidden',
+                  flexShrink: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'rgba(139, 0, 0, 0.2)',
+                  border: '2px solid var(--apex-orange)'
+                }}>
+                  {renderAvatar(msg.avatar)}
+                </div>
+                
+                <div style={{
+                  maxWidth: '70%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: isOwnMessage ? 'flex-end' : 'flex-start'
+                }}>
                   <div style={{
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    overflow: 'hidden',
-                    flexShrink: 0,
+                    fontSize: '12px',
+                    color: '#888',
+                    marginBottom: '4px',
                     display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: 'rgba(139, 0, 0, 0.2)',
-                    border: '2px solid var(--apex-orange)'
+                    gap: '8px',
+                    alignItems: 'center'
                   }}>
-                    {renderAvatar(msg.avatar)}
+                    <span style={{ color: 'var(--apex-orange)', fontWeight: '600' }}>
+                      {msg.username}
+                    </span>
+                    <span>{formatTime(msg.timestamp)}</span>
                   </div>
                   
                   <div style={{
-                    maxWidth: '70%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: isOwnMessage ? 'flex-end' : 'flex-start'
+                    padding: '12px 16px',
+                    borderRadius: '12px',
+                    background: isOwnMessage 
+                      ? 'linear-gradient(135deg, rgba(139, 0, 0, 0.3), rgba(139, 0, 0, 0.1))'
+                      : 'rgba(45, 55, 72, 0.5)',
+                    border: `1px solid ${isOwnMessage ? 'var(--apex-orange)' : '#333'}`,
+                    color: 'white',
+                    wordWrap: 'break-word',
+                    position: 'relative'
                   }}>
-                    <div style={{
-                      fontSize: '12px',
-                      color: '#888',
-                      marginBottom: '4px',
-                      display: 'flex',
-                      gap: '8px',
-                      alignItems: 'center'
-                    }}>
-                      <span style={{ color: 'var(--apex-orange)', fontWeight: '600' }}>
-                        {msg.username}
-                      </span>
-                      <span>{formatTime(msg.timestamp)}</span>
-                    </div>
-                    
-                    <div style={{
-                      padding: '12px 16px',
-                      borderRadius: '12px',
-                      background: isOwnMessage 
-                        ? 'linear-gradient(135deg, rgba(139, 0, 0, 0.3), rgba(139, 0, 0, 0.1))'
-                        : 'rgba(45, 55, 72, 0.5)',
-                      border: `1px solid ${isOwnMessage ? 'var(--apex-orange)' : '#333'}`,
-                      color: 'white',
-                      wordWrap: 'break-word'
-                    }}>
-                      {msg.message}
-                    </div>
+                    {msg.message}
+                    {currentUser?.isAdmin && (
+                      <button
+                        onClick={() => deleteMessage(msg.id || msg._id)}
+                        style={{
+                          position: 'absolute',
+                          top: '-8px',
+                          right: '-8px',
+                          width: '20px',
+                          height: '20px',
+                          borderRadius: '50%',
+                          background: '#dc2626',
+                          color: 'white',
+                          border: 'none',
+                          fontSize: '12px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                        title="Delete message (Admin)"
+                      >
+                        ×
+                      </button>
+                    )}
                   </div>
                 </div>
-              );
-            })}
-            <div ref={messagesEndRef} />
-          </>
+              </div>
+            );
+          })
         )}
       </div>
 

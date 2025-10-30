@@ -118,8 +118,10 @@ const Profile = ({ userId }) => {
     );
   }
 
-  // If not own profile AND not friends, show limited view
-  const showLimitedView = !isOwnProfile && !isFriend;
+  // If not own profile AND not friends AND not admin, show limited view
+  const currentUser = apiService.getUser();
+  const isAdmin = currentUser?.isAdmin || false;
+  const showLimitedView = !isOwnProfile && !isFriend && !isAdmin;
 
   return (
     <PageContainer>

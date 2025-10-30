@@ -21,9 +21,7 @@ router.get('/local', authenticateToken, async (req, res) => {
       friendIds = friendships.map(friendship => 
         friendship.userId1 === userId.toString() ? friendship.userId2 : friendship.userId1
       );
-    } catch (friendError) {
-      console.log('No friendships collection or error:', friendError.message);
-    }
+    } catch (friendError) {}
     
     const userIds = [userId.toString(), ...friendIds];
     let activitiesFromDb = [];
@@ -35,9 +33,7 @@ router.get('/local', authenticateToken, async (req, res) => {
       .skip(skip)
       .limit(limit)
       .toArray();
-    } catch (activityError) {
-      console.log('No activities collection or error:', activityError.message);
-    }
+    } catch (activityError) {}
 
     if (activitiesFromDb.length > 0) {
       activitiesWithUserInfo = await Promise.all(activitiesFromDb.map(async (activity) => {
@@ -46,9 +42,7 @@ router.get('/local', authenticateToken, async (req, res) => {
           user = await mongoose.connection.db.collection('Users').findOne({
             _id: new mongoose.Types.ObjectId(activity.userId)
           });
-        } catch (userError) {
-          console.log('Error fetching user for activity:', userError.message);
-        }
+        } catch (userError) {}
         
         return {
           ...activity,
@@ -66,7 +60,6 @@ router.get('/local', authenticateToken, async (req, res) => {
       activities: activitiesWithUserInfo
     });
   } catch (error) {
-    console.error('Error fetching local activity feed:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching local activity feed'
@@ -88,9 +81,7 @@ router.get('/global', authenticateToken, async (req, res) => {
       .skip(skip)
       .limit(limit)
       .toArray();
-    } catch (activityError) {
-      console.log('No activities collection or error:', activityError.message);
-    }
+    } catch (activityError) {}
 
     if (activitiesFromDb.length > 0) {
       activitiesWithUserInfo = await Promise.all(activitiesFromDb.map(async (activity) => {
@@ -99,9 +90,7 @@ router.get('/global', authenticateToken, async (req, res) => {
           user = await mongoose.connection.db.collection('Users').findOne({
             _id: new mongoose.Types.ObjectId(activity.userId)
           });
-        } catch (userError) {
-          console.log('Error fetching user for activity:', userError.message);
-        }
+        } catch (userError) {}
         
         return {
           ...activity,
@@ -119,7 +108,6 @@ router.get('/global', authenticateToken, async (req, res) => {
       activities: activitiesWithUserInfo
     });
   } catch (error) {
-    console.error('Error fetching global activity feed:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching global activity feed'
@@ -142,7 +130,6 @@ const createActivity = async (userId, type, description, data = {}) => {
     await mongoose.connection.db.collection('Activities').insertOne(activity);
     return activity;
   } catch (error) {
-    console.error('Error creating activity:', error);
     return null;
   }
 };
@@ -173,7 +160,6 @@ router.post('/', authenticateToken, async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error creating activity:', error);
     res.status(500).json({
       success: false,
       message: 'Error creating activity'

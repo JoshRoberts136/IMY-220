@@ -50,8 +50,9 @@ const ProjectCard = () => {
       
       if (response.success) {
         const currentUser = apiService.getUser();
-        const isProjectOwner = response.ownedBy === currentUser?.id;
-        const isProjectMember = response.members?.includes(currentUser?.id);
+        const isAdmin = currentUser?.isAdmin || false;
+        const isProjectOwner = response.ownedBy === currentUser?.id || isAdmin;
+        const isProjectMember = response.members?.includes(currentUser?.id) || isAdmin;
         setIsOwner(isProjectOwner);
         setIsMember(isProjectMember);
         
@@ -280,7 +281,9 @@ const ProjectCard = () => {
     );
   }
 
-  const canEdit = isOwner && !project.checkedOutBy;
+  const currentUser = apiService.getUser();
+  const isAdmin = currentUser?.isAdmin || false;
+  const canEdit = (isOwner && !project.checkedOutBy) || isAdmin;
 
   return (
     <PageContainer>
@@ -313,18 +316,20 @@ const ProjectCard = () => {
                   variant="warning"
                   icon={Edit3}
                   onClick={handleEditProject}
-                  disabled={!!project.checkedOutBy}
-                  title={project.checkedOutBy ? 'Cannot edit while project is checked out' : 'Edit project'}
+                  disabled={!isAdmin && !!project.checkedOutBy}
+                  title={project.checkedOutBy && !isAdmin ? 'Cannot edit while project is checked out' : isAdmin ? 'Edit Project (Admin)' : 'Edit project'}
                 >
-                  Edit Project
+                  {isAdmin ? 'Edit Project (Admin)' : 'Edit Project'}
                 </Button>
-                <Button
-                  variant="secondary"
-                  icon={Crown}
-                  onClick={() => setIsTransferOwnershipOpen(true)}
-                >
-                  Transfer Ownership
-                </Button>
+                {!isAdmin && (
+                  <Button
+                    variant="secondary"
+                    icon={Crown}
+                    onClick={() => setIsTransferOwnershipOpen(true)}
+                  >
+                    Transfer Ownership
+                  </Button>
+                )}
               </div>
             )}
           </div>
@@ -372,7 +377,7 @@ const ProjectCard = () => {
           ) : (
             <div className="text-gray-400">No members yet</div>
           )}
-          {isMember && (
+          {isMember && !isAdmin && (
             <Button 
               variant="secondary"
               onClick={() => setIsAddMemberModalOpen(true)}

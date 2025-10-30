@@ -13,6 +13,7 @@ const userSchema = new Schema({
   },
   email: { type: String, required: true, unique: true },
   isActive: { type: Boolean, default: true },
+  isAdmin: { type: Boolean, default: false },
   password: { type: String, required: true },
   updatedAt: { type: Date, default: Date.now },
   lastLogin: { type: Date, default: Date.now },

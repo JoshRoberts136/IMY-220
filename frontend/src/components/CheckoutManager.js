@@ -58,12 +58,12 @@ const CheckoutManager = ({ project, isMember, onStatusChange }) => {
       });
       
       if (response.success) {
-        alert('Project checked in successfully!');
         setCheckinMessage('');
         setShowCheckinForm(false);
         if (onStatusChange) {
-          onStatusChange();
+          await onStatusChange();
         }
+        alert('Project checked in successfully!');
       } else {
         alert(response.message || 'Failed to checkin project');
       }

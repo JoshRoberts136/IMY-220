@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { authenticateToken } = require('../middleware/auth');
-const uploadProjectFiles = require('../config/projectFilesMulter');
+const { uploadProjectFiles } = require('../middleware/upload');
 const path = require('path');
 const fs = require('fs');
 const router = express.Router();
@@ -10,15 +10,11 @@ router.get('/user-commits/:userId', authenticateToken, async (req, res) => {
   try {
     const userId = req.params.userId;
     
-    console.log('Fetching commits for user:', userId);
-    
     const commits = await mongoose.connection.db.collection('Commits')
       .find({ userId: userId })
       .sort({ timestamp: -1 })
       .limit(10)
       .toArray();
-    
-    console.log('Found commits:', commits.length);
     
     const commitsWithProjects = await Promise.all(
       commits.map(async (commit) => {
@@ -32,14 +28,11 @@ router.get('/user-commits/:userId', authenticateToken, async (req, res) => {
       })
     );
     
-    console.log('Commits with projects:', commitsWithProjects);
-    
     res.json({
       success: true,
       commits: commitsWithProjects
     });
   } catch (error) {
-    console.error('Error fetching user commits:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching user commits'
@@ -51,14 +44,10 @@ router.get('/project-commits/:projectId', authenticateToken, async (req, res) =>
   try {
     const projectId = req.params.projectId;
     
-    console.log('Fetching commits for project:', projectId);
-    
     const commits = await mongoose.connection.db.collection('Commits')
       .find({ projectId: projectId })
       .sort({ timestamp: -1 })
       .toArray();
-    
-    console.log('Found commits:', commits.length);
     
     const commitsWithUsers = await Promise.all(
       commits.map(async (commit) => {
@@ -78,7 +67,6 @@ router.get('/project-commits/:projectId', authenticateToken, async (req, res) =>
       commits: commitsWithUsers
     });
   } catch (error) {
-    console.error('Error fetching project commits:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching project commits'
@@ -105,7 +93,6 @@ router.get('/', authenticateToken, async (req, res) => {
       projects: projectsWithOwners
     });
   } catch (error) {
-    console.error('Error fetching projects:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching projects'
@@ -116,6 +103,8 @@ router.get('/', authenticateToken, async (req, res) => {
 router.get('/:id', authenticateToken, async (req, res) => {
   try {
     const projectId = req.params.id;
+    const user = req.user;
+    const userId = user.id || user._id;
     
     let project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
     
@@ -136,6 +125,12 @@ router.get('/:id', authenticateToken, async (req, res) => {
       id: project.ownedBy
     });
     
+    const members = project.members || [];
+    const isMember = members.includes(userId);
+    const isCheckedOut = !!project.checkedOutBy;
+    const isCheckedOutByCurrentUser = project.checkedOutBy === userId;
+    const canEdit = isMember && (!isCheckedOut || isCheckedOutByCurrentUser);
+    
     res.json({
       success: true,
       id: project.id || project._id,
@@ -144,21 +139,25 @@ router.get('/:id', authenticateToken, async (req, res) => {
       status: project.status,
       language: project.language,
       ownedBy: project.ownedBy,
-      members: project.members || [],
+      members: members,
       hashtags: project.hashtags || [],
       stars: project.stars || 0,
       forks: project.forks || 0,
       commits: project.commits || [],
       messages: project.messages || [],
+      files: project.files || [],
       checkedOutBy: project.checkedOutBy || null,
       checkedOutAt: project.checkedOutAt || null,
       lastUpdated: project.lastUpdated,
       createdAt: project.createdAt,
       ownerName: owner ? owner.username : 'Unknown',
-      ownerAvatar: owner ? (owner.profile?.avatar || '👤') : '👤'
+      ownerAvatar: owner ? (owner.profile?.avatar || '👤') : '👤',
+      isMember: isMember,
+      canEdit: canEdit,
+      isCheckedOut: isCheckedOut,
+      isCheckedOutByCurrentUser: isCheckedOutByCurrentUser
     });
   } catch (error) {
-    console.error('Error fetching project:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching project'
@@ -185,6 +184,7 @@ router.post('/', authenticateToken, async (req, res) => {
       forks: 0,
       commits: [],
       messages: [],
+      files: [],
       lastUpdated: new Date().toISOString(),
       createdAt: new Date().toISOString()
     };
@@ -197,7 +197,6 @@ router.post('/', authenticateToken, async (req, res) => {
       ...newProject
     });
   } catch (error) {
-    console.error('Error creating project:', error);
     res.status(500).json({
       success: false,
       message: 'Error creating project'
@@ -211,6 +210,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
     const updateData = req.body;
     const user = req.user;
     const userId = user.id || user._id;
+    const isAdmin = user.isAdmin || false;
     
     const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
     if (!project) {
@@ -220,7 +220,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
       });
     }
     
-    if (project.ownedBy !== userId) {
+    if (project.ownedBy !== userId && !isAdmin) {
       return res.status(403).json({
         success: false,
         message: 'You can only update your own projects'
@@ -248,7 +248,6 @@ router.put('/:id', authenticateToken, async (req, res) => {
       ...result.value
     });
   } catch (error) {
-    console.error('Error updating project:', error);
     res.status(500).json({
       success: false,
       message: 'Error updating project'
@@ -261,6 +260,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     const projectId = req.params.id;
     const user = req.user;
     const userId = user.id || user._id;
+    const isAdmin = user.isAdmin || false;
     
     const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
     if (!project) {
@@ -270,7 +270,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
       });
     }
     
-    if (project.ownedBy !== userId) {
+    if (project.ownedBy !== userId && !isAdmin) {
       return res.status(403).json({
         success: false,
         message: 'You can only delete your own projects'
@@ -284,7 +284,6 @@ router.delete('/:id', authenticateToken, async (req, res) => {
       message: 'Project deleted successfully'
     });
   } catch (error) {
-    console.error('Error deleting project:', error);
     res.status(500).json({
       success: false,
       message: 'Error deleting project'
@@ -298,8 +297,7 @@ router.post('/:id/members', authenticateToken, async (req, res) => {
     const { userId: newMemberId } = req.body;
     const user = req.user;
     const userId = user.id || user._id;
-    
-    console.log('Adding member to project:', { projectId, newMemberId, requesterId: userId });
+    const isAdmin = user.isAdmin || false;
     
     const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
     if (!project) {
@@ -310,7 +308,7 @@ router.post('/:id/members', authenticateToken, async (req, res) => {
     }
     
     const members = project.members || [];
-    if (!members.includes(userId) && project.ownedBy !== userId) {
+    if (!members.includes(userId) && project.ownedBy !== userId && !isAdmin) {
       return res.status(403).json({
         success: false,
         message: 'Only project members can add other members'
@@ -325,14 +323,10 @@ router.post('/:id/members', authenticateToken, async (req, res) => {
       });
     }
     
-    const friendsResponse = await mongoose.connection.db.collection('Friends').findOne({
-      $or: [
-        { userId: userId, friendId: newMemberId, status: 'accepted' },
-        { userId: newMemberId, friendId: userId, status: 'accepted' }
-      ]
-    });
+    const currentUserData = await mongoose.connection.db.collection('Users').findOne({ id: userId });
+    const currentUserFriends = currentUserData?.friends || [];
     
-    if (!friendsResponse) {
+    if (!currentUserFriends.includes(newMemberId)) {
       return res.status(403).json({
         success: false,
         message: 'You can only add friends to projects'
@@ -354,14 +348,11 @@ router.post('/:id/members', authenticateToken, async (req, res) => {
       }
     );
     
-    console.log('Member added successfully');
-    
     res.json({
       success: true,
       message: 'Member added successfully'
     });
   } catch (error) {
-    console.error('Error adding member:', error);
     res.status(500).json({
       success: false,
       message: 'Error adding member'
@@ -375,8 +366,7 @@ router.delete('/:id/members/:memberId', authenticateToken, async (req, res) => {
     const memberIdToRemove = req.params.memberId;
     const user = req.user;
     const userId = user.id || user._id;
-    
-    console.log('Removing member from project:', { projectId, memberIdToRemove, requesterId: userId });
+    const isAdmin = user.isAdmin || false;
     
     const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
     if (!project) {
@@ -386,7 +376,7 @@ router.delete('/:id/members/:memberId', authenticateToken, async (req, res) => {
       });
     }
     
-    if (project.ownedBy !== userId) {
+    if (project.ownedBy !== userId && !isAdmin) {
       return res.status(403).json({
         success: false,
         message: 'Only the project owner can remove members'
@@ -408,14 +398,11 @@ router.delete('/:id/members/:memberId', authenticateToken, async (req, res) => {
       }
     );
     
-    console.log('Member removed successfully');
-    
     res.json({
       success: true,
       message: 'Member removed successfully'
     });
   } catch (error) {
-    console.error('Error removing member:', error);
     res.status(500).json({
       success: false,
       message: 'Error removing member'
@@ -429,8 +416,6 @@ router.post('/:id/transfer-ownership', authenticateToken, async (req, res) => {
     const { newOwnerId } = req.body;
     const user = req.user;
     const userId = user.id || user._id;
-    
-    console.log('Transferring ownership:', { projectId, newOwnerId, currentOwnerId: userId });
     
     const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
     if (!project) {
@@ -470,7 +455,6 @@ router.post('/:id/transfer-ownership', authenticateToken, async (req, res) => {
       message: 'Ownership transferred successfully'
     });
   } catch (error) {
-    console.error('Error transferring ownership:', error);
     res.status(500).json({
       success: false,
       message: 'Error transferring ownership'
@@ -483,6 +467,7 @@ router.post('/:id/checkout', authenticateToken, async (req, res) => {
     const projectId = req.params.id;
     const user = req.user;
     const userId = user.id || user._id;
+    const isAdmin = user.isAdmin || false;
     
     const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
     if (!project) {
@@ -493,17 +478,20 @@ router.post('/:id/checkout', authenticateToken, async (req, res) => {
     }
     
     const members = project.members || [];
-    if (!members.includes(userId)) {
+    if (!members.includes(userId) && !isAdmin) {
       return res.status(403).json({
         success: false,
         message: 'Only project members can checkout'
       });
     }
     
-    if (project.checkedOutBy) {
+    if (project.checkedOutBy && project.checkedOutBy !== userId) {
+      const checkedOutUser = await mongoose.connection.db.collection('Users').findOne({
+        id: project.checkedOutBy
+      });
       return res.status(400).json({
         success: false,
-        message: 'Project is already checked out by another user'
+        message: `Project is already checked out by ${checkedOutUser?.username || 'another user'}`
       });
     }
     
@@ -524,7 +512,6 @@ router.post('/:id/checkout', authenticateToken, async (req, res) => {
       checkedOutBy: userId
     });
   } catch (error) {
-    console.error('Error checking out project:', error);
     res.status(500).json({
       success: false,
       message: 'Error checking out project'
@@ -532,7 +519,7 @@ router.post('/:id/checkout', authenticateToken, async (req, res) => {
   }
 });
 
-router.post('/:id/checkin', authenticateToken, async (req, res) => {
+router.post('/:id/checkin', authenticateToken, uploadProjectFiles.array('files', 10), async (req, res) => {
   try {
     const projectId = req.params.id;
     const { message, version } = req.body;
@@ -554,19 +541,45 @@ router.post('/:id/checkin', authenticateToken, async (req, res) => {
       });
     }
     
+    let uploadedFiles = [];
+    if (req.files && req.files.length > 0) {
+      uploadedFiles = req.files.map(file => ({
+        id: `file_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        originalName: file.originalname,
+        filename: file.filename,
+        path: `/uploads/project-files/${projectId}/${file.filename}`,
+        size: file.size,
+        mimetype: file.mimetype,
+        uploadedBy: userId,
+        uploadedAt: new Date().toISOString()
+      }));
+    }
+    
+    const updateData = { 
+      $unset: { 
+        checkedOutBy: '',
+        checkedOutAt: ''
+      },
+      $set: {
+        version: version || project.version || '1.0.0',
+        lastUpdated: new Date().toISOString()
+      }
+    };
+    
+    if (uploadedFiles.length > 0) {
+      updateData.$push = { files: { $each: uploadedFiles } };
+    }
+    
     await mongoose.connection.db.collection('Projects').updateOne(
       { id: projectId },
-      { 
-        $unset: { 
-          checkedOutBy: '',
-          checkedOutAt: ''
-        },
-        $set: {
-          version: version || project.version || '1.0.0',
-          lastUpdated: new Date().toISOString()
-        }
-      }
+      updateData
     );
+    
+    const crypto = require('crypto');
+    const commitHash = crypto.createHash('sha256')
+      .update(`${projectId}${userId}${Date.now()}${message}`)
+      .digest('hex')
+      .substring(0, 40);
     
     const commit = {
       id: `commit_${Date.now()}`,
@@ -574,7 +587,9 @@ router.post('/:id/checkin', authenticateToken, async (req, res) => {
       userId: userId,
       author: user.username,
       message: message || 'No message provided',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      filesChanged: uploadedFiles.length,
+      hash: commitHash
     };
     
     await mongoose.connection.db.collection('Commits').insertOne(commit);
@@ -582,13 +597,14 @@ router.post('/:id/checkin', authenticateToken, async (req, res) => {
     res.json({
       success: true,
       message: 'Project checked in successfully',
-      commit
+      commit,
+      filesUploaded: uploadedFiles.length
     });
   } catch (error) {
-    console.error('Error checking in project:', error);
+    console.error('Checkin error:', error);
     res.status(500).json({
       success: false,
-      message: 'Error checking in project'
+      message: error.message || 'Error checking in project'
     });
   }
 });
@@ -639,7 +655,6 @@ router.post('/:id/messages', authenticateToken, async (req, res) => {
       messageData: newMessage
     });
   } catch (error) {
-    console.error('Error posting message:', error);
     res.status(500).json({
       success: false,
       message: 'Error posting message'
@@ -664,10 +679,51 @@ router.get('/:id/messages', authenticateToken, async (req, res) => {
       messages: project.messages || []
     });
   } catch (error) {
-    console.error('Error fetching messages:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching messages'
+    });
+  }
+});
+
+router.delete('/:id/messages/:messageId', authenticateToken, async (req, res) => {
+  try {
+    const projectId = req.params.id;
+    const messageId = req.params.messageId;
+    const user = req.user;
+    const isAdmin = user.isAdmin || false;
+    
+    if (!isAdmin) {
+      return res.status(403).json({
+        success: false,
+        message: 'Admin access required'
+      });
+    }
+    
+    const result = await mongoose.connection.db.collection('Projects').updateOne(
+      { id: projectId },
+      { 
+        $pull: { messages: { id: messageId } },
+        $set: { lastUpdated: new Date().toISOString() }
+      }
+    );
+    
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Message not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      message: 'Message deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete message error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting message'
     });
   }
 });
@@ -677,6 +733,7 @@ router.post('/:id/files', authenticateToken, uploadProjectFiles.array('files', 1
     const projectId = req.params.id;
     const user = req.user;
     const userId = user.id || user._id;
+    const isAdmin = user.isAdmin || false;
     
     const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
     if (!project) {
@@ -687,10 +744,17 @@ router.post('/:id/files', authenticateToken, uploadProjectFiles.array('files', 1
     }
     
     const members = project.members || [];
-    if (!members.includes(userId)) {
+    if (!members.includes(userId) && !isAdmin) {
       return res.status(403).json({
         success: false,
         message: 'Only project members can upload files'
+      });
+    }
+    
+    if (project.checkedOutBy !== userId && !isAdmin) {
+      return res.status(403).json({
+        success: false,
+        message: 'You must checkout the project before uploading files'
       });
     }
     
@@ -726,7 +790,6 @@ router.post('/:id/files', authenticateToken, uploadProjectFiles.array('files', 1
       files: uploadedFiles
     });
   } catch (error) {
-    console.error('Error uploading files:', error);
     res.status(500).json({
       success: false,
       message: 'Error uploading files'
@@ -751,7 +814,6 @@ router.get('/:id/files', authenticateToken, async (req, res) => {
       files: project.files || []
     });
   } catch (error) {
-    console.error('Error fetching files:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching files'
@@ -793,10 +855,68 @@ router.get('/:id/files/:fileId/download', authenticateToken, async (req, res) =>
     
     res.download(filePath, file.originalName);
   } catch (error) {
-    console.error('Error downloading file:', error);
     res.status(500).json({
       success: false,
       message: 'Error downloading file'
+    });
+  }
+});
+
+router.delete('/:id/files/:fileId', authenticateToken, async (req, res) => {
+  try {
+    const projectId = req.params.id;
+    const fileId = req.params.fileId;
+    const user = req.user;
+    const userId = user.id || user._id;
+    const isAdmin = user.isAdmin || false;
+    
+    const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        message: 'Project not found'
+      });
+    }
+    
+    const members = project.members || [];
+    if (!members.includes(userId) && !isAdmin) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only project members can delete files'
+      });
+    }
+    
+    const files = project.files || [];
+    const file = files.find(f => f.id === fileId);
+    
+    if (!file) {
+      return res.status(404).json({
+        success: false,
+        message: 'File not found'
+      });
+    }
+    
+    const filePath = path.join(__dirname, '../uploads/project-files', projectId, file.filename);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+    
+    await mongoose.connection.db.collection('Projects').updateOne(
+      { id: projectId },
+      { 
+        $pull: { files: { id: fileId } },
+        $set: { lastUpdated: new Date().toISOString() }
+      }
+    );
+    
+    res.json({
+      success: true,
+      message: 'File deleted successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting file'
     });
   }
 });

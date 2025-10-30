@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 mongoose.set('bufferCommands', true);
 
 const connectDB = require('./config/database');
+const { authenticateToken } = require('./middleware/auth');
 
 const apiRoutes = require('./routes/api');
 const authRoutes = require('./routes/auth');
@@ -27,7 +28,6 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static(path.join(__dirname, '../public')));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use('/uploads/project-files', express.static(path.join(__dirname, 'uploads/project-files')));
 
 app.use('/api/auth', authRoutes);
 app.use('/api', apiRoutes);
@@ -47,6 +47,8 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+
+
 app.use('/api/*', (req, res) => {
   res.status(404).json({
     success: false,
@@ -56,8 +58,7 @@ app.use('/api/*', (req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  console.error('Error:', err);
-  
+  // Validation errors
   if (err.name === 'ValidationError') {
     return res.status(400).json({
       success: false,
@@ -66,6 +67,7 @@ app.use((err, req, res, next) => {
     });
   }
   
+  // JWT errors
   if (err.name === 'JsonWebTokenError') {
     return res.status(401).json({
       success: false,
@@ -82,14 +84,32 @@ app.use((err, req, res, next) => {
     });
   }
   
+  // Multer file upload errors
   if (err.code === 'LIMIT_FILE_SIZE') {
     return res.status(400).json({
       success: false,
       error: 'File too large',
-      message: 'Image must be less than 5MB'
+      message: 'File must be less than the maximum allowed size'
     });
   }
   
+  if (err.code === 'LIMIT_FILE_COUNT') {
+    return res.status(400).json({
+      success: false,
+      error: 'Too many files',
+      message: 'Maximum number of files exceeded'
+    });
+  }
+  
+  if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+    return res.status(400).json({
+      success: false,
+      error: 'Unexpected file field',
+      message: 'Unexpected file field in the upload'
+    });
+  }
+  
+  // Custom multer errors
   if (err.message === 'Only image files are allowed!') {
     return res.status(400).json({
       success: false,
@@ -98,6 +118,17 @@ app.use((err, req, res, next) => {
     });
   }
   
+  // Generic multer error
+  if (err instanceof Error && err.name === 'MulterError') {
+    return res.status(400).json({
+      success: false,
+      error: 'File upload error',
+      message: err.message
+    });
+  }
+  
+  // Generic server error
+  console.error('Server Error:', err);
   res.status(500).json({
     success: false,
     error: 'Internal Server Error',
@@ -114,23 +145,16 @@ app.get('*', (req, res) => {
 const startServer = async () => {
   await connectDB();
   
-  app.listen(port, '0.0.0.0', () => {
-    console.log(`🚀 Server running on port ${port}`);
-    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`📡 API: http://localhost:${port}/api`);
-    console.log(`🏠 Frontend: http://localhost:${port}`);
-  });
+  app.listen(port, '0.0.0.0', () => {});
 };
 
 startServer();
 
 process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
   process.exit(1);
 });
 
 process.on('unhandledRejection', (error) => {
-  console.error('Unhandled Rejection:', error);
   process.exit(1);
 });
 
