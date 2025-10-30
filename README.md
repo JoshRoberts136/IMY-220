@@ -39,7 +39,7 @@ npm run dev
 For production:
 ```bash
 npm run build
-npm start
+npm run dev
 ```
 
 ## What's in here
