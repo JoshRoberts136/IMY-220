@@ -4,18 +4,6 @@ https://github.com/JoshRoberts136/IMY-220
 
 Collaborative version control platform for developers.
 
-## Setup
-
-You need Docker and a MongoDB database (Atlas works fine).
-
-Make a `.env` file:
-```
-MONGODB_URI=your_connection_string
-JWT_SECRET=whatever_you_want
-PORT=3000
-NODE_ENV=production
-```
-
 ## Running with Docker
 
 ```bash
