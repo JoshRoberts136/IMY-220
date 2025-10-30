@@ -1,0 +1,408 @@
+[{
+  "_id": {
+    "$oid": "68da5cf33d9ec6dd7be6d3ef"
+  },
+  "id": "user_001",
+  "username": "WraithRunneras",
+  "email": "wraith@example.com",
+  "password": "$2a$10$lcEII1QRYy4qvQjyTeKOru4FZxOJgzL//ee3zcSox2GcFf1UjS5JO",
+  "profile": {
+    "firstName": "Alex",
+    "lastName": "Chen",
+    "avatar": "/uploads/profile-images/user_user_001_1761832843537.jpeg",
+    "title": "Game Developers",
+    "bio": "Stealth mode activated. Building the next generation of gaming experiences."
+  },
+  "isActive": true,
+  "ownedProjects": [
+    "proj_001",
+    "proj_002",
+    "proj_003"
+  ],
+  "memberProjects": [
+    "proj_004",
+    "proj_005",
+    "proj_006",
+    "proj_007",
+    "proj_008"
+  ],
+  "commits": [
+    "commit_001",
+    "commit_004",
+    "commit_006",
+    "commit_010"
+  ],
+  "friends": [
+    "user_005",
+    "user_002",
+    "user_1761664422375",
+    "user_1761664507224",
+    "user_1761664116005",
+    "user_004",
+    "user_003"
+  ],
+  "lastLogin": {
+    "$date": "2025-10-30T16:58:58.615Z"
+  },
+  "updatedAt": {
+    "$date": "2025-10-30T17:23:52.178Z"
+  },
+  "theme": "dark"
+},
+{
+  "_id": {
+    "$oid": "68da5cf33d9ec6dd7be6d3f0"
+  },
+  "id": "user_002",
+  "username": "PathfinderBot",
+  "email": "pathfinder@example.com",
+  "password": "$2a$10$lcEII1QRYy4qvQjyTeKOru4FZxOJgzL//ee3zcSox2GcFf1UjS5JO",
+  "profile": {
+    "firstName": "Sarah",
+    "lastName": "Johnson",
+    "avatar": "/uploads/profile-images/user_002_1761578933847.jpg",
+    "title": "AI Engineer",
+    "bio": "Navigating the future with artificial intelligence and machine learning."
+  },
+  "isActive": true,
+  "ownedProjects": [
+    "proj_004",
+    "proj_005",
+    "proj_006"
+  ],
+  "memberProjects": [
+    "proj_001",
+    "proj_007",
+    "proj_008",
+    "proj_009",
+    "proj_010"
+  ],
+  "commits": [
+    "commit_002",
+    "commit_007",
+    "commit_011",
+    "commit_015"
+  ],
+  "friends": [
+    "user_003",
+    "user_005",
+    "user_1759472929548",
+    "user_001"
+  ],
+  "lastLogin": {
+    "$date": "2025-10-27T15:28:46.187Z"
+  },
+  "updatedAt": {
+    "$date": "2025-10-27T15:28:53.929Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68da5cf33d9ec6dd7be6d3f1"
+  },
+  "id": "user_003",
+  "username": "CodeLegend42",
+  "email": "codelegend@example.com",
+  "password": "$2a$10$lcEII1QRYy4qvQjyTeKOru4FZxOJgzL//ee3zcSox2GcFf1UjS5JO",
+  "profile": {
+    "firstName": "Jordan",
+    "lastName": "Smith",
+    "avatar": "⚡",
+    "title": "Full-Stack Champion",
+    "bio": "Conquering bugs and building digital empires."
+  },
+  "isActive": true,
+  "ownedProjects": [
+    "proj_007",
+    "proj_008",
+    "proj_009"
+  ],
+  "memberProjects": [
+    "proj_001",
+    "proj_002",
+    "proj_004",
+    "proj_011",
+    "proj_012"
+  ],
+  "commits": [
+    "commit_003",
+    "commit_005",
+    "commit_008",
+    "commit_012",
+    "commit_018"
+  ],
+  "friends": [
+    "user_002",
+    "user_004",
+    "user_1761664116005",
+    "user_1761664679768",
+    "user_001"
+  ]
+},
+{
+  "_id": {
+    "$oid": "68da5cf33d9ec6dd7be6d3f2"
+  },
+  "id": "user_004",
+  "username": "CyberNinja",
+  "email": "cyber@example.com",
+  "password": "$2a$10$lcEII1QRYy4qvQjyTeKOru4FZxOJgzL//ee3zcSox2GcFf1UjS5JO",
+  "profile": {
+    "firstName": "Tae",
+    "lastName": "Park",
+    "avatar": "🥷",
+    "title": "Security Expert",
+    "bio": "Protecting systems with cutting-edge cybersecurity solutions."
+  },
+  "isActive": true,
+  "ownedProjects": [
+    "proj_010",
+    "proj_011",
+    "proj_012"
+  ],
+  "memberProjects": [
+    "proj_002",
+    "proj_003",
+    "proj_005",
+    "proj_013",
+    "proj_014"
+  ],
+  "commits": [
+    "commit_009",
+    "commit_013",
+    "commit_016",
+    "commit_019",
+    "commit_021"
+  ],
+  "friends": [
+    "user_003",
+    "user_005",
+    "user_1761664116005",
+    "user_1761664679768",
+    "user_1761664422375",
+    "user_1761664507224",
+    "user_001"
+  ]
+},
+{
+  "_id": {
+    "$oid": "68da5cf33d9ec6dd7be6d3f3"
+  },
+  "id": "user_005",
+  "username": "DataWizard",
+  "email": "wizard@example.com",
+  "password": "$2a$10$lcEII1QRYy4qvQjyTeKOru4FZxOJgzL//ee3zcSox2GcFf1UjS5JO",
+  "profile": {
+    "firstName": "Maya",
+    "lastName": "Rodriguez",
+    "avatar": "🧙",
+    "title": "ML Engineer",
+    "bio": "Turning data into insights, one model at a time."
+  },
+  "isActive": true,
+  "ownedProjects": [
+    "proj_013",
+    "proj_014",
+    "proj_015"
+  ],
+  "memberProjects": [
+    "proj_003",
+    "proj_006",
+    "proj_009",
+    "proj_010",
+    "proj_011"
+  ],
+  "commits": [
+    "commit_014",
+    "commit_017",
+    "commit_020",
+    "commit_022"
+  ],
+  "friends": [
+    "user_002",
+    "user_004",
+    "user_001",
+    "user_1761664507224"
+  ]
+},
+{
+  "_id": {
+    "$oid": "68ff8fdf40ff61974f36a0f4"
+  },
+  "id": "user_1761578975087",
+  "username": "Joshua",
+  "email": "josh@gmail.com",
+  "password": "$2a$10$nz6n6Mrb6ukMBbL.NWBySejlo23/338d9CIP9HeYao960CSUy8jE2",
+  "profile": {
+    "firstName": "Joshua",
+    "lastName": "",
+    "avatar": "/uploads/profile-images/user_1761578975087_1761578991235.jpg"
+  },
+  "isActive": true,
+  "ownedProjects": [
+    "proj_1759300854037",
+    "proj_1759301504786",
+    "proj_1759472995735"
+  ],
+  "memberProjects": [],
+  "commits": [],
+  "friends": [],
+  "createdAt": "2025-10-27T15:29:35.088Z",
+  "updatedAt": {
+    "$date": "2025-10-27T15:29:51.274Z"
+  },
+  "lastLogin": "2025-10-27T15:29:35.088Z"
+},
+{
+  "_id": {
+    "$oid": "6900dc74498d02972496afbe"
+  },
+  "id": "user_1761664116005",
+  "username": "David ",
+  "email": "david@email.com",
+  "password": "$2a$10$z4ODVgv0Kz9ARwXvuZOwPOLbYnWMmeeYUzoWMfrI/C86e3JyM9Zme",
+  "profile": {
+    "firstName": "David",
+    "lastName": "",
+    "avatar": "/uploads/profile-images/user_1761664116005_1761664351454.jpg"
+  },
+  "isActive": true,
+  "ownedProjects": [],
+  "memberProjects": [],
+  "commits": [],
+  "friends": [
+    "user_004",
+    "user_003",
+    "user_1761664679768",
+    "user_1761664422375",
+    "user_001"
+  ],
+  "createdAt": "2025-10-28T15:08:36.005Z",
+  "updatedAt": {
+    "$date": "2025-10-28T15:12:31.498Z"
+  },
+  "lastLogin": "2025-10-28T15:08:36.005Z"
+},
+{
+  "_id": {
+    "$oid": "6900dda6498d02972496afc1"
+  },
+  "id": "user_1761664422375",
+  "username": "Noah",
+  "email": "noah@email.com",
+  "password": "$2a$10$0m3ajSs71JaZTFXhLjU0YukOHlZwLAQCwtiwJwiMcMocOHAGspcAm",
+  "profile": {
+    "firstName": "Noah",
+    "lastName": "",
+    "avatar": "/uploads/profile-images/user_1761664422375_1761664440226.jpg"
+  },
+  "isActive": true,
+  "ownedProjects": [],
+  "memberProjects": [],
+  "commits": [],
+  "friends": [
+    "user_004",
+    "user_001",
+    "user_1761664116005"
+  ],
+  "createdAt": "2025-10-28T15:13:42.375Z",
+  "updatedAt": {
+    "$date": "2025-10-28T15:14:00.278Z"
+  },
+  "lastLogin": {
+    "$date": "2025-10-28T15:19:06.714Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6900ddfb498d02972496afc4"
+  },
+  "id": "user_1761664507224",
+  "username": "Dylan",
+  "email": "dylan@email.com",
+  "password": "$2a$10$7YvmnVnfeBgUOmCyoxX8a.toUCz61sge564MeOsfnezKzus6tcf/a",
+  "profile": {
+    "firstName": "Dylan",
+    "lastName": "",
+    "avatar": "/uploads/profile-images/user_1761664507224_1761664517243.jpg"
+  },
+  "isActive": true,
+  "ownedProjects": [],
+  "memberProjects": [],
+  "commits": [],
+  "friends": [
+    "user_1761664679768",
+    "user_004",
+    "user_001",
+    "user_005"
+  ],
+  "createdAt": "2025-10-28T15:15:07.224Z",
+  "updatedAt": {
+    "$date": "2025-10-28T15:15:17.282Z"
+  },
+  "lastLogin": {
+    "$date": "2025-10-28T19:47:10.146Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6900dea7498d02972496afc7"
+  },
+  "id": "user_1761664679768",
+  "username": "Bonk",
+  "email": "bonk@email.com",
+  "password": "$2a$10$xIVZ4L4YMdPOj5jBryDQsugt0NBj88cpduLtGylhHHfAr3h3aVBlC",
+  "profile": {
+    "firstName": "Bonk",
+    "lastName": "",
+    "avatar": "/uploads/profile-images/user_1761664679768_1761664690606.jpg"
+  },
+  "isActive": true,
+  "ownedProjects": [],
+  "memberProjects": [],
+  "commits": [],
+  "friends": [
+    "user_1761664507224",
+    "user_1761664116005",
+    "user_004",
+    "user_003"
+  ],
+  "createdAt": "2025-10-28T15:17:59.768Z",
+  "updatedAt": {
+    "$date": "2025-10-28T15:18:10.645Z"
+  },
+  "lastLogin": {
+    "$date": "2025-10-28T19:36:06.064Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69033c4978228e24399245e8"
+  },
+  "id": "user_admin_1761819721445",
+  "username": "admin",
+  "email": "admin@apexcoding.com",
+  "password": "$2a$10$t1ZdQS6Kg.ogxjvu5iNEUeR20oLm55HDqFqt1FO1xpW7oGvIBhaMK",
+  "profile": {
+    "bio": "System Administrator",
+    "avatar": "👑",
+    "location": "System",
+    "website": "",
+    "github": "",
+    "twitter": ""
+  },
+  "isAdmin": true,
+  "isActive": true,
+  "friends": [],
+  "ownedProjects": [],
+  "memberProjects": [],
+  "createdAt": {
+    "$date": "2025-10-30T10:22:01.445Z"
+  },
+  "updatedAt": {
+    "$date": "2025-10-30T10:22:01.445Z"
+  },
+  "lastLogin": {
+    "$date": "2025-10-30T11:06:58.873Z"
+  }
+}]

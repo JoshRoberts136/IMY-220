@@ -1,0 +1,928 @@
+[{
+  "_id": {
+    "$oid": "68da5dd83d9ec6dd7be6d422"
+  },
+  "id": "proj_003",
+  "name": "Quantum Computing Simulator",
+  "description": "Web-based quantum circuit simulator with visual circuit builder interface",
+  "status": "active",
+  "language": "JavaScript",
+  "ownedBy": "user_004",
+  "members": [
+    "user_001",
+    "user_004"
+  ],
+  "hashtags": [
+    "quantum",
+    "simulation",
+    "physics"
+  ],
+  "stars": 89,
+  "forks": 23,
+  "commits": [
+    "commit_006",
+    {
+      "id": 1761761505481,
+      "hash": "vu2y3go7cdrurjq0ivihzk",
+      "message": "dss",
+      "author": "WraithRunnera",
+      "userId": "user_001",
+      "timestamp": "2025-10-29T18:11:45.481Z",
+      "filesChanged": 1,
+      "projectId": "proj_003",
+      "_id": {
+        "$oid": "690258e1d59745980a5e545e"
+      }
+    },
+    {
+      "id": 1761830960677,
+      "hash": "cy1d6ke54qmwow6v6h5l0e",
+      "message": "dasdsa",
+      "author": "WraithRunnera",
+      "userId": "user_001",
+      "timestamp": "2025-10-30T13:29:20.677Z",
+      "filesChanged": 1,
+      "projectId": "proj_003",
+      "_id": {
+        "$oid": "69036830b5439c11609dacbf"
+      }
+    }
+  ],
+  "messages": [
+    {
+      "id": "msg_1761680549034",
+      "userId": "user_001",
+      "username": "WraithRunnera",
+      "avatar": "/uploads/profile-images/user_001_1761578523931.jpg",
+      "message": "idk",
+      "timestamp": "2025-10-28T19:42:29.034Z"
+    },
+    {
+      "id": "msg_1761761570395",
+      "userId": "user_001",
+      "username": "WraithRunnera",
+      "avatar": "/uploads/profile-images/user_001_1761578523931.jpg",
+      "message": "test1",
+      "timestamp": "2025-10-29T18:12:50.395Z"
+    },
+    {
+      "id": "msg_1761761575206",
+      "userId": "user_001",
+      "username": "WraithRunnera",
+      "avatar": "/uploads/profile-images/user_001_1761578523931.jpg",
+      "message": "testerrrr",
+      "timestamp": "2025-10-29T18:12:55.206Z"
+    },
+    {
+      "id": "msg_1761761577838",
+      "userId": "user_001",
+      "username": "WraithRunnera",
+      "avatar": "/uploads/profile-images/user_001_1761578523931.jpg",
+      "message": "ee",
+      "timestamp": "2025-10-29T18:12:57.838Z"
+    },
+    {
+      "id": "msg_1761830969385",
+      "userId": "user_001",
+      "username": "WraithRunnera",
+      "avatar": "/uploads/profile-images/user_001_1761578523931.jpg",
+      "message": "ddd",
+      "timestamp": "2025-10-30T13:29:29.385Z"
+    }
+  ],
+  "createdAt": "2025-10-09T12:10:50.000Z",
+  "lastUpdated": "2025-10-30T17:31:11.366Z",
+  "version": "1.0.0",
+  "files": [
+    {
+      "id": "file_1761818917514_v6w9o9g2x",
+      "originalName": "applications.html",
+      "filename": "1761818917477_applications.html",
+      "path": "/uploads/project-files/proj_003/1761818917477_applications.html",
+      "size": 3607,
+      "mimetype": "text/html",
+      "uploadedBy": "user_001",
+      "uploadedAt": "2025-10-30T10:08:37.514Z"
+    },
+    {
+      "id": "file_1761832512830_oo4u68fgv",
+      "originalName": "bitnami.css",
+      "filename": "1761832512787_bitnami.css",
+      "path": "/uploads/project-files/proj_003/1761832512787_bitnami.css",
+      "size": 177,
+      "mimetype": "text/css",
+      "uploadedBy": "user_001",
+      "uploadedAt": "2025-10-30T13:55:12.830Z"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "68da5dd83d9ec6dd7be6d423"
+  },
+  "id": "proj_004",
+  "name": "AI Code Review Bot",
+  "description": "Automated code review system using LLMs for intelligent pull request analysis",
+  "status": "active",
+  "language": "TypeScript",
+  "ownedBy": "user_002",
+  "members": [
+    "user_002",
+    "user_001",
+    "user_003"
+  ],
+  "hashtags": [
+    "ai",
+    "automation",
+    "codereview"
+  ],
+  "stars": 312,
+  "forks": 78,
+  "commits": [
+    "commit_007",
+    "commit_008",
+    {
+      "id": 1759260383770,
+      "hash": "06v214qqv2ratwdvy0y3epq",
+      "message": "sadasdasd",
+      "author": "WraithRunners",
+      "userId": "user_001",
+      "timestamp": "2025-09-30T19:26:23.770Z",
+      "filesChanged": 1,
+      "projectId": "proj_004",
+      "_id": {
+        "$oid": "68dc2edf7cdea41e0a1b02af"
+      }
+    },
+    {
+      "id": 1759263345847,
+      "hash": "pe1lced0p9q6rpiyfvhet",
+      "message": "newcommit test 69",
+      "author": "WraithRunners",
+      "userId": "user_001",
+      "timestamp": "2025-09-30T20:15:45.847Z",
+      "filesChanged": 1,
+      "projectId": "proj_004",
+      "_id": {
+        "$oid": "68dc3a71201658fe804af2a3"
+      }
+    },
+    {
+      "id": 1759323683995,
+      "hash": "j7f4nlqda8rjfhukbq4h6a",
+      "message": "sss",
+      "author": "WraithRunner",
+      "userId": "user_001",
+      "timestamp": "2025-10-01T13:01:23.995Z",
+      "filesChanged": 1,
+      "projectId": "proj_004",
+      "_id": {
+        "$oid": "68dd2623e04ce83b4577d8e7"
+      }
+    },
+    {
+      "id": 1759332475304,
+      "hash": "rgeredtx8elmzlgjcayqs",
+      "message": "as",
+      "author": "WraithRunner",
+      "userId": "user_001",
+      "timestamp": "2025-10-01T15:27:55.304Z",
+      "filesChanged": 1,
+      "projectId": "proj_004",
+      "_id": {
+        "$oid": "68dd487bf2c8e14cb0a8bfef"
+      }
+    },
+    {
+      "id": 1761598592800,
+      "hash": "719vrosmxhvy3u9fdix3gj",
+      "message": "dsadasd",
+      "author": "WraithRunnera",
+      "userId": "user_001",
+      "timestamp": "2025-10-27T20:56:32.800Z",
+      "filesChanged": 1,
+      "projectId": "proj_004",
+      "_id": {
+        "$oid": "68ffdc80a53ef94d81894f52"
+      }
+    }
+  ],
+  "messages": [
+    {
+      "id": "msg_1761835059308",
+      "userId": "user_001",
+      "username": "WraithRunneras",
+      "avatar": "/uploads/profile-images/user_user_001_1761832843537.jpeg",
+      "message": "sdadsa",
+      "timestamp": "2025-10-30T14:37:39.308Z"
+    }
+  ],
+  "lastUpdated": "2025-10-30T14:37:39.308Z",
+  "createdAt": "2025-10-20T17:04:42.000Z"
+},
+{
+  "_id": {
+    "$oid": "68da5dd83d9ec6dd7be6d424"
+  },
+  "id": "proj_005",
+  "name": "Cloud Gaming Platform",
+  "description": "Low-latency cloud gaming infrastructure with WebRTC streaming capabilities",
+  "status": "active",
+  "language": "Go",
+  "ownedBy": "user_002",
+  "members": [
+    "user_002",
+    "user_001",
+    "user_004"
+  ],
+  "hashtags": [
+    "gaming",
+    "cloud",
+    "streaming"
+  ],
+  "stars": 167,
+  "forks": 43,
+  "commits": [
+    "commit_009"
+  ],
+  "messages": [],
+  "createdAt": "2025-10-24T08:50:39.000Z",
+  "lastUpdated": "2025-10-24T08:50:39.000Z"
+},
+{
+  "_id": {
+    "$oid": "68da5dd83d9ec6dd7be6d425"
+  },
+  "id": "proj_006",
+  "name": "Blockchain Voting System",
+  "description": "Transparent and secure voting platform using smart contracts and zero-knowledge proofs",
+  "status": "active",
+  "language": "Solidity",
+  "ownedBy": "user_002",
+  "members": [
+    "user_002",
+    "user_001",
+    "user_005"
+  ],
+  "hashtags": [
+    "blockchain",
+    "voting",
+    "security"
+  ],
+  "stars": 201,
+  "forks": 56,
+  "commits": [
+    "commit_010"
+  ],
+  "messages": [],
+  "createdAt": "2025-10-18T22:32:29.000Z",
+  "lastUpdated": "2025-10-18T22:32:29.000Z"
+},
+{
+  "_id": {
+    "$oid": "68da5dd83d9ec6dd7be6d426"
+  },
+  "id": "proj_007",
+  "name": "AR Navigation System",
+  "description": "Augmented reality indoor navigation using computer vision and SLAM algorithms",
+  "status": "active",
+  "language": "C++",
+  "ownedBy": "user_003",
+  "members": [
+    "user_003",
+    "user_001",
+    "user_002"
+  ],
+  "hashtags": [
+    "ar",
+    "navigation",
+    "computervision"
+  ],
+  "stars": 98,
+  "forks": 29,
+  "commits": [
+    "commit_011",
+    "commit_012"
+  ],
+  "messages": [
+    "msg_010"
+  ],
+  "createdAt": "2025-10-04T23:42:34.000Z",
+  "lastUpdated": "2025-10-04T23:42:34.000Z"
+},
+{
+  "_id": {
+    "$oid": "68da5dd83d9ec6dd7be6d427"
+  },
+  "id": "proj_008",
+  "name": "IoT Smart Home Hub",
+  "description": "Universal smart home controller with AI-powered automation and voice control",
+  "status": "active",
+  "language": "Python",
+  "ownedBy": "user_003",
+  "members": [
+    "user_003",
+    "user_001",
+    "user_002"
+  ],
+  "hashtags": [
+    "iot",
+    "smarthome",
+    "automation"
+  ],
+  "stars": 223,
+  "forks": 59,
+  "commits": [
+    "commit_013"
+  ],
+  "messages": [],
+  "createdAt": "2025-10-07T19:08:33.000Z",
+  "lastUpdated": "2025-10-07T19:08:33.000Z"
+},
+{
+  "_id": {
+    "$oid": "68da5dd83d9ec6dd7be6d428"
+  },
+  "id": "proj_009",
+  "name": "Game Engine X",
+  "description": "Lightweight 2D game engine with built-in physics and particle systems",
+  "status": "active",
+  "language": "C++",
+  "ownedBy": "user_003",
+  "members": [
+    "user_003",
+    "user_002",
+    "user_005"
+  ],
+  "hashtags": [
+    "gameengine",
+    "2d",
+    "physics"
+  ],
+  "stars": 445,
+  "forks": 123,
+  "commits": [
+    "commit_014"
+  ],
+  "messages": [
+    "msg_013"
+  ],
+  "createdAt": "2025-10-28T06:32:53.000Z",
+  "lastUpdated": "2025-10-28T06:32:53.000Z"
+},
+{
+  "_id": {
+    "$oid": "68da5dd83d9ec6dd7be6d429"
+  },
+  "id": "proj_010",
+  "name": "Secure Chat Protocol",
+  "description": "End-to-end encrypted messaging protocol with quantum-resistant cryptography",
+  "status": "active",
+  "language": "Rust",
+  "ownedBy": "user_004",
+  "members": [
+    "user_004",
+    "user_002",
+    "user_005"
+  ],
+  "hashtags": [
+    "security",
+    "encryption",
+    "messaging"
+  ],
+  "stars": 187,
+  "forks": 41,
+  "commits": [
+    "commit_015",
+    "commit_016"
+  ],
+  "messages": [
+    "msg_014",
+    "msg_015"
+  ],
+  "createdAt": "2025-10-21T10:01:10.000Z",
+  "lastUpdated": "2025-10-21T10:01:10.000Z"
+},
+{
+  "_id": {
+    "$oid": "68da5dd83d9ec6dd7be6d42a"
+  },
+  "id": "proj_011",
+  "name": "Distributed Database System",
+  "description": "High-performance distributed database with automatic sharding and replication",
+  "status": "active",
+  "language": "Go",
+  "ownedBy": "user_004",
+  "members": [
+    "user_004",
+    "user_003",
+    "user_005"
+  ],
+  "hashtags": [
+    "database",
+    "distributed",
+    "scalability"
+  ],
+  "stars": 156,
+  "forks": 38,
+  "commits": [
+    "commit_017"
+  ],
+  "messages": [
+    "msg_016"
+  ],
+  "createdAt": "2025-10-28T11:24:22.000Z",
+  "lastUpdated": "2025-10-28T11:24:22.000Z"
+},
+{
+  "_id": {
+    "$oid": "68da5dd83d9ec6dd7be6d42b"
+  },
+  "id": "proj_012",
+  "name": "Compiler Optimization Suite",
+  "description": "Advanced compiler optimization tools for improved code performance and efficiency",
+  "status": "active",
+  "language": "C++",
+  "ownedBy": "user_004",
+  "members": [
+    "user_004",
+    "user_003"
+  ],
+  "hashtags": [
+    "compiler",
+    "optimization",
+    "performance"
+  ],
+  "stars": 134,
+  "forks": 27,
+  "commits": [
+    "commit_018",
+    "commit_019"
+  ],
+  "messages": [
+    "msg_017"
+  ],
+  "createdAt": "2025-10-31T07:43:31.000Z",
+  "lastUpdated": "2025-10-30T10:52:32.851Z"
+},
+{
+  "_id": {
+    "$oid": "68da5dd83d9ec6dd7be6d42c"
+  },
+  "id": "proj_013",
+  "name": "Real-time Analytics Platform",
+  "description": "Stream processing platform for real-time data analytics and visualization",
+  "status": "active",
+  "language": "Python",
+  "ownedBy": "user_005",
+  "members": [
+    "user_005",
+    "user_004"
+  ],
+  "hashtags": [
+    "analytics",
+    "realtime",
+    "bigdata"
+  ],
+  "stars": 278,
+  "forks": 72,
+  "commits": [
+    "commit_020"
+  ],
+  "messages": [
+    "msg_018",
+    "msg_019"
+  ],
+  "createdAt": "2025-10-05T23:58:45.000Z",
+  "lastUpdated": "2025-10-05T23:58:45.000Z"
+},
+{
+  "_id": {
+    "$oid": "68da5dd83d9ec6dd7be6d42d"
+  },
+  "id": "proj_014",
+  "name": "Computer Vision Library",
+  "description": "GPU-accelerated computer vision library with pre-trained models and custom training",
+  "status": "active",
+  "language": "Python",
+  "ownedBy": "user_005",
+  "members": [
+    "user_005",
+    "user_004"
+  ],
+  "hashtags": [
+    "computervision",
+    "ml",
+    "gpu"
+  ],
+  "stars": 391,
+  "forks": 104,
+  "commits": [
+    "commit_021"
+  ],
+  "messages": [
+    "msg_020"
+  ],
+  "createdAt": "2025-10-14T13:42:56.000Z",
+  "lastUpdated": "2025-10-14T13:42:56.000Z"
+},
+{
+  "_id": {
+    "$oid": "68da5dd83d9ec6dd7be6d42e"
+  },
+  "id": "proj_015",
+  "name": "Web3 DApp Framework",
+  "description": "Full-stack framework for building decentralized applications with Web3 integration",
+  "status": "active",
+  "language": "TypeScript",
+  "ownedBy": "user_005",
+  "members": [
+    "user_005"
+  ],
+  "hashtags": [
+    "web3",
+    "blockchain",
+    "dapp"
+  ],
+  "stars": 212,
+  "forks": 48,
+  "commits": [
+    "commit_022"
+  ],
+  "messages": [
+    "msg_021"
+  ],
+  "createdAt": "2025-10-29T19:44:16.000Z",
+  "lastUpdated": "2025-10-29T19:44:16.000Z"
+},
+{
+  "_id": {
+    "$oid": "68dc3711bc8d3afe420f11fb"
+  },
+  "id": "proj_1759262481033",
+  "name": "Funtest23",
+  "description": "Not sure mate",
+  "status": "active",
+  "language": null,
+  "ownedBy": "user_001",
+  "members": [
+    "user_001"
+  ],
+  "hashtags": [
+    "React"
+  ],
+  "stars": 0,
+  "forks": 0,
+  "commits": [],
+  "messages": [],
+  "lastUpdated": "2025-10-17T05:12:56.000Z",
+  "createdAt": "2025-10-17T05:12:56.000Z"
+},
+{
+  "_id": {
+    "$oid": "68dcccf6c1ead40f5e9fd345"
+  },
+  "id": "proj_1759300854037",
+  "name": "TheBonkProject",
+  "description": "HEHEH",
+  "status": "active",
+  "language": null,
+  "ownedBy": "user_1761578975087",
+  "members": [
+    "user_1759300801012",
+    "user_001",
+    "user_1761578975087"
+  ],
+  "hashtags": [
+    "React"
+  ],
+  "stars": 0,
+  "forks": 0,
+  "commits": [
+    {
+      "id": 1759300878187,
+      "hash": "f8kxrmkm26j58t9rekaq1l",
+      "message": "BonksFirstTime",
+      "author": "HonkyBonky",
+      "userId": "user_1759300801012",
+      "timestamp": "2025-10-01T06:41:18.188Z",
+      "filesChanged": 1,
+      "projectId": "proj_1759300854037",
+      "_id": {
+        "$oid": "68dccd0ec1ead40f5e9fd346"
+      }
+    }
+  ],
+  "messages": [],
+  "lastUpdated": "2025-10-21T23:15:51.000Z",
+  "createdAt": "2025-10-21T23:15:51.000Z",
+  "updatedAt": "2025-10-27T16:34:19.097Z"
+},
+{
+  "_id": {
+    "$oid": "68dccf808b35b6b39fb9cf79"
+  },
+  "id": "proj_1759301504786",
+  "name": "Bonk2",
+  "description": "the retunr of bonk",
+  "status": "active",
+  "language": null,
+  "ownedBy": "user_1761578975087",
+  "members": [
+    "user_1759300801012",
+    "user_1761578975087"
+  ],
+  "hashtags": [
+    "Node.js"
+  ],
+  "stars": 0,
+  "forks": 0,
+  "commits": [],
+  "messages": [],
+  "lastUpdated": "2025-10-15T10:23:17.000Z",
+  "createdAt": "2025-10-15T10:23:17.000Z",
+  "updatedAt": "2025-10-27T16:34:19.137Z"
+},
+{
+  "_id": {
+    "$oid": "68dd06b9878a96622cad66bd"
+  },
+  "id": "proj_1759315641859",
+  "name": "Josh",
+  "description": "dasd",
+  "status": "active",
+  "language": null,
+  "ownedBy": "user_001",
+  "members": [
+    "user_001"
+  ],
+  "hashtags": [
+    "dsdasd"
+  ],
+  "stars": 0,
+  "forks": 0,
+  "commits": [],
+  "messages": [],
+  "lastUpdated": "2025-10-19T16:16:56.000Z",
+  "createdAt": "2025-10-19T16:16:56.000Z"
+},
+{
+  "_id": {
+    "$oid": "68de4057fdfabcd33e4acec4"
+  },
+  "id": "proj_1759395927000",
+  "name": "asadasdasdasdasd",
+  "description": "asdasdasdasd",
+  "status": "active",
+  "language": null,
+  "ownedBy": "user_002",
+  "members": [
+    "user_001",
+    "user_002",
+    "user_004"
+  ],
+  "hashtags": [
+    "React"
+  ],
+  "stars": 0,
+  "forks": 0,
+  "commits": [],
+  "messages": [
+    {
+      "id": "msg_1761726527146",
+      "userId": "user_001",
+      "username": "WraithRunnera",
+      "avatar": "/uploads/profile-images/user_001_1761578523931.jpg",
+      "message": "yappadooda",
+      "timestamp": "2025-10-29T08:28:47.146Z"
+    },
+    {
+      "id": "msg_1761726531872",
+      "userId": "user_001",
+      "username": "WraithRunnera",
+      "avatar": "/uploads/profile-images/user_001_1761578523931.jpg",
+      "message": "yap",
+      "timestamp": "2025-10-29T08:28:51.872Z"
+    },
+    {
+      "id": "msg_1761726533801",
+      "userId": "user_001",
+      "username": "WraithRunnera",
+      "avatar": "/uploads/profile-images/user_001_1761578523931.jpg",
+      "message": "yap",
+      "timestamp": "2025-10-29T08:28:53.801Z"
+    },
+    {
+      "id": "msg_1761726536481",
+      "userId": "user_001",
+      "username": "WraithRunnera",
+      "avatar": "/uploads/profile-images/user_001_1761578523931.jpg",
+      "message": "yap",
+      "timestamp": "2025-10-29T08:28:56.481Z"
+    },
+    {
+      "id": "msg_1761729961167",
+      "userId": "user_001",
+      "username": "WraithRunnera",
+      "avatar": "/uploads/profile-images/user_001_1761578523931.jpg",
+      "message": "sdadas",
+      "timestamp": "2025-10-29T09:26:01.167Z"
+    },
+    {
+      "id": "msg_1761729963557",
+      "userId": "user_001",
+      "username": "WraithRunnera",
+      "avatar": "/uploads/profile-images/user_001_1761578523931.jpg",
+      "message": "asdad",
+      "timestamp": "2025-10-29T09:26:03.557Z"
+    },
+    {
+      "id": "msg_1761845010160",
+      "userId": "user_001",
+      "username": "WraithRunneras",
+      "avatar": "/uploads/profile-images/user_user_001_1761832843537.jpeg",
+      "message": "sss",
+      "timestamp": "2025-10-30T17:23:30.160Z"
+    }
+  ],
+  "lastUpdated": "2025-10-30T17:23:35.167Z",
+  "createdAt": "2025-10-30T20:18:40.000Z",
+  "version": "1.0.0",
+  "files": [
+    {
+      "id": "file_1761830899912_yakwhibzn",
+      "originalName": "applications.html",
+      "filename": "1761830899859_applications.html",
+      "path": "/uploads/project-files/proj_1759395927000/1761830899859_applications.html",
+      "size": 3607,
+      "mimetype": "text/html",
+      "uploadedBy": "user_001",
+      "uploadedAt": "2025-10-30T13:28:19.913Z"
+    },
+    {
+      "id": "file_1761830907765_dp3szxxfs",
+      "originalName": "IMY220_A6.pdf",
+      "filename": "1761830907716_IMY220_A6.pdf",
+      "path": "/uploads/project-files/proj_1759395927000/1761830907716_IMY220_A6.pdf",
+      "size": 252294,
+      "mimetype": "application/pdf",
+      "uploadedBy": "user_001",
+      "uploadedAt": "2025-10-30T13:28:27.765Z"
+    },
+    {
+      "id": "file_1761845002285_fr59dy1q8",
+      "originalName": "max.avif",
+      "filename": "1761845002238_max.avif",
+      "path": "/uploads/project-files/proj_1759395927000/1761845002238_max.avif",
+      "size": 348463,
+      "mimetype": "image/avif",
+      "uploadedBy": "user_001",
+      "uploadedAt": "2025-10-30T17:23:22.285Z"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "68df6d633b208735464f39bb"
+  },
+  "id": "proj_1759472995735",
+  "name": "efuigsduhdnhd",
+  "description": "dusbvsdioucb",
+  "status": "active",
+  "language": null,
+  "ownedBy": "user_1761578975087",
+  "members": [
+    "user_1759472929548",
+    "user_002",
+    "user_1761578975087"
+  ],
+  "hashtags": [
+    "React"
+  ],
+  "stars": 0,
+  "forks": 0,
+  "commits": [
+    {
+      "id": 1759473026603,
+      "hash": "v0co9bdnsmozj63k1mly",
+      "message": "dbduuocdsc",
+      "author": "MR",
+      "userId": "user_1759472929548",
+      "timestamp": "2025-10-03T06:30:26.603Z",
+      "filesChanged": 1,
+      "projectId": "proj_1759472995735",
+      "_id": {
+        "$oid": "68df6d823b208735464f39bc"
+      }
+    }
+  ],
+  "messages": [],
+  "lastUpdated": "2025-10-29T20:55:25.000Z",
+  "createdAt": "2025-10-29T20:55:25.000Z",
+  "languages": [],
+  "repository": "",
+  "tags": [
+    "React"
+  ],
+  "visibility": "public",
+  "updatedAt": "2025-10-27T16:34:19.167Z"
+},
+{
+  "_id": {
+    "$oid": "69011702498d02972496afcd"
+  },
+  "id": "proj_1761679106773",
+  "name": "Dylans special",
+  "description": "idk yap",
+  "status": "active",
+  "language": null,
+  "ownedBy": "user_1761664507224",
+  "members": [
+    "user_1761664507224"
+  ],
+  "hashtags": [
+    "Node.js",
+    "React"
+  ],
+  "stars": 0,
+  "forks": 0,
+  "commits": [],
+  "messages": [],
+  "lastUpdated": "2025-10-28T19:18:26.773Z",
+  "createdAt": "2025-10-28T19:18:26.773Z"
+},
+{
+  "_id": {
+    "$oid": "69011765498d02972496afce"
+  },
+  "id": "proj_1761679205491",
+  "name": "Dylans special",
+  "description": "idk yap",
+  "status": "active",
+  "language": null,
+  "ownedBy": "user_1761664679768",
+  "members": [
+    "user_1761664507224",
+    "user_1761664679768"
+  ],
+  "hashtags": [
+    "Node.js",
+    "React"
+  ],
+  "stars": 0,
+  "forks": 0,
+  "commits": [],
+  "messages": [],
+  "lastUpdated": "2025-10-28T19:35:25.082Z",
+  "createdAt": "2025-10-28T19:20:05.491Z",
+  "version": "1.0.0"
+},
+{
+  "_id": {
+    "$oid": "69011770498d02972496afcf"
+  },
+  "id": "proj_1761679216857",
+  "name": "sadasd",
+  "description": "asdasd",
+  "status": "active",
+  "language": null,
+  "ownedBy": "user_1761664507224",
+  "members": [
+    "user_1761664507224"
+  ],
+  "hashtags": [
+    "Node.js"
+  ],
+  "stars": 0,
+  "forks": 0,
+  "commits": [],
+  "messages": [],
+  "lastUpdated": "2025-10-28T19:20:16.858Z",
+  "createdAt": "2025-10-28T19:20:16.858Z"
+},
+{
+  "_id": {
+    "$oid": "6903368c82aecda6fbbf186c"
+  },
+  "id": "proj_1761818252906",
+  "name": "sdad",
+  "description": "asdasd",
+  "status": "active",
+  "language": null,
+  "ownedBy": "user_001",
+  "members": [
+    "user_001"
+  ],
+  "hashtags": [
+    "ai",
+    "automation",
+    "codereview"
+  ],
+  "stars": 0,
+  "forks": 0,
+  "commits": [],
+  "messages": [],
+  "files": [],
+  "lastUpdated": "2025-10-30T09:57:32.906Z",
+  "createdAt": "2025-10-30T09:57:32.906Z"
+}]
