@@ -82,7 +82,6 @@ function Files({ projectId, project, onCommitCreated }) {
     }
   };
 
-  // Check if avatar is a file path or emoji
   const isImagePath = (avatar) => {
     return avatar && (avatar.startsWith('/') || avatar.startsWith('http'));
   };
@@ -90,11 +89,11 @@ function Files({ projectId, project, onCommitCreated }) {
   const renderCommitAvatar = (commit) => {
     const avatar = commit.userAvatar;
     const username = commit.username || commit.author;
-    
+
     if (isImagePath(avatar)) {
       return (
-        <img 
-          src={avatar} 
+        <img
+          src={avatar}
           alt={username}
           style={{
             width: '20px',
@@ -106,10 +105,8 @@ function Files({ projectId, project, onCommitCreated }) {
         />
       );
     } else if (avatar && avatar.length <= 2) {
-      // It's an emoji
       return <span className="commit-avatar">{avatar}</span>;
     } else {
-      // Use default avatar
       return (
         <div style={{ display: 'inline-block', marginRight: '8px', verticalAlign: 'middle' }}>
           <DefaultAvatar username={username} size={20} />

@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { ObjectId } = require('mongodb');
-const User = require('../models/userModel');
+const { getDB } = require('../config/database');
 const router = express.Router();
 
 const generateToken = (userId) => {
@@ -14,8 +14,9 @@ const generateToken = (userId) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+    const db = getDB();
 
-    const user = await User.db.collection('Users').findOne({ 
+    const user = await db.collection('Users').findOne({ 
       email: { $regex: new RegExp(`^${email}$`, 'i') } 
     });
 
@@ -37,7 +38,7 @@ router.post('/login', async (req, res) => {
 
     const token = generateToken(user.id);
 
-    await User.db.collection('Users').updateOne(
+    await db.collection('Users').updateOne(
       { id: user.id },
       { $set: { lastLogin: new Date() } }
     );
@@ -66,8 +67,9 @@ router.post('/login', async (req, res) => {
 router.post('/register', async (req, res) => {
   try {
     const { username, email, password, profile } = req.body;
+    const db = getDB();
 
-    const existingUser = await User.db.collection('Users').findOne({
+    const existingUser = await db.collection('Users').findOne({
       $or: [
         { email: { $regex: new RegExp(`^${email}$`, 'i') } }, 
         { username }
@@ -100,7 +102,7 @@ router.post('/register', async (req, res) => {
       lastLogin: new Date().toISOString()
     };
 
-    const result = await User.db.collection('Users').insertOne(newUser);
+    const result = await db.collection('Users').insertOne(newUser);
 
     const token = generateToken(newUser.id);
 
@@ -133,8 +135,9 @@ router.get('/verify', async (req, res) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    const db = getDB();
     
-    const user = await User.db.collection('Users').findOne({ id: decoded.userId });
+    const user = await db.collection('Users').findOne({ id: decoded.userId });
     
     if (!user) {
       return res.status(401).json({ success: false, message: 'User not found' });
@@ -165,6 +168,7 @@ router.put('/profile', async (req, res) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
     const { profile } = req.body;
+    const db = getDB();
 
     const updateData = {
       $set: {
@@ -175,7 +179,7 @@ router.put('/profile', async (req, res) => {
       }
     };
 
-    const result = await User.db.collection('Users').findOneAndUpdate(
+    const result = await db.collection('Users').findOneAndUpdate(
       { id: decoded.userId },
       updateData,
       { returnDocument: 'after' }
@@ -196,8 +200,9 @@ router.delete('/profile', async (req, res) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
     const userId = decoded.userId;
+    const db = getDB();
     
-    const user = await User.db.collection('Users').findOne({ id: userId });
+    const user = await db.collection('Users').findOne({ id: userId });
     
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
@@ -205,7 +210,7 @@ router.delete('/profile', async (req, res) => {
 
     if (user.ownedProjects && user.ownedProjects.length > 0) {
       for (const projectId of user.ownedProjects) {
-        const project = await User.db.collection('Projects').findOne({ id: projectId });
+        const project = await db.collection('Projects').findOne({ id: projectId });
         
         if (project) {
           const otherMembers = (project.members || []).filter(memberId => memberId !== userId);
@@ -213,7 +218,7 @@ router.delete('/profile', async (req, res) => {
           if (otherMembers.length > 0) {
             const randomMember = otherMembers[Math.floor(Math.random() * otherMembers.length)];
             
-            await User.db.collection('Projects').updateOne(
+            await db.collection('Projects').updateOne(
               { id: projectId },
               { 
                 $set: { 
@@ -223,34 +228,34 @@ router.delete('/profile', async (req, res) => {
               }
             );
           } else {
-            await User.db.collection('Projects').deleteOne({ id: projectId });
+            await db.collection('Projects').deleteOne({ id: projectId });
           }
         }
       }
     }
 
     if (user.memberProjects && user.memberProjects.length > 0) {
-      await User.db.collection('Projects').updateMany(
+      await db.collection('Projects').updateMany(
         { id: { $in: user.memberProjects } },
         { $pull: { members: userId } }
       );
     }
     
-    await User.db.collection('Commits').deleteMany({ userId: userId });
+    await db.collection('Commits').deleteMany({ userId: userId });
 
-    await User.db.collection('Users').updateMany(
+    await db.collection('Users').updateMany(
       { friends: userId },
       { $pull: { friends: userId } }
     );
 
-    await User.db.collection('FriendRequests').deleteMany({
+    await db.collection('FriendRequests').deleteMany({
       $or: [
         { senderId: userId },
         { receiverId: userId }
       ]
     });
 
-    const deleteResult = await User.db.collection('Users').deleteOne({ id: userId });
+    const deleteResult = await db.collection('Users').deleteOne({ id: userId });
     
     if (deleteResult.deletedCount === 0) {
       return res.status(404).json({ success: false, message: 'User not found' });

@@ -11,7 +11,7 @@ const ProfileImageUpload = ({ currentAvatar, userId, onUploadSuccess, isOwnProfi
   const [preview, setPreview] = useState(null);
   const fileInputRef = useRef(null);
 
-  // Prevent body scroll when modal is open
+  
   React.useEffect(() => {
     if (isModalOpen) {
       document.body.style.overflow = 'hidden';
@@ -33,28 +33,28 @@ const ProfileImageUpload = ({ currentAvatar, userId, onUploadSuccess, isOwnProfi
   const validateAndPreviewFile = (file) => {
     setError('');
 
-    // Check file type
+    
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
       setError('Only image files (JPEG, PNG, GIF, WebP) are allowed');
       return;
     }
 
-    // Check file size (5MB)
+    
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
       setError('Image must be less than 5MB');
       return;
     }
 
-    // Create preview
+    
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreview(reader.result);
     };
     reader.readAsDataURL(file);
 
-    // Auto-upload
+    
     uploadImage(file);
   };
 
@@ -66,7 +66,7 @@ const ProfileImageUpload = ({ currentAvatar, userId, onUploadSuccess, isOwnProfi
     formData.append('avatar', file);
 
     try {
-      // Use the correct token key
+      
       const token = localStorage.getItem('authToken');
       
       if (!token) {
@@ -144,10 +144,10 @@ const ProfileImageUpload = ({ currentAvatar, userId, onUploadSuccess, isOwnProfi
     fileInputRef.current?.click();
   };
 
-  // Check if there's a real uploaded image (not emoji)
+  
   const hasRealImage = () => {
     if (!currentAvatar) return false;
-    // Check if it's a file path (starts with / or http) vs emoji
+    
     return currentAvatar.startsWith('/') || currentAvatar.startsWith('http');
   };
 
@@ -159,7 +159,7 @@ const ProfileImageUpload = ({ currentAvatar, userId, onUploadSuccess, isOwnProfi
 
   const imageUrl = getImageUrl();
 
-  // If not own profile, just show the image
+  
   if (!isOwnProfile) {
     return (
       <div className="user-avatar user-avatar-large">
@@ -176,7 +176,7 @@ const ProfileImageUpload = ({ currentAvatar, userId, onUploadSuccess, isOwnProfi
     );
   }
 
-  // For own profile, make it clickable
+  
   return (
     <>
       <div 

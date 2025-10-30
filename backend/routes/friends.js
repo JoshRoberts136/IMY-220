@@ -1,14 +1,16 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const { getDB } = require('../config/database');
+const { ObjectId } = require('mongodb');
 const { authenticateToken } = require('../middleware/auth');
 const router = express.Router();
 
 router.get('/', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const user = req.user;
     const userId = user.id || user._id?.toString();
     
-    const currentUser = await mongoose.connection.db.collection('Users').findOne({ id: userId });
+    const currentUser = await db.collection('Users').findOne({ id: userId });
     
     if (!currentUser) {
       return res.status(404).json({
@@ -26,10 +28,10 @@ router.get('/', authenticateToken, async (req, res) => {
       });
     }
     
-    const allProjects = await mongoose.connection.db.collection('Projects').find({}).toArray();
+    const allProjects = await db.collection('Projects').find({}).toArray();
     
     const friends = await Promise.all(friendIds.map(async (friendId) => {
-      const friendUser = await mongoose.connection.db.collection('Users').findOne({ id: friendId });
+      const friendUser = await db.collection('Users').findOne({ id: friendId });
       
       if (!friendUser) {
         return null;
@@ -72,6 +74,7 @@ router.get('/', authenticateToken, async (req, res) => {
 
 router.get('/status/:userId', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const currentUser = req.user;
     const currentUserId = currentUser.id || currentUser._id?.toString();
     const targetUserId = req.params.userId;
@@ -83,7 +86,7 @@ router.get('/status/:userId', authenticateToken, async (req, res) => {
       });
     }
     
-    const user = await mongoose.connection.db.collection('Users').findOne({ id: currentUserId });
+    const user = await db.collection('Users').findOne({ id: currentUserId });
     
     if (!user) {
       return res.json({
@@ -109,6 +112,7 @@ router.get('/status/:userId', authenticateToken, async (req, res) => {
 
 router.post('/add', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const { friendId } = req.body;
     const currentUser = req.user;
     const userId = currentUser.id || currentUser._id?.toString();
@@ -120,7 +124,7 @@ router.post('/add', authenticateToken, async (req, res) => {
       });
     }
     
-    const friendUser = await mongoose.connection.db.collection('Users').findOne({ id: friendId });
+    const friendUser = await db.collection('Users').findOne({ id: friendId });
     if (!friendUser) {
       return res.status(404).json({
         success: false,
@@ -128,7 +132,7 @@ router.post('/add', authenticateToken, async (req, res) => {
       });
     }
     
-    const user = await mongoose.connection.db.collection('Users').findOne({ id: userId });
+    const user = await db.collection('Users').findOne({ id: userId });
     const friendIds = user.friends || [];
     
     if (friendIds.includes(friendId)) {
@@ -138,12 +142,12 @@ router.post('/add', authenticateToken, async (req, res) => {
       });
     }
     
-    await mongoose.connection.db.collection('Users').updateOne(
+    await db.collection('Users').updateOne(
       { id: userId },
       { $push: { friends: friendId } }
     );
     
-    await mongoose.connection.db.collection('Users').updateOne(
+    await db.collection('Users').updateOne(
       { id: friendId },
       { $push: { friends: userId } }
     );
@@ -162,16 +166,17 @@ router.post('/add', authenticateToken, async (req, res) => {
 
 router.delete('/:friendId', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const { friendId } = req.params;
     const currentUser = req.user;
     const userId = currentUser.id || currentUser._id?.toString();
     
-    await mongoose.connection.db.collection('Users').updateOne(
+    await db.collection('Users').updateOne(
       { id: userId },
       { $pull: { friends: friendId } }
     );
     
-    await mongoose.connection.db.collection('Users').updateOne(
+    await db.collection('Users').updateOne(
       { id: friendId },
       { $pull: { friends: userId } }
     );
@@ -190,11 +195,12 @@ router.delete('/:friendId', authenticateToken, async (req, res) => {
 
 router.get('/mutual-projects/:friendId', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const currentUser = req.user;
     const userId = currentUser.id || currentUser._id?.toString();
     const friendId = req.params.friendId;
     
-    const mutualProjects = await mongoose.connection.db.collection('Projects')
+    const mutualProjects = await db.collection('Projects')
       .find({
         members: { $all: [userId, friendId] }
       })
@@ -202,7 +208,7 @@ router.get('/mutual-projects/:friendId', authenticateToken, async (req, res) => 
     
     const projectsWithOwners = await Promise.all(
       mutualProjects.map(async (project) => {
-        const owner = await mongoose.connection.db.collection('Users').findOne({
+        const owner = await db.collection('Users').findOne({
           id: project.ownedBy
         });
         

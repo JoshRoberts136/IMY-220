@@ -1,10 +1,12 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const { getDB } = require('../config/database');
+const { ObjectId } = require('mongodb');
 const { authenticateToken } = require('../middleware/auth');
 const router = express.Router();
 
 router.get('/', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const { query, type, limit = 10, skip = 0 } = req.query;
     
     if (!query) {
@@ -20,7 +22,7 @@ router.get('/', authenticateToken, async (req, res) => {
     let results = [];
     
     if (!type || type === 'user') {
-      const userResults = await mongoose.connection.db.collection('Users').find({
+      const userResults = await db.collection('Users').find({
         $or: [
           { username: { $regex: query, $options: 'i' } },
           { email: { $regex: query, $options: 'i' } },
@@ -60,7 +62,7 @@ router.get('/', authenticateToken, async (req, res) => {
     }
     
     if (!type || type === 'project') {
-      const projectResults = await mongoose.connection.db.collection('Projects').find({
+      const projectResults = await db.collection('Projects').find({
         $or: [
           { name: { $regex: query, $options: 'i' } },
           { description: { $regex: query, $options: 'i' } },
@@ -73,8 +75,8 @@ router.get('/', authenticateToken, async (req, res) => {
       .toArray();
       
       const projects = await Promise.all(projectResults.map(async (project) => {
-        const owner = await mongoose.connection.db.collection('Users').findOne({
-          _id: new mongoose.Types.ObjectId(project.ownedBy)
+        const owner = await db.collection('Users').findOne({
+          _id: new ObjectId(project.ownedBy)
         });
         
         return {
@@ -129,6 +131,7 @@ router.get('/', authenticateToken, async (req, res) => {
 
 router.get('/suggestions', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const { query, limit = 5 } = req.query;
     
     if (!query || query.length < 2) {
@@ -140,14 +143,14 @@ router.get('/suggestions', authenticateToken, async (req, res) => {
     
     const searchLimit = Math.min(parseInt(limit), 10);
 
-    const userSuggestions = await mongoose.connection.db.collection('Users').find({
+    const userSuggestions = await db.collection('Users').find({
       username: { $regex: `^${query}`, $options: 'i' },
       isActive: true
     })
     .limit(searchLimit)
     .toArray();
     
-    const projectSuggestions = await mongoose.connection.db.collection('Projects').find({
+    const projectSuggestions = await db.collection('Projects').find({
       name: { $regex: `^${query}`, $options: 'i' }
     })
     .limit(searchLimit)

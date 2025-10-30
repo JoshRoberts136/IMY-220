@@ -56,7 +56,6 @@ const ProjectPreview = React.memo(({ activity }) => {
     return icons[type] || '📋';
   };
 
-  // Check if image/avatar is a file path or emoji
   const isImagePath = (img) => {
     return img && (img.startsWith('/') || img.startsWith('http'));
   };

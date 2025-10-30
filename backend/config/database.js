@@ -1,31 +1,31 @@
-const mongoose = require('mongoose');
+const { MongoClient } = require('mongodb');
 require('dotenv').config();
+
+let db = null;
+let client = null;
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI, {
-      maxPoolSize: 10,
-      serverSelectionTimeoutMS: 5000, 
-      socketTimeoutMS: 45000, 
-      bufferCommands: false 
-    });
+    client = new MongoClient(process.env.MONGODB_URI);
+    await client.connect();
+    db = client.db('Apex');
+    console.log('MongoDB connected');
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    process.exit(1);
+  }
+};
 
-    mongoose.connection.on('error', (err) => {});
-
-    mongoose.connection.on('disconnected', () => {});
-
-    mongoose.connection.on('reconnected', () => {});
-
-  } catch (error) {}
+const getDB = () => {
+  if (!db) throw new Error('Database not connected');
+  return db;
 };
 
 process.on('SIGINT', async () => {
-  try {
-    await mongoose.connection.close();
+  if (client) {
+    await client.close();
     process.exit(0);
-  } catch (error) {
-    process.exit(1);
   }
 });
 
-module.exports = connectDB;
+module.exports = { connectDB, getDB };

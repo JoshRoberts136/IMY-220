@@ -2,11 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const mongoose = require('mongoose');
-
-mongoose.set('bufferCommands', true);
-
-const connectDB = require('./config/database');
+const { connectDB } = require('./config/database');
 const { authenticateToken } = require('./middleware/auth');
 
 const apiRoutes = require('./routes/api');
@@ -47,8 +43,6 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-
-
 app.use('/api/*', (req, res) => {
   res.status(404).json({
     success: false,
@@ -58,7 +52,6 @@ app.use('/api/*', (req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  // Validation errors
   if (err.name === 'ValidationError') {
     return res.status(400).json({
       success: false,
@@ -66,8 +59,7 @@ app.use((err, req, res, next) => {
       message: err.message
     });
   }
-  
-  // JWT errors
+
   if (err.name === 'JsonWebTokenError') {
     return res.status(401).json({
       success: false,
@@ -75,7 +67,7 @@ app.use((err, req, res, next) => {
       message: 'Authentication failed'
     });
   }
-  
+
   if (err.name === 'TokenExpiredError') {
     return res.status(401).json({
       success: false,
@@ -83,8 +75,7 @@ app.use((err, req, res, next) => {
       message: 'Please login again'
     });
   }
-  
-  // Multer file upload errors
+
   if (err.code === 'LIMIT_FILE_SIZE') {
     return res.status(400).json({
       success: false,
@@ -92,7 +83,7 @@ app.use((err, req, res, next) => {
       message: 'File must be less than the maximum allowed size'
     });
   }
-  
+
   if (err.code === 'LIMIT_FILE_COUNT') {
     return res.status(400).json({
       success: false,
@@ -100,7 +91,7 @@ app.use((err, req, res, next) => {
       message: 'Maximum number of files exceeded'
     });
   }
-  
+
   if (err.code === 'LIMIT_UNEXPECTED_FILE') {
     return res.status(400).json({
       success: false,
@@ -108,8 +99,7 @@ app.use((err, req, res, next) => {
       message: 'Unexpected file field in the upload'
     });
   }
-  
-  // Custom multer errors
+
   if (err.message === 'Only image files are allowed!') {
     return res.status(400).json({
       success: false,
@@ -117,8 +107,7 @@ app.use((err, req, res, next) => {
       message: err.message
     });
   }
-  
-  // Generic multer error
+
   if (err instanceof Error && err.name === 'MulterError') {
     return res.status(400).json({
       success: false,
@@ -126,14 +115,13 @@ app.use((err, req, res, next) => {
       message: err.message
     });
   }
-  
-  // Generic server error
+
   console.error('Server Error:', err);
   res.status(500).json({
     success: false,
     error: 'Internal Server Error',
-    message: process.env.NODE_ENV === 'production' ? 
-      'Something went wrong' : 
+    message: process.env.NODE_ENV === 'production' ?
+      'Something went wrong' :
       err.message
   });
 });
@@ -144,7 +132,7 @@ app.get('*', (req, res) => {
 
 const startServer = async () => {
   await connectDB();
-  
+
   app.listen(port, '0.0.0.0', () => {});
 };
 

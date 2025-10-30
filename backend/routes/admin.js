@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose');
+const { getDB } = require('../config/database');
+const { ObjectId } = require('mongodb');
 const { requireAdmin } = require('../middleware/auth');
 
 router.get('/users', requireAdmin, async (req, res) => {
   try {
-    const users = await mongoose.connection.db.collection('Users')
+    const db = getDB();
+    const users = await db.collection('Users')
       .find({})
       .project({ password: 0 })
       .toArray();
@@ -25,6 +27,7 @@ router.get('/users', requireAdmin, async (req, res) => {
 
 router.put('/users/:userId', requireAdmin, async (req, res) => {
   try {
+    const db = getDB();
     const { userId } = req.params;
     const updates = req.body;
     
@@ -32,13 +35,13 @@ router.put('/users/:userId', requireAdmin, async (req, res) => {
     updates.updatedAt = new Date();
     
     let result;
-    if (mongoose.Types.ObjectId.isValid(userId)) {
-      result = await mongoose.connection.db.collection('Users').updateOne(
-        { _id: new mongoose.Types.ObjectId(userId) },
+    if (ObjectId.isValid(userId)) {
+      result = await db.collection('Users').updateOne(
+        { _id: new ObjectId(userId) },
         { $set: updates }
       );
     } else {
-      result = await mongoose.connection.db.collection('Users').updateOne(
+      result = await db.collection('Users').updateOne(
         { id: userId },
         { $set: updates }
       );
@@ -66,15 +69,16 @@ router.put('/users/:userId', requireAdmin, async (req, res) => {
 
 router.delete('/users/:userId', requireAdmin, async (req, res) => {
   try {
+    const db = getDB();
     const { userId } = req.params;
     
     let user;
-    if (mongoose.Types.ObjectId.isValid(userId)) {
-      user = await mongoose.connection.db.collection('Users').findOne({
-        _id: new mongoose.Types.ObjectId(userId)
+    if (ObjectId.isValid(userId)) {
+      user = await db.collection('Users').findOne({
+        _id: new ObjectId(userId)
       });
     } else {
-      user = await mongoose.connection.db.collection('Users').findOne({
+      user = await db.collection('Users').findOne({
         id: userId
       });
     }
@@ -86,16 +90,16 @@ router.delete('/users/:userId', requireAdmin, async (req, res) => {
       });
     }
     
-    await mongoose.connection.db.collection('Projects').deleteMany({ ownerId: user.id });
-    await mongoose.connection.db.collection('Messages').deleteMany({ userId: user.id });
-    await mongoose.connection.db.collection('Commits').deleteMany({ userId: user.id });
+    await db.collection('Projects').deleteMany({ ownerId: user.id });
+    await db.collection('Messages').deleteMany({ userId: user.id });
+    await db.collection('Commits').deleteMany({ userId: user.id });
     
-    if (mongoose.Types.ObjectId.isValid(userId)) {
-      await mongoose.connection.db.collection('Users').deleteOne({
-        _id: new mongoose.Types.ObjectId(userId)
+    if (ObjectId.isValid(userId)) {
+      await db.collection('Users').deleteOne({
+        _id: new ObjectId(userId)
       });
     } else {
-      await mongoose.connection.db.collection('Users').deleteOne({
+      await db.collection('Users').deleteOne({
         id: userId
       });
     }
@@ -115,7 +119,8 @@ router.delete('/users/:userId', requireAdmin, async (req, res) => {
 
 router.get('/projects', requireAdmin, async (req, res) => {
   try {
-    const projects = await mongoose.connection.db.collection('Projects')
+    const db = getDB();
+    const projects = await db.collection('Projects')
       .find({})
       .toArray();
     
@@ -134,12 +139,13 @@ router.get('/projects', requireAdmin, async (req, res) => {
 
 router.put('/projects/:projectId', requireAdmin, async (req, res) => {
   try {
+    const db = getDB();
     const { projectId } = req.params;
     const updates = req.body;
     
     updates.updatedAt = new Date();
     
-    const result = await mongoose.connection.db.collection('Projects').updateOne(
+    const result = await db.collection('Projects').updateOne(
       { id: projectId },
       { $set: updates }
     );
@@ -166,11 +172,12 @@ router.put('/projects/:projectId', requireAdmin, async (req, res) => {
 
 router.delete('/projects/:projectId', requireAdmin, async (req, res) => {
   try {
+    const db = getDB();
     const { projectId } = req.params;
     
-    await mongoose.connection.db.collection('Projects').deleteOne({ id: projectId });
-    await mongoose.connection.db.collection('Messages').deleteMany({ projectId: projectId });
-    await mongoose.connection.db.collection('Commits').deleteMany({ projectId: projectId });
+    await db.collection('Projects').deleteOne({ id: projectId });
+    await db.collection('Messages').deleteMany({ projectId: projectId });
+    await db.collection('Commits').deleteMany({ projectId: projectId });
     
     res.json({
       success: true,
@@ -187,7 +194,8 @@ router.delete('/projects/:projectId', requireAdmin, async (req, res) => {
 
 router.get('/messages', requireAdmin, async (req, res) => {
   try {
-    const messages = await mongoose.connection.db.collection('Messages')
+    const db = getDB();
+    const messages = await db.collection('Messages')
       .find({})
       .sort({ timestamp: -1 })
       .toArray();
@@ -207,15 +215,16 @@ router.get('/messages', requireAdmin, async (req, res) => {
 
 router.delete('/messages/:messageId', requireAdmin, async (req, res) => {
   try {
+    const db = getDB();
     const { messageId } = req.params;
     
     let result;
-    if (mongoose.Types.ObjectId.isValid(messageId)) {
-      result = await mongoose.connection.db.collection('Messages').deleteOne({
-        _id: new mongoose.Types.ObjectId(messageId)
+    if (ObjectId.isValid(messageId)) {
+      result = await db.collection('Messages').deleteOne({
+        _id: new ObjectId(messageId)
       });
     } else {
-      result = await mongoose.connection.db.collection('Messages').deleteOne({
+      result = await db.collection('Messages').deleteOne({
         id: messageId
       });
     }
@@ -242,7 +251,8 @@ router.delete('/messages/:messageId', requireAdmin, async (req, res) => {
 
 router.get('/commits', requireAdmin, async (req, res) => {
   try {
-    const commits = await mongoose.connection.db.collection('Commits')
+    const db = getDB();
+    const commits = await db.collection('Commits')
       .find({})
       .sort({ timestamp: -1 })
       .toArray();
@@ -262,9 +272,10 @@ router.get('/commits', requireAdmin, async (req, res) => {
 
 router.delete('/commits/:commitId', requireAdmin, async (req, res) => {
   try {
+    const db = getDB();
     const { commitId } = req.params;
     
-    const result = await mongoose.connection.db.collection('Commits').deleteOne({
+    const result = await db.collection('Commits').deleteOne({
       id: commitId
     });
     

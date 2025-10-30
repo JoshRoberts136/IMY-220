@@ -1,17 +1,20 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const { getDB } = require('../config/database');
+const { ObjectId } = require('mongodb');
 const { authenticateToken } = require('../middleware/auth');
 const router = express.Router();
 
 router.get('/local', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const userId = req.user._id || req.user.id;
     const limit = parseInt(req.query.limit) || 20;
     const skip = parseInt(req.query.skip) || 0;
     let activitiesWithUserInfo = [];
     let friendIds = [];
     try {
-      const friendships = await mongoose.connection.db.collection('Friendships').find({
+    const db = getDB();
+      const friendships = await db.collection('Friendships').find({
         $or: [
           { userId1: userId.toString() },
           { userId2: userId.toString() }
@@ -26,7 +29,8 @@ router.get('/local', authenticateToken, async (req, res) => {
     const userIds = [userId.toString(), ...friendIds];
     let activitiesFromDb = [];
     try {
-      activitiesFromDb = await mongoose.connection.db.collection('Activities').find({
+    const db = getDB();
+      activitiesFromDb = await db.collection('Activities').find({
         userId: { $in: userIds }
       })
       .sort({ createdAt: -1 })
@@ -39,8 +43,9 @@ router.get('/local', authenticateToken, async (req, res) => {
       activitiesWithUserInfo = await Promise.all(activitiesFromDb.map(async (activity) => {
         let user = null;
         try {
-          user = await mongoose.connection.db.collection('Users').findOne({
-            _id: new mongoose.Types.ObjectId(activity.userId)
+    const db = getDB();
+          user = await db.collection('Users').findOne({
+            _id: new ObjectId(activity.userId)
           });
         } catch (userError) {}
         
@@ -69,12 +74,14 @@ router.get('/local', authenticateToken, async (req, res) => {
 
 router.get('/global', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const limit = parseInt(req.query.limit) || 20;
     const skip = parseInt(req.query.skip) || 0;
     let activitiesWithUserInfo = [];
     let activitiesFromDb = [];
     try {
-      activitiesFromDb = await mongoose.connection.db.collection('Activities').find({
+    const db = getDB();
+      activitiesFromDb = await db.collection('Activities').find({
         isPublic: { $ne: false } 
       })
       .sort({ createdAt: -1 })
@@ -87,8 +94,9 @@ router.get('/global', authenticateToken, async (req, res) => {
       activitiesWithUserInfo = await Promise.all(activitiesFromDb.map(async (activity) => {
         let user = null;
         try {
-          user = await mongoose.connection.db.collection('Users').findOne({
-            _id: new mongoose.Types.ObjectId(activity.userId)
+    const db = getDB();
+          user = await db.collection('Users').findOne({
+            _id: new ObjectId(activity.userId)
           });
         } catch (userError) {}
         
@@ -117,6 +125,7 @@ router.get('/global', authenticateToken, async (req, res) => {
 
 const createActivity = async (userId, type, description, data = {}) => {
   try {
+    const db = getDB();
     const activity = {
       id: `activity_${Date.now()}`,
       userId: userId.toString(),
@@ -127,7 +136,7 @@ const createActivity = async (userId, type, description, data = {}) => {
       createdAt: new Date()
     };
     
-    await mongoose.connection.db.collection('Activities').insertOne(activity);
+    await db.collection('Activities').insertOne(activity);
     return activity;
   } catch (error) {
     return null;
@@ -136,6 +145,7 @@ const createActivity = async (userId, type, description, data = {}) => {
 
 router.post('/', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const { type, description, data, isPublic } = req.body;
     const userId = req.user._id || req.user.id;
     
@@ -149,7 +159,7 @@ router.post('/', authenticateToken, async (req, res) => {
       createdAt: new Date()
     };
     
-    const result = await mongoose.connection.db.collection('Activities').insertOne(activity);
+    const result = await db.collection('Activities').insertOne(activity);
     
     res.status(201).json({
       success: true,

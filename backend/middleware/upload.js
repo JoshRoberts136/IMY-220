@@ -2,13 +2,10 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Ensure base upload directory exists
 const baseUploadDir = path.join(__dirname, '../uploads');
 if (!fs.existsSync(baseUploadDir)) {
   fs.mkdirSync(baseUploadDir, { recursive: true });
 }
-
-// Profile Image Upload Configuration
 const profileImageStorage = multer.diskStorage({
   destination: function (req, file, cb) {
     const uploadDir = path.join(__dirname, '../uploads/profile-images');
@@ -40,12 +37,11 @@ const profileImageFilter = (req, file, cb) => {
 const uploadProfileImage = multer({
   storage: profileImageStorage,
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB max file size
+    fileSize: 5 * 1024 * 1024
   },
   fileFilter: profileImageFilter
 });
 
-// Project Files Upload Configuration
 const projectFilesStorage = multer.diskStorage({
   destination: function (req, file, cb) {
     const projectId = req.params.id || req.body.projectId || 'temp';
@@ -68,14 +64,13 @@ const projectFilesStorage = multer.diskStorage({
 });
 
 const projectFilesFilter = (req, file, cb) => {
-  // Allow all file types for projects
   cb(null, true);
 };
 
 const uploadProjectFiles = multer({
   storage: projectFilesStorage,
   limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB max file size
+    fileSize: 10 * 1024 * 1024
   },
   fileFilter: projectFilesFilter
 });

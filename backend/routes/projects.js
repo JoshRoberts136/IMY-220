@@ -1,5 +1,6 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const { getDB } = require('../config/database');
+const { ObjectId } = require('mongodb');
 const { authenticateToken } = require('../middleware/auth');
 const { uploadProjectFiles } = require('../middleware/upload');
 const path = require('path');
@@ -8,9 +9,10 @@ const router = express.Router();
 
 router.get('/user-commits/:userId', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const userId = req.params.userId;
     
-    const commits = await mongoose.connection.db.collection('Commits')
+    const commits = await db.collection('Commits')
       .find({ userId: userId })
       .sort({ timestamp: -1 })
       .limit(10)
@@ -18,7 +20,7 @@ router.get('/user-commits/:userId', authenticateToken, async (req, res) => {
     
     const commitsWithProjects = await Promise.all(
       commits.map(async (commit) => {
-        const project = await mongoose.connection.db.collection('Projects').findOne({
+        const project = await db.collection('Projects').findOne({
           id: commit.projectId
         });
         return {
@@ -42,16 +44,17 @@ router.get('/user-commits/:userId', authenticateToken, async (req, res) => {
 
 router.get('/project-commits/:projectId', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const projectId = req.params.projectId;
     
-    const commits = await mongoose.connection.db.collection('Commits')
+    const commits = await db.collection('Commits')
       .find({ projectId: projectId })
       .sort({ timestamp: -1 })
       .toArray();
     
     const commitsWithUsers = await Promise.all(
       commits.map(async (commit) => {
-        const user = await mongoose.connection.db.collection('Users').findOne({
+        const user = await db.collection('Users').findOne({
           id: commit.userId
         });
         return {
@@ -76,8 +79,9 @@ router.get('/project-commits/:projectId', authenticateToken, async (req, res) =>
 
 router.get('/', authenticateToken, async (req, res) => {
   try {
-    const projects = await mongoose.connection.db.collection('Projects').find({}).toArray();
-    const users = await mongoose.connection.db.collection('Users').find({}).toArray();
+    const db = getDB();
+    const projects = await db.collection('Projects').find({}).toArray();
+    const users = await db.collection('Users').find({}).toArray();
     
     const projectsWithOwners = projects.map(project => {
       const owner = users.find(user => user.id === project.ownedBy);
@@ -102,15 +106,16 @@ router.get('/', authenticateToken, async (req, res) => {
 
 router.get('/:id', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const projectId = req.params.id;
     const user = req.user;
     const userId = user.id || user._id;
     
-    let project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    let project = await db.collection('Projects').findOne({ id: projectId });
     
-    if (!project && mongoose.Types.ObjectId.isValid(projectId)) {
-      project = await mongoose.connection.db.collection('Projects').findOne({
-        _id: new mongoose.Types.ObjectId(projectId)
+    if (!project && ObjectId.isValid(projectId)) {
+      project = await db.collection('Projects').findOne({
+        _id: new ObjectId(projectId)
       });
     }
     
@@ -121,7 +126,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
       });
     }
     
-    const owner = await mongoose.connection.db.collection('Users').findOne({
+    const owner = await db.collection('Users').findOne({
       id: project.ownedBy
     });
     
@@ -167,6 +172,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
 
 router.post('/', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const { name, description, status, language, hashtags } = req.body;
     const user = req.user;
     const userId = user.id || user._id;
@@ -189,7 +195,7 @@ router.post('/', authenticateToken, async (req, res) => {
       createdAt: new Date().toISOString()
     };
     
-    await mongoose.connection.db.collection('Projects').insertOne(newProject);
+    await db.collection('Projects').insertOne(newProject);
     
     res.status(201).json({
       success: true,
@@ -206,13 +212,14 @@ router.post('/', authenticateToken, async (req, res) => {
 
 router.put('/:id', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const projectId = req.params.id;
     const updateData = req.body;
     const user = req.user;
     const userId = user.id || user._id;
     const isAdmin = user.isAdmin || false;
     
-    const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    const project = await db.collection('Projects').findOne({ id: projectId });
     if (!project) {
       return res.status(404).json({
         success: false,
@@ -236,7 +243,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
     delete update.id;
     delete update.ownedBy;
     
-    const result = await mongoose.connection.db.collection('Projects').findOneAndUpdate(
+    const result = await db.collection('Projects').findOneAndUpdate(
       { id: projectId },
       { $set: update },
       { returnDocument: 'after' }
@@ -257,12 +264,13 @@ router.put('/:id', authenticateToken, async (req, res) => {
 
 router.delete('/:id', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const projectId = req.params.id;
     const user = req.user;
     const userId = user.id || user._id;
     const isAdmin = user.isAdmin || false;
     
-    const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    const project = await db.collection('Projects').findOne({ id: projectId });
     if (!project) {
       return res.status(404).json({
         success: false,
@@ -277,7 +285,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
       });
     }
     
-    await mongoose.connection.db.collection('Projects').deleteOne({ id: projectId });
+    await db.collection('Projects').deleteOne({ id: projectId });
     
     res.json({
       success: true,
@@ -293,13 +301,14 @@ router.delete('/:id', authenticateToken, async (req, res) => {
 
 router.post('/:id/members', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const projectId = req.params.id;
     const { userId: newMemberId } = req.body;
     const user = req.user;
     const userId = user.id || user._id;
     const isAdmin = user.isAdmin || false;
     
-    const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    const project = await db.collection('Projects').findOne({ id: projectId });
     if (!project) {
       return res.status(404).json({
         success: false,
@@ -315,7 +324,7 @@ router.post('/:id/members', authenticateToken, async (req, res) => {
       });
     }
     
-    const userToAdd = await mongoose.connection.db.collection('Users').findOne({ id: newMemberId });
+    const userToAdd = await db.collection('Users').findOne({ id: newMemberId });
     if (!userToAdd) {
       return res.status(404).json({
         success: false,
@@ -323,7 +332,7 @@ router.post('/:id/members', authenticateToken, async (req, res) => {
       });
     }
     
-    const currentUserData = await mongoose.connection.db.collection('Users').findOne({ id: userId });
+    const currentUserData = await db.collection('Users').findOne({ id: userId });
     const currentUserFriends = currentUserData?.friends || [];
     
     if (!currentUserFriends.includes(newMemberId)) {
@@ -340,7 +349,7 @@ router.post('/:id/members', authenticateToken, async (req, res) => {
       });
     }
     
-    await mongoose.connection.db.collection('Projects').updateOne(
+    await db.collection('Projects').updateOne(
       { id: projectId },
       { 
         $push: { members: newMemberId },
@@ -362,13 +371,14 @@ router.post('/:id/members', authenticateToken, async (req, res) => {
 
 router.delete('/:id/members/:memberId', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const projectId = req.params.id;
     const memberIdToRemove = req.params.memberId;
     const user = req.user;
     const userId = user.id || user._id;
     const isAdmin = user.isAdmin || false;
     
-    const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    const project = await db.collection('Projects').findOne({ id: projectId });
     if (!project) {
       return res.status(404).json({
         success: false,
@@ -390,7 +400,7 @@ router.delete('/:id/members/:memberId', authenticateToken, async (req, res) => {
       });
     }
     
-    await mongoose.connection.db.collection('Projects').updateOne(
+    await db.collection('Projects').updateOne(
       { id: projectId },
       { 
         $pull: { members: memberIdToRemove },
@@ -412,12 +422,13 @@ router.delete('/:id/members/:memberId', authenticateToken, async (req, res) => {
 
 router.post('/:id/transfer-ownership', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const projectId = req.params.id;
     const { newOwnerId } = req.body;
     const user = req.user;
     const userId = user.id || user._id;
     
-    const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    const project = await db.collection('Projects').findOne({ id: projectId });
     if (!project) {
       return res.status(404).json({
         success: false,
@@ -440,7 +451,7 @@ router.post('/:id/transfer-ownership', authenticateToken, async (req, res) => {
       });
     }
     
-    await mongoose.connection.db.collection('Projects').updateOne(
+    await db.collection('Projects').updateOne(
       { id: projectId },
       { 
         $set: { 
@@ -464,12 +475,13 @@ router.post('/:id/transfer-ownership', authenticateToken, async (req, res) => {
 
 router.post('/:id/checkout', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const projectId = req.params.id;
     const user = req.user;
     const userId = user.id || user._id;
     const isAdmin = user.isAdmin || false;
     
-    const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    const project = await db.collection('Projects').findOne({ id: projectId });
     if (!project) {
       return res.status(404).json({
         success: false,
@@ -486,7 +498,7 @@ router.post('/:id/checkout', authenticateToken, async (req, res) => {
     }
     
     if (project.checkedOutBy && project.checkedOutBy !== userId) {
-      const checkedOutUser = await mongoose.connection.db.collection('Users').findOne({
+      const checkedOutUser = await db.collection('Users').findOne({
         id: project.checkedOutBy
       });
       return res.status(400).json({
@@ -495,7 +507,7 @@ router.post('/:id/checkout', authenticateToken, async (req, res) => {
       });
     }
     
-    await mongoose.connection.db.collection('Projects').updateOne(
+    await db.collection('Projects').updateOne(
       { id: projectId },
       { 
         $set: { 
@@ -521,12 +533,13 @@ router.post('/:id/checkout', authenticateToken, async (req, res) => {
 
 router.post('/:id/checkin', authenticateToken, uploadProjectFiles.array('files', 10), async (req, res) => {
   try {
+    const db = getDB();
     const projectId = req.params.id;
     const { message, version } = req.body;
     const user = req.user;
     const userId = user.id || user._id;
     
-    const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    const project = await db.collection('Projects').findOne({ id: projectId });
     if (!project) {
       return res.status(404).json({
         success: false,
@@ -570,7 +583,7 @@ router.post('/:id/checkin', authenticateToken, uploadProjectFiles.array('files',
       updateData.$push = { files: { $each: uploadedFiles } };
     }
     
-    await mongoose.connection.db.collection('Projects').updateOne(
+    await db.collection('Projects').updateOne(
       { id: projectId },
       updateData
     );
@@ -592,7 +605,7 @@ router.post('/:id/checkin', authenticateToken, uploadProjectFiles.array('files',
       hash: commitHash
     };
     
-    await mongoose.connection.db.collection('Commits').insertOne(commit);
+    await db.collection('Commits').insertOne(commit);
     
     res.json({
       success: true,
@@ -611,12 +624,13 @@ router.post('/:id/checkin', authenticateToken, uploadProjectFiles.array('files',
 
 router.post('/:id/messages', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const projectId = req.params.id;
     const { message } = req.body;
     const user = req.user;
     const userId = user.id || user._id;
     
-    const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    const project = await db.collection('Projects').findOne({ id: projectId });
     if (!project) {
       return res.status(404).json({
         success: false,
@@ -641,7 +655,7 @@ router.post('/:id/messages', authenticateToken, async (req, res) => {
       timestamp: new Date().toISOString()
     };
     
-    await mongoose.connection.db.collection('Projects').updateOne(
+    await db.collection('Projects').updateOne(
       { id: projectId },
       { 
         $push: { messages: newMessage },
@@ -664,9 +678,10 @@ router.post('/:id/messages', authenticateToken, async (req, res) => {
 
 router.get('/:id/messages', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const projectId = req.params.id;
     
-    const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    const project = await db.collection('Projects').findOne({ id: projectId });
     if (!project) {
       return res.status(404).json({
         success: false,
@@ -688,6 +703,7 @@ router.get('/:id/messages', authenticateToken, async (req, res) => {
 
 router.delete('/:id/messages/:messageId', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const projectId = req.params.id;
     const messageId = req.params.messageId;
     const user = req.user;
@@ -700,7 +716,7 @@ router.delete('/:id/messages/:messageId', authenticateToken, async (req, res) =>
       });
     }
     
-    const result = await mongoose.connection.db.collection('Projects').updateOne(
+    const result = await db.collection('Projects').updateOne(
       { id: projectId },
       { 
         $pull: { messages: { id: messageId } },
@@ -730,12 +746,13 @@ router.delete('/:id/messages/:messageId', authenticateToken, async (req, res) =>
 
 router.post('/:id/files', authenticateToken, uploadProjectFiles.array('files', 10), async (req, res) => {
   try {
+    const db = getDB();
     const projectId = req.params.id;
     const user = req.user;
     const userId = user.id || user._id;
     const isAdmin = user.isAdmin || false;
     
-    const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    const project = await db.collection('Projects').findOne({ id: projectId });
     if (!project) {
       return res.status(404).json({
         success: false,
@@ -776,7 +793,7 @@ router.post('/:id/files', authenticateToken, uploadProjectFiles.array('files', 1
       uploadedAt: new Date().toISOString()
     }));
     
-    await mongoose.connection.db.collection('Projects').updateOne(
+    await db.collection('Projects').updateOne(
       { id: projectId },
       { 
         $push: { files: { $each: uploadedFiles } },
@@ -799,9 +816,10 @@ router.post('/:id/files', authenticateToken, uploadProjectFiles.array('files', 1
 
 router.get('/:id/files', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const projectId = req.params.id;
     
-    const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    const project = await db.collection('Projects').findOne({ id: projectId });
     if (!project) {
       return res.status(404).json({
         success: false,
@@ -823,10 +841,11 @@ router.get('/:id/files', authenticateToken, async (req, res) => {
 
 router.get('/:id/files/:fileId/download', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const projectId = req.params.id;
     const fileId = req.params.fileId;
     
-    const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    const project = await db.collection('Projects').findOne({ id: projectId });
     if (!project) {
       return res.status(404).json({
         success: false,
@@ -864,13 +883,14 @@ router.get('/:id/files/:fileId/download', authenticateToken, async (req, res) =>
 
 router.delete('/:id/files/:fileId', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const projectId = req.params.id;
     const fileId = req.params.fileId;
     const user = req.user;
     const userId = user.id || user._id;
     const isAdmin = user.isAdmin || false;
     
-    const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+    const project = await db.collection('Projects').findOne({ id: projectId });
     if (!project) {
       return res.status(404).json({
         success: false,
@@ -901,7 +921,7 @@ router.delete('/:id/files/:fileId', authenticateToken, async (req, res) => {
       fs.unlinkSync(filePath);
     }
     
-    await mongoose.connection.db.collection('Projects').updateOne(
+    await db.collection('Projects').updateOne(
       { id: projectId },
       { 
         $pull: { files: { id: fileId } },

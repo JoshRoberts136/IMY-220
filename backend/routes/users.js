@@ -1,5 +1,5 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const { getDB } = require('../config/database');
 const { authenticateToken } = require('../middleware/auth');
 const { uploadProfileImage } = require('../middleware/upload');
 const router = express.Router();
@@ -16,7 +16,8 @@ const requireAdmin = (req, res, next) => {
 
 router.get('/', authenticateToken, async (req, res) => {
   try {
-    const users = await mongoose.connection.db.collection('Users')
+    const db = getDB();
+    const users = await db.collection('Users')
       .find({})
       .project({
         id: 1,
@@ -43,8 +44,9 @@ router.get('/', authenticateToken, async (req, res) => {
 router.get('/:userId', authenticateToken, async (req, res) => {
   try {
     const userId = req.params.userId;
+    const db = getDB();
     
-    const user = await mongoose.connection.db.collection('Users').findOne({ id: userId });
+    const user = await db.collection('Users').findOne({ id: userId });
     
     if (!user) {
       return res.status(404).json({
@@ -76,8 +78,9 @@ router.get('/:userId', authenticateToken, async (req, res) => {
 router.get('/:userId/profile', authenticateToken, async (req, res) => {
   try {
     const userId = req.params.userId;
+    const db = getDB();
     
-    const user = await mongoose.connection.db.collection('Users').findOne({ id: userId });
+    const user = await db.collection('Users').findOne({ id: userId });
     
     if (!user) {
       return res.status(404).json({
@@ -120,6 +123,7 @@ router.post('/:userId/profile/avatar', authenticateToken, uploadProfileImage.sin
     const userId = req.params.userId;
     const fs = require('fs');
     const path = require('path');
+    const db = getDB();
     
     if (!req.file) {
       return res.status(400).json({
@@ -128,7 +132,7 @@ router.post('/:userId/profile/avatar', authenticateToken, uploadProfileImage.sin
       });
     }
     
-    const user = await mongoose.connection.db.collection('Users').findOne({ id: userId });
+    const user = await db.collection('Users').findOne({ id: userId });
     
     if (!user) {
       fs.unlinkSync(req.file.path);
@@ -147,7 +151,7 @@ router.post('/:userId/profile/avatar', authenticateToken, uploadProfileImage.sin
     
     const avatarPath = `/uploads/profile-images/${req.file.filename}`;
     
-    await mongoose.connection.db.collection('Users').updateOne(
+    await db.collection('Users').updateOne(
       { id: userId },
       { 
         $set: { 
@@ -181,6 +185,7 @@ router.delete('/:userId/profile/avatar', authenticateToken, async (req, res) => 
     const userId = req.params.userId;
     const currentUserId = req.user.id || (req.user._id ? req.user._id.toString() : null);
     const isAdmin = req.user.isAdmin || false;
+    const db = getDB();
     
     if (currentUserId !== userId && !isAdmin) {
       return res.status(403).json({
@@ -189,7 +194,7 @@ router.delete('/:userId/profile/avatar', authenticateToken, async (req, res) => 
       });
     }
     
-    const user = await mongoose.connection.db.collection('Users').findOne({ id: userId });
+    const user = await db.collection('Users').findOne({ id: userId });
     
     if (!user) {
       return res.status(404).json({
@@ -207,7 +212,7 @@ router.delete('/:userId/profile/avatar', authenticateToken, async (req, res) => 
       }
     }
     
-    await mongoose.connection.db.collection('Users').updateOne(
+    await db.collection('Users').updateOne(
       { id: userId },
       { 
         $set: { 
@@ -234,12 +239,13 @@ router.put('/:userId', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const userId = req.params.userId;
     const updateData = req.body;
+    const db = getDB();
     
     delete updateData._id;
     delete updateData.id;
     delete updateData.password;
     
-    await mongoose.connection.db.collection('Users').updateOne(
+    await db.collection('Users').updateOne(
       { id: userId },
       { 
         $set: {
@@ -264,8 +270,9 @@ router.put('/:userId', authenticateToken, requireAdmin, async (req, res) => {
 router.delete('/:userId', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const userId = req.params.userId;
+    const db = getDB();
     
-    const user = await mongoose.connection.db.collection('Users').findOne({ id: userId });
+    const user = await db.collection('Users').findOne({ id: userId });
     
     if (!user) {
       return res.status(404).json({
@@ -276,7 +283,7 @@ router.delete('/:userId', authenticateToken, requireAdmin, async (req, res) => {
 
     if (user.ownedProjects && user.ownedProjects.length > 0) {
       for (const projectId of user.ownedProjects) {
-        const project = await mongoose.connection.db.collection('Projects').findOne({ id: projectId });
+        const project = await db.collection('Projects').findOne({ id: projectId });
         
         if (project) {
           const otherMembers = (project.members || []).filter(memberId => memberId !== userId);
@@ -284,7 +291,7 @@ router.delete('/:userId', authenticateToken, requireAdmin, async (req, res) => {
           if (otherMembers.length > 0) {
             const randomMember = otherMembers[Math.floor(Math.random() * otherMembers.length)];
             
-            await mongoose.connection.db.collection('Projects').updateOne(
+            await db.collection('Projects').updateOne(
               { id: projectId },
               { 
                 $set: { 
@@ -294,34 +301,34 @@ router.delete('/:userId', authenticateToken, requireAdmin, async (req, res) => {
               }
             );
           } else {
-            await mongoose.connection.db.collection('Projects').deleteOne({ id: projectId });
+            await db.collection('Projects').deleteOne({ id: projectId });
           }
         }
       }
     }
 
     if (user.memberProjects && user.memberProjects.length > 0) {
-      await mongoose.connection.db.collection('Projects').updateMany(
+      await db.collection('Projects').updateMany(
         { id: { $in: user.memberProjects } },
         { $pull: { members: userId } }
       );
     }
     
-    await mongoose.connection.db.collection('Commits').deleteMany({ userId: userId });
+    await db.collection('Commits').deleteMany({ userId: userId });
 
-    await mongoose.connection.db.collection('Users').updateMany(
+    await db.collection('Users').updateMany(
       { friends: userId },
       { $pull: { friends: userId } }
     );
 
-    await mongoose.connection.db.collection('FriendRequests').deleteMany({
+    await db.collection('FriendRequests').deleteMany({
       $or: [
         { senderId: userId },
         { receiverId: userId }
       ]
     });
 
-    await mongoose.connection.db.collection('Users').deleteOne({ id: userId });
+    await db.collection('Users').deleteOne({ id: userId });
     
     res.json({
       success: true,

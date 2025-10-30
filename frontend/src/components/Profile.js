@@ -47,7 +47,7 @@ const Profile = ({ userId }) => {
               if (response.success) {
                 setProfileData(response);
                 
-                // Check if they are friends
+                
                 const friendshipResponse = await apiService.checkFriendshipStatus(userId);
                 if (friendshipResponse.success && friendshipResponse.status === 'friends') {
                   setIsFriend(true);
@@ -90,11 +90,11 @@ const Profile = ({ userId }) => {
     setRefreshTrigger(prev => prev + 1);
   };
 
-  // Handle friendship status changes dynamically without page reload
+  
   const handleFriendshipChange = (newStatus) => {
     console.log('Friendship status changed to:', newStatus);
     
-    // Update isFriend state immediately
+    
     if (newStatus === 'friends') {
       setIsFriend(true);
     } else if (newStatus === 'none' || newStatus === 'removed') {
@@ -118,7 +118,7 @@ const Profile = ({ userId }) => {
     );
   }
 
-  // If not own profile AND not friends AND not admin, show limited view
+  
   const currentUser = apiService.getUser();
   const isAdmin = currentUser?.isAdmin || false;
   const showLimitedView = !isOwnProfile && !isFriend && !isAdmin;

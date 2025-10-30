@@ -13,9 +13,6 @@ body {
   overflow-x: hidden;
   min-height: 100vh;
   position: relative;
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
-  will-change: scroll-position;
 }
 
 html, body {
@@ -24,7 +21,15 @@ html, body {
   -ms-overflow-style: none;
 }
 
+body.modal-open {
+  overflow: hidden !important;
+}
+
 html::-webkit-scrollbar,
 body::-webkit-scrollbar {
   display: none;
+}
+
+.fixed {
+  position: fixed !important;
 }

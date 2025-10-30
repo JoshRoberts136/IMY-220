@@ -1,10 +1,12 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const { getDB } = require('../config/database');
+const { ObjectId } = require('mongodb');
 const { authenticateToken } = require('../middleware/auth');
 const router = express.Router();
 
 router.post('/', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const { message, filesChanged, projectId, author, userId } = req.body;
     
     if (!message || !projectId || !author || !userId) {
@@ -14,7 +16,7 @@ router.post('/', authenticateToken, async (req, res) => {
       });
     }
 
-    const project = await mongoose.connection.db.collection('Projects').findOne({ 
+    const project = await db.collection('Projects').findOne({ 
       id: projectId 
     });
     
@@ -49,9 +51,9 @@ router.post('/', authenticateToken, async (req, res) => {
       projectId: projectId
     };
     
-    await mongoose.connection.db.collection('Commits').insertOne(newCommit);
+    await db.collection('Commits').insertOne(newCommit);
 
-    await mongoose.connection.db.collection('Projects').updateOne(
+    await db.collection('Projects').updateOne(
       { id: projectId },
       { 
         $push: { commits: newCommit },
@@ -59,7 +61,7 @@ router.post('/', authenticateToken, async (req, res) => {
       }
     );
     
-    const user = await mongoose.connection.db.collection('Users').findOne({ id: userId });
+    const user = await db.collection('Users').findOne({ id: userId });
     
     res.status(201).json({
       success: true,
@@ -83,16 +85,17 @@ router.post('/', authenticateToken, async (req, res) => {
 
 router.get('/project/:projectId', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const projectId = req.params.projectId;
     
-    const commits = await mongoose.connection.db.collection('Commits')
+    const commits = await db.collection('Commits')
       .find({ projectId: projectId })
       .sort({ timestamp: -1 })
       .toArray();
 
     const commitsWithUsers = await Promise.all(
       commits.map(async (commit) => {
-        const user = await mongoose.connection.db.collection('Users').findOne({
+        const user = await db.collection('Users').findOne({
           id: commit.userId
         });
         return {
@@ -117,20 +120,21 @@ router.get('/project/:projectId', authenticateToken, async (req, res) => {
 
 router.get('/user/:userId', authenticateToken, async (req, res) => {
   try {
+    const db = getDB();
     const userId = req.params.userId;
     
-    const commits = await mongoose.connection.db.collection('Commits')
+    const commits = await db.collection('Commits')
       .find({ userId: userId })
       .sort({ timestamp: -1 })
       .toArray();
     
     const commitsWithProjects = await Promise.all(
       commits.map(async (commit) => {
-        const project = await mongoose.connection.db.collection('Projects').findOne({
+        const project = await db.collection('Projects').findOne({
           id: commit.projectId
         });
         
-        const user = await mongoose.connection.db.collection('Users').findOne({
+        const user = await db.collection('Users').findOne({
           id: commit.userId
         });
         

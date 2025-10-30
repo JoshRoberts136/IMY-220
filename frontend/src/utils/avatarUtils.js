@@ -1,6 +1,6 @@
 import React from 'react';
 
-// Default emoji avatars to choose from
+
 const DEFAULT_EMOJIS = [
   '👤', '🎮', '💻', '🚀', '⚡', '🔥', 
   '🎯', '💡', '🎨', '🎭', '🎪', '🎬',
@@ -12,11 +12,11 @@ const DEFAULT_EMOJIS = [
   '☕', '🍺', '🍷', '🍸', '🥤', '🧃'
 ];
 
-// Get a consistent emoji based on username
+
 export const getDefaultEmoji = (username) => {
   if (!username) return '👤';
   
-  // Simple hash function to get consistent emoji for same username
+  
   let hash = 0;
   for (let i = 0; i < username.length; i++) {
     hash = username.charCodeAt(i) + ((hash << 5) - hash);
@@ -26,14 +26,14 @@ export const getDefaultEmoji = (username) => {
   return DEFAULT_EMOJIS[index];
 };
 
-// Generate initials from username (kept for potential future use)
+
 export const getInitials = (username) => {
   if (!username) return '?';
   
-  // Remove numbers and special characters
+  
   const cleanName = username.replace(/[^a-zA-Z\s]/g, '');
   
-  // Split by spaces or camelCase
+  
   const parts = cleanName.split(/(?=[A-Z])|\s+/);
   
   if (parts.length >= 2) {
@@ -43,7 +43,7 @@ export const getInitials = (username) => {
   return cleanName.substring(0, 2).toUpperCase();
 };
 
-// React component for default avatar with emoji
+
 export const DefaultAvatar = ({ username, size = 150, className = '' }) => {
   const emoji = getDefaultEmoji(username);
   

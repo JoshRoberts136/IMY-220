@@ -77,7 +77,7 @@ const ViewFriend = ({ userId }) => {
     navigate(`/profile/${friendId}`);
   };
 
-  // Check if avatar is a real uploaded image (not emoji)
+  
   const hasRealAvatar = (avatar) => {
     if (!avatar) return false;
     return avatar.startsWith('/') || avatar.startsWith('http');

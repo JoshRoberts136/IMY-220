@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
+const { ObjectId } = require('mongodb');
+const { getDB } = require('../config/database');
 
 const authenticateToken = async (req, res, next) => {
   try {
@@ -24,22 +25,15 @@ const authenticateToken = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-    
-    if (!mongoose.connection.db) {
-      return res.status(503).json({
-        success: false,
-        error: 'Service unavailable',
-        message: 'Database connection not available'
-      });
-    }
+    const db = getDB();
 
     let user;
-    if (mongoose.Types.ObjectId.isValid(decoded.userId)) {
-      user = await mongoose.connection.db.collection('Users').findOne({
-        _id: new mongoose.Types.ObjectId(decoded.userId)
+    if (ObjectId.isValid(decoded.userId) && decoded.userId.length === 24) {
+      user = await db.collection('Users').findOne({
+        _id: new ObjectId(decoded.userId)
       });
     } else {
-      user = await mongoose.connection.db.collection('Users').findOne({
+      user = await db.collection('Users').findOne({
         id: decoded.userId
       });
     }
@@ -96,18 +90,15 @@ const optionalAuth = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-    
-    if (!mongoose.connection.db) {
-      return next();
-    }
+    const db = getDB();
 
     let user;
-    if (mongoose.Types.ObjectId.isValid(decoded.userId)) {
-      user = await mongoose.connection.db.collection('Users').findOne({
-        _id: new mongoose.Types.ObjectId(decoded.userId)
+    if (ObjectId.isValid(decoded.userId) && decoded.userId.length === 24) {
+      user = await db.collection('Users').findOne({
+        _id: new ObjectId(decoded.userId)
       });
     } else {
-      user = await mongoose.connection.db.collection('Users').findOne({
+      user = await db.collection('Users').findOne({
         id: decoded.userId
       });
     }
@@ -147,22 +138,15 @@ const requireAdmin = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-    
-    if (!mongoose.connection.db) {
-      return res.status(503).json({
-        success: false,
-        error: 'Service unavailable',
-        message: 'Database connection not available'
-      });
-    }
+    const db = getDB();
 
     let user;
-    if (mongoose.Types.ObjectId.isValid(decoded.userId)) {
-      user = await mongoose.connection.db.collection('Users').findOne({
-        _id: new mongoose.Types.ObjectId(decoded.userId)
+    if (ObjectId.isValid(decoded.userId) && decoded.userId.length === 24) {
+      user = await db.collection('Users').findOne({
+        _id: new ObjectId(decoded.userId)
       });
     } else {
-      user = await mongoose.connection.db.collection('Users').findOne({
+      user = await db.collection('Users').findOne({
         id: decoded.userId
       });
     }
